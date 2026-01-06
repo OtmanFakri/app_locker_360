@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:app_locker360/data/datasources/hive_service.dart';
 import 'package:app_locker360/presentation/pages/onboarding/page.dart';
+import 'package:app_locker360/presentation/pages/auth/auth_page.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -61,9 +62,9 @@ class _SplashScreenState extends State<SplashScreen> {
     final settings = HiveService.getGlobalSettings();
 
     if (settings.hasCompletedOnboarding) {
-      // User has completed onboarding, go to home
+      // User has completed onboarding, show auth screen
       Navigator.of(context).pushReplacement(
-        MaterialPageRoute(builder: (context) => const HomePage()),
+        MaterialPageRoute(builder: (context) => const AuthPage()),
       );
     } else {
       // First time user, show onboarding
