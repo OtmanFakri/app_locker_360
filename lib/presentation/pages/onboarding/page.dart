@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:app_locker360/data/datasources/hive_service.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:app_locker360/presentation/pages/home/home_page.dart';
 
 /// شاشة الإعداد الأولي (Onboarding)
 /// تظهر فقط عند تثبيت التطبيق لأول مرة
@@ -705,21 +706,6 @@ class _PinSetupPageState extends State<PinSetupPage> {
           border: Border.all(color: Colors.white.withOpacity(0.1), width: 1),
         ),
         child: Center(child: child),
-      ),
-    );
-  }
-}
-
-/// Placeholder home page - replace with your actual home page
-class HomePage extends StatelessWidget {
-  const HomePage({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('App Locker 360')),
-      body: const Center(
-        child: Text('Home Page - Replace with your actual home page'),
       ),
     );
   }
