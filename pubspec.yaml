@@ -30,6 +30,20 @@ dependencies:
   google_fonts: ^6.1.0
   flutter_svg: ^2.0.9
 
+  # Encryption & File Management
+  encrypt: ^5.0.3
+  image_picker: ^1.0.7
+  path_provider: ^2.1.1
+  permission_handler: ^11.1.0
+  video_thumbnail: ^0.5.3
+  image: ^4.0.17
+  photo_manager: ^3.0.0
+
+  # File Preview
+  photo_view: ^0.14.0
+  video_player: ^2.8.1
+  audioplayers: ^5.2.1
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

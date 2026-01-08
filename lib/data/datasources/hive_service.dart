@@ -36,6 +36,9 @@ class HiveService {
     if (!Hive.isAdapterRegistered(3)) {
       Hive.registerAdapter(LogEntryAdapter());
     }
+    if (!Hive.isAdapterRegistered(4)) {
+      Hive.registerAdapter(FileTypeAdapter());
+    }
 
     _initialized = true;
   }

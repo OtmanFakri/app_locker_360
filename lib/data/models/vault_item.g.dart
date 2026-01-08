@@ -60,3 +60,57 @@ class VaultItemAdapter extends TypeAdapter<VaultItem> {
           runtimeType == other.runtimeType &&
           typeId == other.typeId;
 }
+
+class FileTypeAdapter extends TypeAdapter<FileType> {
+  @override
+  final int typeId = 4;
+
+  @override
+  FileType read(BinaryReader reader) {
+    switch (reader.readByte()) {
+      case 0:
+        return FileType.image;
+      case 1:
+        return FileType.video;
+      case 2:
+        return FileType.audio;
+      case 3:
+        return FileType.document;
+      case 4:
+        return FileType.other;
+      default:
+        return FileType.image;
+    }
+  }
+
+  @override
+  void write(BinaryWriter writer, FileType obj) {
+    switch (obj) {
+      case FileType.image:
+        writer.writeByte(0);
+        break;
+      case FileType.video:
+        writer.writeByte(1);
+        break;
+      case FileType.audio:
+        writer.writeByte(2);
+        break;
+      case FileType.document:
+        writer.writeByte(3);
+        break;
+      case FileType.other:
+        writer.writeByte(4);
+        break;
+    }
+  }
+
+  @override
+  int get hashCode => typeId.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is FileTypeAdapter &&
+          runtimeType == other.runtimeType &&
+          typeId == other.typeId;
+}

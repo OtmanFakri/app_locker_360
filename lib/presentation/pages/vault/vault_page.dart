@@ -1,7 +1,12 @@
+import 'dart:io';
+import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:app_locker360/data/datasources/hive_service.dart';
 import 'package:app_locker360/data/models/vault_item.dart';
+import 'package:app_locker360/data/services/encryption_service.dart';
+import 'package:app_locker360/data/services/file_manager_service.dart';
+import 'package:app_locker360/data/services/vault_service.dart';
 
 /// Vault page - shows encrypted files
 class VaultPage extends StatefulWidget {
@@ -13,6 +18,7 @@ class VaultPage extends StatefulWidget {
 
 class _VaultPageState extends State<VaultPage> {
   FileType _selectedType = FileType.image;
+  bool _isLoading = false;
 
   @override
   Widget build(BuildContext context) {
@@ -34,17 +40,7 @@ class _VaultPageState extends State<VaultPage> {
         actions: [
           IconButton(
             icon: const Icon(Icons.add_rounded, color: Colors.white),
-            onPressed: () {
-              // TODO: Add file to vault
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text(
-                    'إضافة ملفات قيد التطوير',
-                    style: GoogleFonts.cairo(),
-                  ),
-                ),
-              );
-            },
+            onPressed: _addFilesToVault,
           ),
         ],
       ),
@@ -84,7 +80,15 @@ class _VaultPageState extends State<VaultPage> {
 
           // Vault items
           Expanded(
-            child: vaultItems.isEmpty
+            child: _isLoading
+                ? const Center(
+                    child: CircularProgressIndicator(
+                      valueColor: AlwaysStoppedAnimation<Color>(
+                        Color(0xFF667EEA),
+                      ),
+                    ),
+                  )
+                : vaultItems.isEmpty
                 ? Center(
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
@@ -102,6 +106,14 @@ class _VaultPageState extends State<VaultPage> {
                             fontSize: 16,
                           ),
                         ),
+                        const SizedBox(height: 8),
+                        Text(
+                          'اضغط على + لإضافة ملفات',
+                          style: GoogleFonts.cairo(
+                            color: Colors.white.withOpacity(0.4),
+                            fontSize: 14,
+                          ),
+                        ),
                       ],
                     ),
                   )
@@ -117,7 +129,10 @@ class _VaultPageState extends State<VaultPage> {
                     itemCount: vaultItems.length,
                     itemBuilder: (context, index) {
                       final item = vaultItems[index];
-                      return _VaultItemCard(item: item);
+                      return _VaultItemCard(
+                        item: item,
+                        onDelete: () => _deleteVaultItem(item),
+                      );
                     },
                   ),
           ),
@@ -163,12 +178,233 @@ class _VaultPageState extends State<VaultPage> {
       ),
     );
   }
+
+  Future<void> _addFilesToVault() async {
+    try {
+      // Check permissions
+      final hasPermission = await FileManagerService.hasStoragePermission();
+      if (!hasPermission) {
+        final granted = await FileManagerService.requestStoragePermission();
+        if (!granted) {
+          if (mounted) {
+            _showError('يجب منح صلاحية الوصول للملفات');
+          }
+          return;
+        }
+      }
+
+      // Show dialog to choose file type
+      if (!mounted) return;
+      final fileType = await _showFileTypeDialog();
+      if (fileType == null) return;
+
+      List<File>? files;
+
+      // Pick files based on type
+      if (fileType == 'image') {
+        files = await FileManagerService.pickImages(allowMultiple: true);
+      } else if (fileType == 'video') {
+        final video = await FileManagerService.pickVideo();
+        if (video != null) {
+          files = [video];
+        }
+      }
+
+      if (files == null || files.isEmpty) return;
+
+      // Show confirmation dialog
+      if (mounted) {
+        final confirmed = await _showConfirmationDialog(files.length);
+        if (!confirmed) return;
+      }
+
+      // Process files
+      setState(() => _isLoading = true);
+
+      int successCount = 0;
+      int failCount = 0;
+
+      for (final file in files) {
+        try {
+          await _addSingleFileToVault(file);
+          successCount++;
+        } catch (e) {
+          failCount++;
+          print('Failed to add file ${file.path}: $e');
+        }
+      }
+
+      setState(() => _isLoading = false);
+
+      if (mounted) {
+        if (successCount > 0) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                'تم تشفير $successCount ملف بنجاح' +
+                    (failCount > 0 ? ' و فشل $failCount' : ''),
+                style: GoogleFonts.cairo(),
+              ),
+              backgroundColor: const Color(0xFF667EEA),
+            ),
+          );
+        } else {
+          _showError('فشل تشفير جميع الملفات');
+        }
+      }
+    } catch (e) {
+      setState(() => _isLoading = false);
+      if (mounted) {
+        _showError('حدث خطأ: $e');
+      }
+    }
+  }
+
+  Future<void> _addSingleFileToVault(File file) async {
+    // Get master PIN and salt
+    final settings = HiveService.getGlobalSettings();
+    final masterPin = settings.masterPin;
+
+    // Get or generate salt
+    Uint8List salt;
+    if (settings.encryptionSalt != null &&
+        settings.encryptionSalt!.isNotEmpty) {
+      salt = Uint8List.fromList(settings.encryptionSalt!);
+    } else {
+      salt = EncryptionService.generateSalt();
+      final updatedSettings = settings.copyWith(encryptionSalt: salt);
+      await HiveService.updateGlobalSettings(updatedSettings);
+    }
+
+    // Use VaultService to add file to vault
+    await VaultService.addFileToVault(
+      sourceFile: file,
+      masterPin: masterPin,
+      encryptionSalt: salt,
+      onProgress: (progress) {
+        // Optional: Update UI with progress
+        print('Progress: ${(progress * 100).toStringAsFixed(0)}%');
+      },
+    );
+  }
+
+  Future<String?> _showFileTypeDialog() async {
+    return await showDialog<String>(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: const Color(0xFF1A1F3A),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: Text(
+          'اختر نوع الملف',
+          style: GoogleFonts.cairo(
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              leading: const Icon(
+                Icons.image_rounded,
+                color: Color(0xFF667EEA),
+              ),
+              title: Text('صور', style: GoogleFonts.cairo(color: Colors.white)),
+              onTap: () => Navigator.pop(context, 'image'),
+            ),
+            ListTile(
+              leading: const Icon(
+                Icons.videocam_rounded,
+                color: Color(0xFF667EEA),
+              ),
+              title: Text(
+                'فيديو',
+                style: GoogleFonts.cairo(color: Colors.white),
+              ),
+              onTap: () => Navigator.pop(context, 'video'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Future<bool> _showConfirmationDialog(int fileCount) async {
+    return await showDialog<bool>(
+          context: context,
+          builder: (context) => AlertDialog(
+            backgroundColor: const Color(0xFF1A1F3A),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(20),
+            ),
+            title: Text(
+              'تأكيد التشفير',
+              style: GoogleFonts.cairo(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            content: Text(
+              'سيتم تشفير $fileCount ملف وحذف النسخة الأصلية.\nهل تريد المتابعة؟',
+              style: GoogleFonts.cairo(color: Colors.white70),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context, false),
+                child: Text(
+                  'إلغاء',
+                  style: GoogleFonts.cairo(color: Colors.white60),
+                ),
+              ),
+              ElevatedButton(
+                onPressed: () => Navigator.pop(context, true),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF667EEA),
+                ),
+                child: Text(
+                  'تشفير',
+                  style: GoogleFonts.cairo(color: Colors.white),
+                ),
+              ),
+            ],
+          ),
+        ) ??
+        false;
+  }
+
+  Future<void> _deleteVaultItem(VaultItem item) async {
+    try {
+      await VaultService.deleteVaultItem(item);
+
+      setState(() {});
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('تم حذف الملف', style: GoogleFonts.cairo())),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        _showError('فشل حذف الملف: $e');
+      }
+    }
+  }
+
+  void _showError(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message, style: GoogleFonts.cairo()),
+        backgroundColor: Colors.redAccent,
+      ),
+    );
+  }
 }
 
 class _VaultItemCard extends StatelessWidget {
   final VaultItem item;
+  final VoidCallback onDelete;
 
-  const _VaultItemCard({required this.item});
+  const _VaultItemCard({required this.item, required this.onDelete});
 
   @override
   Widget build(BuildContext context) {
@@ -182,20 +418,66 @@ class _VaultItemCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Expanded(
-            child: Container(
-              decoration: BoxDecoration(
-                color: const Color(0xFF667EEA).withOpacity(0.2),
-                borderRadius: const BorderRadius.vertical(
-                  top: Radius.circular(16),
+            child: Stack(
+              children: [
+                // Display thumbnail if available, otherwise show icon
+                Container(
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF667EEA).withOpacity(0.2),
+                    borderRadius: const BorderRadius.vertical(
+                      top: Radius.circular(16),
+                    ),
+                  ),
+                  child: item.thumbnail != null
+                      ? ClipRRect(
+                          borderRadius: const BorderRadius.vertical(
+                            top: Radius.circular(16),
+                          ),
+                          child: Image.memory(
+                            item.thumbnail!,
+                            fit: BoxFit.cover,
+                            width: double.infinity,
+                            height: double.infinity,
+                            errorBuilder: (context, error, stackTrace) {
+                              // Fallback to icon if thumbnail fails to load
+                              return Center(
+                                child: Icon(
+                                  _getIconForType(item.fileType),
+                                  size: 48,
+                                  color: const Color(0xFF667EEA),
+                                ),
+                              );
+                            },
+                          ),
+                        )
+                      : Center(
+                          child: Icon(
+                            _getIconForType(item.fileType),
+                            size: 48,
+                            color: const Color(0xFF667EEA),
+                          ),
+                        ),
                 ),
-              ),
-              child: Center(
-                child: Icon(
-                  _getIconForType(item.fileType),
-                  size: 48,
-                  color: const Color(0xFF667EEA),
+                Positioned(
+                  top: 8,
+                  right: 8,
+                  child: GestureDetector(
+                    onTap: onDelete,
+                    child: Container(
+                      padding: const EdgeInsets.all(4),
+                      decoration: BoxDecoration(
+                        color: Colors.redAccent,
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(
+                        Icons.delete_rounded,
+                        color: Colors.white,
+                        size: 16,
+                      ),
+                    ),
+                  ),
                 ),
-              ),
+              ],
             ),
           ),
           Padding(

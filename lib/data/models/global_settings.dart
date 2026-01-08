@@ -48,6 +48,10 @@ class GlobalSettings extends HiveObject {
   @HiveField(10)
   bool hasCompletedOnboarding;
 
+  /// Salt for encryption key derivation
+  @HiveField(11)
+  List<int>? encryptionSalt;
+
   GlobalSettings({
     this.masterPin = "",
     this.appTheme = "Light",
@@ -60,6 +64,7 @@ class GlobalSettings extends HiveObject {
     this.hideAppIcon = false,
     this.stealthMode = false,
     this.hasCompletedOnboarding = false,
+    this.encryptionSalt,
   });
 
   /// Create a copy with modified fields
@@ -75,6 +80,7 @@ class GlobalSettings extends HiveObject {
     bool? hideAppIcon,
     bool? stealthMode,
     bool? hasCompletedOnboarding,
+    List<int>? encryptionSalt,
   }) {
     return GlobalSettings(
       masterPin: masterPin ?? this.masterPin,
@@ -89,6 +95,7 @@ class GlobalSettings extends HiveObject {
       stealthMode: stealthMode ?? this.stealthMode,
       hasCompletedOnboarding:
           hasCompletedOnboarding ?? this.hasCompletedOnboarding,
+      encryptionSalt: encryptionSalt ?? this.encryptionSalt,
     );
   }
 
@@ -106,6 +113,7 @@ class GlobalSettings extends HiveObject {
       'hideAppIcon': hideAppIcon,
       'stealthMode': stealthMode,
       'hasCompletedOnboarding': hasCompletedOnboarding,
+      'encryptionSalt': encryptionSalt,
     };
   }
 
@@ -123,6 +131,7 @@ class GlobalSettings extends HiveObject {
       hideAppIcon: map['hideAppIcon'] as bool? ?? false,
       stealthMode: map['stealthMode'] as bool? ?? false,
       hasCompletedOnboarding: map['hasCompletedOnboarding'] as bool? ?? false,
+      encryptionSalt: map['encryptionSalt'] as List<int>?,
     );
   }
 

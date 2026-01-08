@@ -28,13 +28,14 @@ class GlobalSettingsAdapter extends TypeAdapter<GlobalSettings> {
       hideAppIcon: fields[8] as bool,
       stealthMode: fields[9] as bool,
       hasCompletedOnboarding: fields[10] as bool,
+      encryptionSalt: (fields[11] as List?)?.cast<int>(),
     );
   }
 
   @override
   void write(BinaryWriter writer, GlobalSettings obj) {
     writer
-      ..writeByte(11)
+      ..writeByte(12)
       ..writeByte(0)
       ..write(obj.masterPin)
       ..writeByte(1)
@@ -56,7 +57,9 @@ class GlobalSettingsAdapter extends TypeAdapter<GlobalSettings> {
       ..writeByte(9)
       ..write(obj.stealthMode)
       ..writeByte(10)
-      ..write(obj.hasCompletedOnboarding);
+      ..write(obj.hasCompletedOnboarding)
+      ..writeByte(11)
+      ..write(obj.encryptionSalt);
   }
 
   @override

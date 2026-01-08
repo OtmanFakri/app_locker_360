@@ -4,11 +4,17 @@ import 'package:hive/hive.dart';
 part 'vault_item.g.dart';
 
 /// Enum for file types in vault
+@HiveType(typeId: 4)
 enum FileType {
+  @HiveField(0)
   image, // صورة
+  @HiveField(1)
   video, // فيديو
+  @HiveField(2)
   audio, // صوت
+  @HiveField(3)
   document, // مستند
+  @HiveField(4)
   other, // أخرى
 }
 
