@@ -60,3 +60,91 @@ class AppsConfigAdapter extends TypeAdapter<AppsConfig> {
           runtimeType == other.runtimeType &&
           typeId == other.typeId;
 }
+
+class LockTypeAdapter extends TypeAdapter<LockType> {
+  @override
+  final int typeId = 5;
+
+  @override
+  LockType read(BinaryReader reader) {
+    switch (reader.readByte()) {
+      case 0:
+        return LockType.global;
+      case 1:
+        return LockType.custom;
+      default:
+        return LockType.global;
+    }
+  }
+
+  @override
+  void write(BinaryWriter writer, LockType obj) {
+    switch (obj) {
+      case LockType.global:
+        writer.writeByte(0);
+        break;
+      case LockType.custom:
+        writer.writeByte(1);
+        break;
+    }
+  }
+
+  @override
+  int get hashCode => typeId.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is LockTypeAdapter &&
+          runtimeType == other.runtimeType &&
+          typeId == other.typeId;
+}
+
+class NetBlockAdapter extends TypeAdapter<NetBlock> {
+  @override
+  final int typeId = 6;
+
+  @override
+  NetBlock read(BinaryReader reader) {
+    switch (reader.readByte()) {
+      case 0:
+        return NetBlock.none;
+      case 1:
+        return NetBlock.wifi;
+      case 2:
+        return NetBlock.mobile;
+      case 3:
+        return NetBlock.all;
+      default:
+        return NetBlock.none;
+    }
+  }
+
+  @override
+  void write(BinaryWriter writer, NetBlock obj) {
+    switch (obj) {
+      case NetBlock.none:
+        writer.writeByte(0);
+        break;
+      case NetBlock.wifi:
+        writer.writeByte(1);
+        break;
+      case NetBlock.mobile:
+        writer.writeByte(2);
+        break;
+      case NetBlock.all:
+        writer.writeByte(3);
+        break;
+    }
+  }
+
+  @override
+  int get hashCode => typeId.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is NetBlockAdapter &&
+          runtimeType == other.runtimeType &&
+          typeId == other.typeId;
+}

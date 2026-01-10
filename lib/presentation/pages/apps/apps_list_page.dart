@@ -69,7 +69,7 @@ class _AppsListPageState extends State<AppsListPage> {
   void _toggleLock(Application app) {
     final config =
         HiveService.getAppConfig(app.packageName) ??
-        AppsConfig(packageName: app.packageName, appName: app.appName);
+        AppsConfig(packageName: app.packageName, appName: app.appName,lockType: LockType.global);
 
     final updatedConfig = config.copyWith(isLocked: !config.isLocked);
     HiveService.addAppConfig(updatedConfig);

@@ -3,16 +3,24 @@ import 'package:hive/hive.dart';
 part 'apps_config.g.dart';
 
 /// Enum for lock type
+@HiveType(typeId: 5)
 enum LockType {
-  global, // استخدام الرمز العام
+  @HiveField(0)
+  global, // استخدام  الرمز العام
+  @HiveField(1)
   custom, // استخدام رمز خاص
 }
 
 /// Enum for network blocking
+@HiveType(typeId: 6)
 enum NetBlock {
+  @HiveField(0)
   none, // النت خدام عادي
+  @HiveField(1)
   wifi, // قطع الواي فاي فقط
+  @HiveField(2)
   mobile, // قطع بيانات الموبايل فقط
+  @HiveField(3)
   all, // قطع كل الإنترنت
 }
 

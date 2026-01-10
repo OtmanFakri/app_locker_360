@@ -4,6 +4,7 @@ import 'package:app_locker360/data/models/vault_item.dart';
 import 'package:app_locker360/data/models/global_settings.dart';
 import 'package:app_locker360/data/models/log_entry.dart';
 
+
 /// Hive box names
 class HiveBoxes {
   static const String appsConfig = 'apps_config';
@@ -26,6 +27,8 @@ class HiveService {
     // Register adapters
     if (!Hive.isAdapterRegistered(0)) {
       Hive.registerAdapter(AppsConfigAdapter());
+      Hive.registerAdapter(LockTypeAdapter());
+      Hive.registerAdapter(NetBlockAdapter());
     }
     if (!Hive.isAdapterRegistered(1)) {
       Hive.registerAdapter(VaultItemAdapter());
