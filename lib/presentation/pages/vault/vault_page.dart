@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:photo_manager/photo_manager.dart';
 import 'package:wechat_assets_picker/wechat_assets_picker.dart';
+import 'package:file_picker/file_picker.dart' as picker;
 import 'package:app_locker360/data/datasources/hive_service.dart';
 import 'package:app_locker360/data/models/vault_item.dart';
 import 'package:app_locker360/data/services/encryption_service.dart';
@@ -308,6 +309,117 @@ class _VaultPageState extends State<VaultPage> {
           }
         }
         return; // Early return for videos
+      } else if (fileType == 'other') {
+        // Use file_picker for any other file type (MP3, PDF, APK, DOCX, etc.)
+        // Note: file_picker creates a cache copy, but we want to delete the ORIGINAL file too
+
+        picker.FilePickerResult? result;
+        try {
+          result = await picker.FilePicker.platform.pickFiles(
+            allowMultiple: true,
+            type: picker.FileType.any,
+          );
+        } catch (e) {
+          print('⚠️ File picker error: $e');
+          if (mounted) {
+            _showError('فشل في اختيار الملفات. حاول مرة أخرى.');
+          }
+          return;
+        }
+
+        if (result != null && result.files.isNotEmpty) {
+          setState(() => _isLoading = true);
+          int successCount = 0;
+          int failCount = 0;
+
+          for (final platformFile in result.files) {
+            try {
+              // Skip files without a path (e.g., from cloud storage)
+              if (platformFile.path == null) {
+                print('⚠️ Skipping file without path: ${platformFile.name}');
+                failCount++;
+                continue;
+              }
+
+              final file = File(platformFile.path!);
+
+              // Verify file exists before processing
+              if (!await file.exists()) {
+                print('⚠️ File does not exist: ${platformFile.path}');
+                failCount++;
+                continue;
+              }
+
+              // Try to find and delete the original file
+              // file_picker gives us a cache copy, but we need to delete the original
+              String? originalPath;
+
+              // If the file is in cache, try to find the original
+              if (platformFile.path!.contains('cache/file_picker')) {
+                // The original file is likely in Downloads or Documents
+                // We'll search common locations for a file with the same name and size
+                final fileName = platformFile.name;
+                final fileSize = await file.length();
+
+                // Common document locations
+                final searchPaths = [
+                  '/storage/emulated/0/Download',
+                  '/storage/emulated/0/Documents',
+                  '/storage/emulated/0/Music',
+                ];
+
+                for (final searchPath in searchPaths) {
+                  final possibleOriginal = File('$searchPath/$fileName');
+                  if (await possibleOriginal.exists()) {
+                    final originalSize = await possibleOriginal.length();
+                    if (originalSize == fileSize) {
+                      originalPath = possibleOriginal.path;
+                      break;
+                    }
+                  }
+                }
+              }
+
+              // Encrypt and vault the file
+              await _addSingleFileToVault(file, originalAsset: null);
+
+              // Delete the original file if we found it
+              if (originalPath != null) {
+                try {
+                  await File(originalPath).delete();
+                  print('✅ Deleted original file: $originalPath');
+                } catch (e) {
+                  print('⚠️ Failed to delete original file: $e');
+                }
+              }
+
+              successCount++;
+            } catch (e) {
+              failCount++;
+              print('Failed to add file: $e');
+            }
+          }
+
+          setState(() => _isLoading = false);
+
+          if (mounted) {
+            if (successCount > 0) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(
+                    'تم تشفير $successCount ملف بنجاح' +
+                        (failCount > 0 ? ' و فشل $failCount' : ''),
+                    style: GoogleFonts.cairo(),
+                  ),
+                  backgroundColor: const Color(0xFF667EEA),
+                ),
+              );
+            } else {
+              _showError('فشل تشفير جميع الملفات');
+            }
+          }
+        }
+        return; // Early return for other files
       }
     } catch (e) {
       setState(() => _isLoading = false);
@@ -383,6 +495,17 @@ class _VaultPageState extends State<VaultPage> {
                 style: GoogleFonts.cairo(color: Colors.white),
               ),
               onTap: () => Navigator.pop(context, 'video'),
+            ),
+            ListTile(
+              leading: const Icon(
+                Icons.insert_drive_file_rounded,
+                color: Color(0xFF667EEA),
+              ),
+              title: Text(
+                'أخرى (MP3, PDF, APK...)',
+                style: GoogleFonts.cairo(color: Colors.white),
+              ),
+              onTap: () => Navigator.pop(context, 'other'),
             ),
           ],
         ),
