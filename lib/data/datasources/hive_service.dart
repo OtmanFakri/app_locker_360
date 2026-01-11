@@ -1,9 +1,11 @@
+import 'dart:io';
+
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:app_locker360/data/models/apps_config.dart';
 import 'package:app_locker360/data/models/vault_item.dart';
 import 'package:app_locker360/data/models/global_settings.dart';
 import 'package:app_locker360/data/models/log_entry.dart';
-
+import 'package:path_provider/path_provider.dart';
 
 /// Hive box names
 class HiveBoxes {
@@ -11,6 +13,7 @@ class HiveBoxes {
   static const String vaultItems = 'vault_items';
   static const String globalSettings = 'global_settings';
   static const String logs = 'logs';
+  static const String lockState = 'lock_state';
 }
 
 /// Initialize Hive database
@@ -53,6 +56,7 @@ class HiveService {
       Hive.openBox<VaultItem>(HiveBoxes.vaultItems),
       Hive.openBox<GlobalSettings>(HiveBoxes.globalSettings),
       Hive.openBox<LogEntry>(HiveBoxes.logs),
+      Hive.openBox(HiveBoxes.lockState),
     ]);
   }
 
@@ -71,6 +75,32 @@ class HiveService {
   /// Get Logs box
   static Box<LogEntry> get logsBox => Hive.box<LogEntry>(HiveBoxes.logs);
 
+  static Box get lockStateBox => Hive.box(HiveBoxes.lockState);
+
+  static Future<void> setLockedPackage(String? packageName) async {
+    final box = lockStateBox;
+    if (packageName == null) {
+      await box.delete('current_locked_package');
+      await box.flush();
+    } else {
+      await box.put('current_locked_package', packageName);
+      await box.flush();
+    }
+  }
+
+  /// Set app as temporarily unlocked to prevent immediate re-locking
+  static Future<void> setTemporarilyUnlocked(String packageName) async {
+    final box = lockStateBox;
+    await box.put('temp_unlocked_package', packageName);
+  }
+
+  /// Check if app is temporarily unlocked
+  static bool isTemporarilyUnlocked(String packageName) {
+    final box = lockStateBox;
+    final tempPackage = box.get('temp_unlocked_package');
+    return tempPackage == packageName;
+  }
+
   /// Initialize global settings with default values if not exists
   static Future<void> initializeGlobalSettings() async {
     final box = globalSettingsBox;
@@ -83,6 +113,45 @@ class HiveService {
   static GlobalSettings getGlobalSettings() {
     final box = globalSettingsBox;
     return box.get('settings', defaultValue: GlobalSettings())!;
+  }
+
+  static Future<void> initBackground() async {
+    final Directory directory = await getApplicationDocumentsDirectory();
+    Hive.init(directory.path);
+    if (!Hive.isAdapterRegistered(0)) {
+      Hive.registerAdapter(AppsConfigAdapter());
+      Hive.registerAdapter(LockTypeAdapter());
+      Hive.registerAdapter(NetBlockAdapter());
+    }
+    if (!Hive.isAdapterRegistered(1)) {
+      Hive.registerAdapter(VaultItemAdapter());
+    }
+    if (!Hive.isAdapterRegistered(2)) {
+      Hive.registerAdapter(GlobalSettingsAdapter());
+    }
+    if (!Hive.isAdapterRegistered(3)) {
+      Hive.registerAdapter(LogEntryAdapter());
+    }
+    if (!Hive.isAdapterRegistered(4)) {
+      Hive.registerAdapter(FileTypeAdapter());
+    }
+    if (!Hive.isBoxOpen(HiveBoxes.appsConfig)) {
+      await Hive.openBox<AppsConfig>(HiveBoxes.appsConfig);
+    }
+    if (!Hive.isBoxOpen(HiveBoxes.lockState)) {
+      await Hive.openBox(HiveBoxes.lockState);
+    }
+    // if (!Hive.isBoxOpen(HiveBoxes.vaultItems)) {
+    //   await Hive.openBox<VaultItem>(HiveBoxes.vaultItems);
+    // }
+    // if (!Hive.isBoxOpen(HiveBoxes.globalSettings)) {
+    //   await Hive.openBox<GlobalSettings>(HiveBoxes.globalSettings);
+    // }
+    // if (!Hive.isBoxOpen(HiveBoxes.logs)) {
+    //   await Hive.openBox<LogEntry>(HiveBoxes.logs);
+    // }
+    _initialized = true;
+    print("Hive Background Initialized Successfully ✅");
   }
 
   /// Update global settings
