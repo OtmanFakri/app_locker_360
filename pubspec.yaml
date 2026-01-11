@@ -41,6 +41,7 @@ dependencies:
   image: ^4.0.17
   photo_manager: ^3.0.0
   wechat_assets_picker: ^9.0.0
+  file_picker: ^8.0.0
 
   # File Preview
   photo_view: ^0.14.0
@@ -53,6 +54,17 @@ dev_dependencies:
   flutter_lints: ^6.0.0
   build_runner: ^2.4.6
   hive_generator: ^2.0.1
+  flutter_launcher_icons: ^0.14.4
 
 flutter:
   uses-material-design: true
+
+  assets:
+    - lib/assets/logo.png
+
+flutter_launcher_icons:
+  android: true
+  ios: false
+  image_path: "lib/assets/logo.png"
+  adaptive_icon_background: "#1a2332"
+  adaptive_icon_foreground: "lib/assets/logo.png"
