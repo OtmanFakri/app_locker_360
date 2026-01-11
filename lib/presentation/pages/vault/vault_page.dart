@@ -200,8 +200,6 @@ class _VaultPageState extends State<VaultPage> {
       final fileType = await _showFileTypeDialog();
       if (fileType == null) return;
 
-      List<File>? files;
-
       // Pick files based on type
       if (fileType == 'image') {
         // Use wechat_assets_picker for proper UI selection
@@ -259,47 +257,57 @@ class _VaultPageState extends State<VaultPage> {
         }
         return; // Early return for images
       } else if (fileType == 'video') {
-        final video = await FileManagerService.pickVideo();
-        if (video != null) {
-          files = [video];
+        // Use wechat_assets_picker for videos too (silent deletion!)
+        final List<AssetEntity>? selectedAssets = await AssetPicker.pickAssets(
+          context,
+          pickerConfig: AssetPickerConfig(
+            maxAssets: 5,
+            requestType: RequestType.video,
+            textDelegate: const EnglishAssetPickerTextDelegate(),
+          ),
+        );
+
+        if (selectedAssets != null && selectedAssets.isNotEmpty) {
+          // Same silent deletion strategy as images
+          setState(() => _isLoading = true);
+          int successCount = 0;
+          int failCount = 0;
+
+          for (final asset in selectedAssets) {
+            try {
+              // Get the file from the asset
+              final file = await asset.file;
+              if (file != null) {
+                // vault_service will handle silent deletion
+                await _addSingleFileToVault(file, originalAsset: asset);
+                successCount++;
+              }
+            } catch (e) {
+              failCount++;
+              print('Failed to add video asset: $e');
+            }
+          }
+
+          setState(() => _isLoading = false);
+
+          if (mounted) {
+            if (successCount > 0) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(
+                    'تم تشفير $successCount فيديو بنجاح' +
+                        (failCount > 0 ? ' و فشل $failCount' : ''),
+                    style: GoogleFonts.cairo(),
+                  ),
+                  backgroundColor: const Color(0xFF667EEA),
+                ),
+              );
+            } else {
+              _showError('فشل تشفير جميع الفيديوهات');
+            }
+          }
         }
-      }
-
-      if (files == null || files.isEmpty) return;
-
-      // Process files (for videos and other types)
-      setState(() => _isLoading = true);
-
-      int successCount = 0;
-      int failCount = 0;
-
-      for (final file in files) {
-        try {
-          await _addSingleFileToVault(file);
-          successCount++;
-        } catch (e) {
-          failCount++;
-          print('Failed to add file ${file.path}: $e');
-        }
-      }
-
-      setState(() => _isLoading = false);
-
-      if (mounted) {
-        if (successCount > 0) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(
-                'تم تشفير $successCount ملف بنجاح' +
-                    (failCount > 0 ? ' و فشل $failCount' : ''),
-                style: GoogleFonts.cairo(),
-              ),
-              backgroundColor: const Color(0xFF667EEA),
-            ),
-          );
-        } else {
-          _showError('فشل تشفير جميع الملفات');
-        }
+        return; // Early return for videos
       }
     } catch (e) {
       setState(() => _isLoading = false);
