@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:app_locker360/data/datasources/hive_service.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:app_locker360/presentation/pages/home/home_page.dart';
+import 'package:app_locker360/presentation/pages/onboarding/permissions_page.dart';
 
 /// شاشة الإعداد الأولي (Onboarding)
 /// تظهر فقط عند تثبيت التطبيق لأول مرة
@@ -54,9 +55,9 @@ class _OnboardingPageState extends State<OnboardingPage>
         curve: Curves.easeInOut,
       );
     } else {
-      // Navigate to PIN setup
+      // Navigate to Permissions setup
       Navigator.of(context).pushReplacement(
-        MaterialPageRoute(builder: (context) => const PinSetupPage()),
+        MaterialPageRoute(builder: (context) => const PermissionsPage()),
       );
     }
   }
@@ -315,8 +316,8 @@ class _OnboardingPageState extends State<OnboardingPage>
             _buildSecurityBadge('تشفير AES-256'),
             const SizedBox(height: 12),
             _buildSecurityBadge('حماية بالبصمة'),
-            const SizedBox(height: 12),
-            _buildSecurityBadge('بدون إعلانات'),
+            // const SizedBox(height: 12),
+            // _buildSecurityBadge('بدون إعلانات'),
           ],
         ),
       ),
