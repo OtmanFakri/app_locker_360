@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'dart:typed_data';
 import 'package:flutter/services.dart';
+import 'package:flutter/foundation.dart';
 import 'package:image/image.dart' as img;
 import 'package:video_thumbnail/video_thumbnail.dart';
 import 'package:photo_manager/photo_manager.dart';
@@ -18,11 +19,12 @@ class VaultService {
   /// 2. Encrypt file using stream encryption
   /// 3. Save encrypted file to private directory
   /// 4. Create and store VaultItem in Hive
-  /// 5. Delete original file from gallery
+  /// 5. Cleanup temporary files
   static Future<VaultItem> addFileToVault({
     required File sourceFile,
     required String masterPin,
     required Uint8List encryptionSalt,
+    AssetEntity? originalAsset, // NEW: Optional asset for direct deletion
     void Function(double progress)? onProgress,
   }) async {
     try {
@@ -61,12 +63,15 @@ class VaultService {
       final vaultDir = await FileManagerService.getVaultDirectory();
       final encryptedFile = File('${vaultDir.path}/$encryptedFileName');
 
-      // Encrypt file using streaming (prevents app blocking for large files)
-      await EncryptionService.encryptFileStreaming(
-        sourceFile: sourceFile,
-        destinationFile: encryptedFile,
-        pin: masterPin,
-        salt: encryptionSalt,
+      // Encrypt file using streaming in a background isolate
+      await compute(
+        _encryptFileTask,
+        _EncryptionTaskArgs(
+          sourcePath: sourceFile.path,
+          destinationPath: encryptedFile.path,
+          pin: masterPin,
+          salt: encryptionSalt,
+        ),
       );
 
       // Update progress
@@ -95,8 +100,8 @@ class VaultService {
       // Update progress
       onProgress?.call(0.9);
 
-      // Delete original file from gallery
-      await _deleteOriginalFile(sourceFile.path);
+      // Delete original file from gallery (pass the AssetEntity if available)
+      await _deleteOriginalFile(sourceFile.path, originalAsset);
 
       // Update progress
       onProgress?.call(1.0);
@@ -111,32 +116,8 @@ class VaultService {
   static Future<Uint8List?> _generateImageThumbnail(File imageFile) async {
     try {
       print('🖼️ Generating image thumbnail for: ${imageFile.path}');
-
-      // Read image bytes
-      final bytes = await imageFile.readAsBytes();
-      print('  ✓ Read ${bytes.length} bytes');
-
-      // Decode image
-      final image = img.decodeImage(bytes);
-      if (image == null) {
-        print('  ❌ Failed to decode image');
-        return null;
-      }
-      print('  ✓ Decoded image: ${image.width}x${image.height}');
-
-      // Resize to 300x300 thumbnail
-      final thumbnail = img.copyResize(
-        image,
-        width: 300,
-        height: 300,
-        interpolation: img.Interpolation.average,
-      );
-      print('  ✓ Resized to thumbnail');
-
-      // Encode as JPEG with 80% quality
-      final encoded = Uint8List.fromList(img.encodeJpg(thumbnail, quality: 80));
-      print('  ✅ Thumbnail generated: ${encoded.length} bytes');
-      return encoded;
+      // Run heavy image processing in an isolate
+      return await compute(_generateImageThumbnailTask, imageFile.path);
     } catch (e) {
       print('❌ Failed to generate image thumbnail: $e');
       return null;
@@ -170,110 +151,55 @@ class VaultService {
     }
   }
 
-  /// Delete original file from gallery using MediaStore
-  /// This properly deletes files from Android gallery
-  /// Delete original file from gallery
-  /// Uses photo_manager to find and delete the actual gallery file
-  static Future<bool> _deleteOriginalFile(String filePath) async {
+  /// Delete the original file from the gallery/storage
+  /// Uses direct filesystem deletion (SILENT - no dialogs!)
+  static Future<bool> _deleteOriginalFile(
+    String filePath,
+    AssetEntity? originalAsset,
+  ) async {
     try {
-      print('🗑️ Attempting to delete file from gallery: $filePath');
-
+      print('🗑️ Cleanup: Processing file: $filePath');
       final file = File(filePath);
 
-      // Check if file exists
-      if (!await file.exists()) {
-        print('ℹ️  File does not exist');
-        return false;
-      }
-
-      // Get file info for matching
-      final fileName = filePath.split('/').last;
-      final fileSize = await file.length();
-
-      print('📋 Looking for file: $fileName (size: $fileSize bytes)');
-
-      // Try to find and delete from gallery using photo_manager
-      if (Platform.isAndroid) {
+      // SILENT DELETION: Delete the original file directly from filesystem
+      // This works with MANAGE_EXTERNAL_STORAGE permission without any dialogs!
+      if (originalAsset != null) {
+        print('✅ Have original AssetEntity - deleting from filesystem');
         try {
-          // Request permission
-          final PermissionState ps =
-              await PhotoManager.requestPermissionExtend();
-          if (!ps.isAuth) {
-            print('⚠️  Gallery permission denied');
-            return false;
-          }
-
-          // Get all assets (limit to recent files for performance)
-          final List<AssetPathEntity> paths =
-              await PhotoManager.getAssetPathList(
-                type: RequestType.image | RequestType.video,
-              );
-
-          // Search for matching file
-          for (final path in paths) {
-            final int totalCount = await path.assetCountAsync;
-            final int checkCount = totalCount > 1000 ? 1000 : totalCount;
-
-            final List<AssetEntity> assets = await path.getAssetListRange(
-              start: 0,
-              end: checkCount,
+          // Get the original file path from the asset
+          final originalFile = await originalAsset.file;
+          if (originalFile != null && await originalFile.exists()) {
+            // Delete directly from filesystem (SILENT!)
+            await originalFile.delete();
+            print(
+              '✅ Original file deleted silently from: ${originalFile.path}',
             );
-
-            for (final asset in assets) {
-              final assetFile = await asset.file;
-              if (assetFile != null) {
-                final assetSize = await assetFile.length();
-                final assetName = assetFile.path.split('/').last;
-
-                // Match by name and size
-                if (assetName == fileName && assetSize == fileSize) {
-                  print('✅ Found matching file: ${assetFile.path}');
-
-                  // Try direct file deletion first (faster, no dialog)
-                  try {
-                    await File(assetFile.path).delete();
-                    print('✅ File deleted directly from storage!');
-                    return true;
-                  } catch (e) {
-                    print('⚠️ Direct delete failed: $e');
-
-                    // Fallback: Use PhotoManager (shows system dialog)
-                    try {
-                      final List<String> result = await PhotoManager.editor
-                          .deleteWithIds([asset.id]);
-
-                      if (result.isNotEmpty) {
-                        print('✅ File deleted via PhotoManager!');
-                        return true;
-                      }
-                    } catch (e2) {
-                      print('❌ PhotoManager delete also failed: $e2');
-                    }
-                  }
-
-                  break;
-                }
-              }
-            }
+            print('   Asset ID: ${originalAsset.id}');
+            print('   Title: ${originalAsset.title}');
+          } else {
+            print('⚠️ Original file not found or already deleted');
           }
-
-          print('⚠️  File not found in gallery');
         } catch (e) {
-          print('❌ Photo manager error: $e');
+          print('⚠️ Failed to delete original file: $e');
         }
+      } else {
+        print('ℹ️  No AssetEntity provided - skipping gallery deletion');
       }
 
-      // Fallback: delete cache file
-      try {
-        await file.delete();
-        print('✅ Cache file deleted');
-      } catch (e) {
-        print('⚠️  Could not delete cache: $e');
+      // Always delete the cache copy if it's different from original
+      if (await file.exists()) {
+        try {
+          await file.delete();
+          print('✅ Cache file deleted');
+          return true;
+        } catch (e) {
+          print('⚠️ Failed to delete cache file: $e');
+        }
       }
 
       return false;
     } catch (e) {
-      print('❌ Error in _deleteOriginalFile: $e');
+      print('❌ Error in deletion process: $e');
       return false;
     }
   }
@@ -339,5 +265,59 @@ class VaultService {
     } catch (e) {
       throw Exception('Failed to decrypt vault item: $e');
     }
+  }
+}
+
+/// Arguments for encryption task
+class _EncryptionTaskArgs {
+  final String sourcePath;
+  final String destinationPath;
+  final String pin;
+  final Uint8List salt;
+
+  _EncryptionTaskArgs({
+    required this.sourcePath,
+    required this.destinationPath,
+    required this.pin,
+    required this.salt,
+  });
+}
+
+/// Top-level function for encryption task
+Future<void> _encryptFileTask(_EncryptionTaskArgs args) async {
+  final sourceFile = File(args.sourcePath);
+  final destinationFile = File(args.destinationPath);
+
+  await EncryptionService.encryptFileStreaming(
+    sourceFile: sourceFile,
+    destinationFile: destinationFile,
+    pin: args.pin,
+    salt: args.salt,
+  );
+}
+
+/// Top-level function for image thumbnail generation
+Future<Uint8List?> _generateImageThumbnailTask(String path) async {
+  try {
+    final file = File(path);
+    final bytes = await file.readAsBytes();
+
+    // Decode image
+    final image = img.decodeImage(bytes);
+    if (image == null) return null;
+
+    // Resize to 300x300 thumbnail
+    final thumbnail = img.copyResize(
+      image,
+      width: 300,
+      height: 300,
+      interpolation: img.Interpolation.average,
+    );
+
+    // Encode as JPEG with 80% quality
+    return Uint8List.fromList(img.encodeJpg(thumbnail, quality: 80));
+  } catch (e) {
+    print('Error in thumbnail isolate: $e');
+    return null;
   }
 }

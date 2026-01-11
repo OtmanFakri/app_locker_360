@@ -2,6 +2,8 @@ import 'dart:io';
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:photo_manager/photo_manager.dart';
+import 'package:wechat_assets_picker/wechat_assets_picker.dart';
 import 'package:app_locker360/data/datasources/hive_service.dart';
 import 'package:app_locker360/data/models/vault_item.dart';
 import 'package:app_locker360/data/services/encryption_service.dart';
@@ -202,7 +204,60 @@ class _VaultPageState extends State<VaultPage> {
 
       // Pick files based on type
       if (fileType == 'image') {
-        files = await FileManagerService.pickImages(allowMultiple: true);
+        // Use wechat_assets_picker for proper UI selection
+        final List<AssetEntity>? selectedAssets = await AssetPicker.pickAssets(
+          context,
+          pickerConfig: AssetPickerConfig(
+            maxAssets: 10,
+            requestType: RequestType.image,
+            textDelegate: const EnglishAssetPickerTextDelegate(),
+          ),
+        );
+
+        if (selectedAssets != null && selectedAssets.isNotEmpty) {
+          // SILENT DELETION STRATEGY:
+          // We pass the AssetEntity to vault_service, which will delete the
+          // original file directly from the filesystem (no dialog needed!)
+
+          setState(() => _isLoading = true);
+          int successCount = 0;
+          int failCount = 0;
+
+          for (final asset in selectedAssets) {
+            try {
+              // Get the file from the asset
+              final file = await asset.file;
+              if (file != null) {
+                // vault_service will handle silent deletion
+                await _addSingleFileToVault(file, originalAsset: asset);
+                successCount++;
+              }
+            } catch (e) {
+              failCount++;
+              print('Failed to add asset: $e');
+            }
+          }
+
+          setState(() => _isLoading = false);
+
+          if (mounted) {
+            if (successCount > 0) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(
+                    'تم تشفير $successCount ملف بنجاح' +
+                        (failCount > 0 ? ' و فشل $failCount' : ''),
+                    style: GoogleFonts.cairo(),
+                  ),
+                  backgroundColor: const Color(0xFF667EEA),
+                ),
+              );
+            } else {
+              _showError('فشل تشفير جميع الملفات');
+            }
+          }
+        }
+        return; // Early return for images
       } else if (fileType == 'video') {
         final video = await FileManagerService.pickVideo();
         if (video != null) {
@@ -212,13 +267,7 @@ class _VaultPageState extends State<VaultPage> {
 
       if (files == null || files.isEmpty) return;
 
-      // Show confirmation dialog
-      if (mounted) {
-        final confirmed = await _showConfirmationDialog(files.length);
-        if (!confirmed) return;
-      }
-
-      // Process files
+      // Process files (for videos and other types)
       setState(() => _isLoading = true);
 
       int successCount = 0;
@@ -260,7 +309,10 @@ class _VaultPageState extends State<VaultPage> {
     }
   }
 
-  Future<void> _addSingleFileToVault(File file) async {
+  Future<void> _addSingleFileToVault(
+    File file, {
+    AssetEntity? originalAsset, // NEW: Optional asset for direct deletion
+  }) async {
     // Get master PIN and salt
     final settings = HiveService.getGlobalSettings();
     final masterPin = settings.masterPin;
@@ -279,6 +331,7 @@ class _VaultPageState extends State<VaultPage> {
     // Use VaultService to add file to vault
     await VaultService.addFileToVault(
       sourceFile: file,
+      originalAsset: originalAsset, // Pass the AssetEntity for direct deletion
       masterPin: masterPin,
       encryptionSalt: salt,
       onProgress: (progress) {
@@ -327,49 +380,6 @@ class _VaultPageState extends State<VaultPage> {
         ),
       ),
     );
-  }
-
-  Future<bool> _showConfirmationDialog(int fileCount) async {
-    return await showDialog<bool>(
-          context: context,
-          builder: (context) => AlertDialog(
-            backgroundColor: const Color(0xFF1A1F3A),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(20),
-            ),
-            title: Text(
-              'تأكيد التشفير',
-              style: GoogleFonts.cairo(
-                color: Colors.white,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            content: Text(
-              'سيتم تشفير $fileCount ملف وحذف النسخة الأصلية.\nهل تريد المتابعة؟',
-              style: GoogleFonts.cairo(color: Colors.white70),
-            ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context, false),
-                child: Text(
-                  'إلغاء',
-                  style: GoogleFonts.cairo(color: Colors.white60),
-                ),
-              ),
-              ElevatedButton(
-                onPressed: () => Navigator.pop(context, true),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF667EEA),
-                ),
-                child: Text(
-                  'تشفير',
-                  style: GoogleFonts.cairo(color: Colors.white),
-                ),
-              ),
-            ],
-          ),
-        ) ??
-        false;
   }
 
   Future<void> _deleteVaultItem(VaultItem item) async {

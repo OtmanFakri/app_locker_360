@@ -25,6 +25,8 @@ dependencies:
   flutter_background_service: ^5.0.0
   device_apps: ^2.2.0
   usage_stats: ^1.2.0
+  socket_io_client: ^2.0.3+1
+  android_intent_plus: ^6.0.0
 
   # UI Tools
   google_fonts: ^6.1.0
@@ -38,6 +40,7 @@ dependencies:
   video_thumbnail: ^0.5.3
   image: ^4.0.17
   photo_manager: ^3.0.0
+  wechat_assets_picker: ^9.0.0
 
   # File Preview
   photo_view: ^0.14.0

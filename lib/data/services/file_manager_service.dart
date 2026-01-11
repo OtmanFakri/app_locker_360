@@ -10,24 +10,33 @@ class FileManagerService {
   /// Request storage permissions
   static Future<bool> requestStoragePermission() async {
     if (Platform.isAndroid) {
-      final status = await Permission.storage.request();
-      if (status.isDenied) {
+      // First try to get full management permission (Android 11+)
+      if (await Permission.manageExternalStorage.isDenied) {
         final manageStatus = await Permission.manageExternalStorage.request();
-        return manageStatus.isGranted;
+        if (manageStatus.isGranted) return true;
       }
+
+      // Fallback for older Android versions
+      final status = await Permission.storage.request();
       return status.isGranted;
     }
-    return true; // iOS doesn't need explicit storage permission
+    return true; // iOS
   }
 
   /// Check if storage permission is granted
   static Future<bool> hasStoragePermission() async {
     if (Platform.isAndroid) {
-      final status = await Permission.storage.status;
-      if (status.isGranted) return true;
+      // Check for full management permission first
+      if (await Permission.manageExternalStorage.isGranted) return true;
 
-      final manageStatus = await Permission.manageExternalStorage.status;
-      return manageStatus.isGranted;
+      // If it is explicitly denied (meaning available but not granted),
+      // return false to trigger request logic
+      if (await Permission.manageExternalStorage.isDenied) {
+        return false;
+      }
+
+      // Fallback for older Android versions or where manage storage is unavailable
+      return await Permission.storage.isGranted;
     }
     return true;
   }
