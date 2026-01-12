@@ -1,8 +1,16 @@
+import 'dart:ffi';
+import 'dart:io';
+
+import 'package:android_intent_plus/android_intent.dart';
+import 'package:android_intent_plus/flag.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:usage_stats/usage_stats.dart';
 import 'package:app_locker360/presentation/pages/onboarding/page.dart';
+import 'package:device_info_plus/device_info_plus.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 
 /// صفحة طلب الأذونات
 class PermissionsPage extends StatefulWidget {
@@ -18,6 +26,9 @@ class _PermissionsPageState extends State<PermissionsPage>
   bool _usageStatsGranted = false;
   bool _systemAlertGranted = false;
   bool _isChecking = true;
+  static const platform = MethodChannel('com.example.app_locker360/intent');
+  bool _isXiamoDivice = false;
+  bool _xiaomiPermistionGranted = false;
 
   @override
   void initState() {
@@ -40,8 +51,124 @@ class _PermissionsPageState extends State<PermissionsPage>
     }
   }
 
+  Future<bool> isXiaomiDevice() async {
+    if (!Platform.isAndroid) return false;
+    final DeviceInfo = DeviceInfoPlugin();
+    final androidInfo = await DeviceInfo.androidInfo;
+    final manufacturer = androidInfo.manufacturer.toLowerCase();
+    return manufacturer.contains('xiaomi') ||
+        manufacturer.contains('redmi') ||
+        manufacturer.contains('poco');
+  }
+
+  Future<void> openXiaomiPermissions() async {
+    // Show instruction dialog first
+    if (mounted) {
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            backgroundColor: const Color(0xFF1A1F3A),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(20),
+            ),
+            title: Text(
+              'تعليمات مهمة',
+              style: GoogleFonts.cairo(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+              ),
+              textAlign: TextAlign.center,
+            ),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Icon(
+                  Icons.info_outline_rounded,
+                  color: Color(0xFFFFE66D),
+                  size: 48,
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  'في الصفحة التالية:\n\n'
+                  '1. اضغط على "أذونات أخرى"\n'
+                  '2. ابحث عن "عرض النوافذ المنبثقة أثناء التشغيل في الخلفية"\n'
+                  '3. قم بتفعيل هذا الإذن\n'
+                  '4. ارجع للتطبيق',
+                  style: GoogleFonts.cairo(
+                    fontSize: 14,
+                    color: Colors.white70,
+                    height: 1.6,
+                  ),
+                  textAlign: TextAlign.right,
+                ),
+              ],
+            ),
+            actions: [
+              TextButton(
+                onPressed: () async {
+                  Navigator.of(context).pop();
+
+                  // Open app settings where "Other permissions" can be found
+                  PackageInfo packageInfo = await PackageInfo.fromPlatform();
+                  String packageName = packageInfo.packageName;
+
+                  // Try MIUI specific intent first
+                  try {
+                    final intent = AndroidIntent(
+                      action: 'android.settings.APPLICATION_DETAILS_SETTINGS',
+                      data: 'package:$packageName',
+                      flags: <int>[Flag.FLAG_ACTIVITY_NEW_TASK],
+                    );
+                    await intent.launch();
+                  } catch (e) {
+                    // Fallback to general MIUI permissions
+                    final fallbackIntent = AndroidIntent(
+                      action: 'miui.intent.action.APP_PERM_EDITOR',
+                      arguments: <String, dynamic>{
+                        'extra_pkgname': packageName,
+                      },
+                      flags: <int>[Flag.FLAG_ACTIVITY_NEW_TASK],
+                    );
+                    await fallbackIntent.launch();
+                  }
+                },
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 24,
+                    vertical: 12,
+                  ),
+                  decoration: BoxDecoration(
+                    gradient: const LinearGradient(
+                      colors: [Color(0xFFFF6B6B), Color(0xFFFFE66D)],
+                    ),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Text(
+                    'فهمت، افتح الإعدادات',
+                    style: GoogleFonts.cairo(
+                      fontSize: 14,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+            actionsAlignment: MainAxisAlignment.center,
+          );
+        },
+      );
+    }
+  }
+
   Future<void> _checkPermissions() async {
     setState(() => _isChecking = true);
+
+    // check is xiaomi
+    _isXiamoDivice = await isXiaomiDevice();
 
     // Check storage permission
     final storageStatus = await Permission.manageExternalStorage.status;
@@ -54,6 +181,18 @@ class _PermissionsPageState extends State<PermissionsPage>
     // Check system alert window permission
     final alertStatus = await Permission.systemAlertWindow.status;
     _systemAlertGranted = alertStatus.isGranted;
+
+    // CHEK PERMISTION POPPUP
+    if (_isXiamoDivice) {
+      try {
+        final bool is_Granted = await platform.invokeMethod(
+          "isXiaomiPermissionGranted",
+        );
+        _xiaomiPermistionGranted = is_Granted;
+      } catch (e) {
+        _xiaomiPermistionGranted = false;
+      }
+    }
 
     setState(() => _isChecking = false);
   }
@@ -73,13 +212,17 @@ class _PermissionsPageState extends State<PermissionsPage>
 
   Future<void> _requestSystemAlertPermission() async {
     final status = await Permission.systemAlertWindow.request();
+    await _checkPermissions();
     setState(() {
       _systemAlertGranted = status.isGranted;
     });
   }
 
   bool get _allPermissionsGranted =>
-      _storageGranted && _usageStatsGranted && _systemAlertGranted;
+      _storageGranted &&
+      _usageStatsGranted &&
+      _systemAlertGranted &&
+      (!_isXiamoDivice || _xiaomiPermistionGranted);
 
   void _continue() {
     if (_allPermissionsGranted) {
@@ -152,6 +295,21 @@ class _PermissionsPageState extends State<PermissionsPage>
                         onRequest: _requestSystemAlertPermission,
                         gradient: const [Color(0xFF4FACFE), Color(0xFF00F2FE)],
                       ),
+                      if (_isXiamoDivice) ...[
+                        const SizedBox(height: 20),
+                        _buildPermissionItem(
+                          icon: Icons.phonelink_setup_rounded,
+                          title: 'عرض النوافذ المنبثقة في الخلفية',
+                          description:
+                              'للسماح بعرض شاشة القفل أثناء تشغيل التطبيقات في الخلفية (Xiaomi)',
+                          isGranted: _xiaomiPermistionGranted,
+                          onRequest: openXiaomiPermissions,
+                          gradient: const [
+                            Color(0xFFFF6B6B),
+                            Color(0xFFFFE66D),
+                          ],
+                        ),
+                      ],
                     ],
                   ),
                 ),

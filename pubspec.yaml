@@ -48,6 +48,10 @@ dependencies:
   video_player: ^2.8.1
   audioplayers: ^5.2.1
 
+  # Device Info
+  device_info_plus: ^12.3.0
+  package_info_plus: ^8.1.2
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
