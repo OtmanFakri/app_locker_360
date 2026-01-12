@@ -3,10 +3,10 @@ import 'dart:ui';
 import 'package:app_locker360/presentation/pages/lock_screen/screen_lock_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:app_locker360/data/datasources/hive_service.dart';
+import 'package:app_locker360/data/datasources/mmkv_service.dart';
 import 'package:app_locker360/presentation/pages/onboarding/page.dart';
 import 'package:app_locker360/presentation/pages/auth/auth_page.dart';
-import 'package:hive_flutter/hive_flutter.dart';
+import 'package:mmkv/mmkv.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:usage_stats/usage_stats.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
@@ -26,15 +26,11 @@ void main() async {
     ),
   );
 
-  // Initialize Hive
-  await HiveService.init();
-  await HiveService.openBoxes();
-  await HiveService.initializeGlobalSettings();
-
-  final box = HiveService.lockStateBox;
-  if (box.get('current_locked_package') == null) {
-    await Future.delayed(const Duration(milliseconds: 100));
-  }
+  // Initialize MMKV
+  await MMKV.initialize();
+  await MMKVService.init();
+  await MMKVService.openBoxes();
+  await MMKVService.initializeGlobalSettings();
 
   // Background service
   await initializeService();
@@ -57,106 +53,97 @@ Future<void> initializeService() async {
 
 @pragma('vm:entry-point')
 void onStart(ServiceInstance service) async {
-  // 1. Init Dart
   DartPluginRegistrant.ensureInitialized();
+  await MMKVService.initBackground(); // Initialize MMKV for background
 
-  // 2. Init Hive (Darouri f Background)
-  await HiveService.initBackground();
-
-  // Local active unlock cache (Active for this session)
-  // Hadi hiya li ghat-men3 l-loop hit Hive tape chwya
   String? tempUnlockedPackage;
 
-  // 3. Configure Service
+  // Setup Listeners
   if (service is AndroidServiceInstance) {
-    service.on('setAsForeground').listen((event) {
-      service.setAsForegroundService();
-    });
-    service.on('setAsBackground').listen((event) {
-      service.setAsBackgroundService();
-    });
+    service
+        .on('setAsForeground')
+        .listen((event) => service.setAsForegroundService());
+    service
+        .on('setAsBackground')
+        .listen((event) => service.setAsBackgroundService());
   }
+  service.on('stopService').listen((event) => service.stopSelf());
 
-  service.on('stopService').listen((event) {
-    service.stopSelf();
-  });
-
-  // Hna fin UI ghay-goul l-Service: "Safe rani hellit had l-package"
   service.on('unlockPackage').listen((event) {
     if (event != null && event['package'] != null) {
       tempUnlockedPackage = event['package'];
-      print("🔓 Service Received Unlock: $tempUnlockedPackage");
-
-      // Reset after 30 seconds (just in case)
-      Future.delayed(const Duration(seconds: 30), () {
-        if (tempUnlockedPackage == event['package']) {
-          tempUnlockedPackage = null;
-        }
-      });
+      print("🔓 Service: Unlocked $tempUnlockedPackage locally");
     }
+  });
+
+  // Config update listener (MMKV doesn't need box refresh like Hive)
+  service.on('updateConfig').listen((event) async {
+    print("🔄 SIGNAL: Config update received (MMKV auto-syncs)");
+    // MMKV automatically syncs with disk via mmap, no manual refresh needed
   });
 
   print("==== Service Started Loop ===");
   final myLockerPackageName = 'com.example.app_locker360';
+  String? lastPackageName;
 
-  // 4. INFINITE LOOP (Machi Timer)
   while (true) {
     try {
-      // Logic Time: N-choufo chno tra f 5 d-tawani l-akhira
       final endData = DateTime.now();
-      final startData = endData.subtract(const Duration(seconds: 5));
+      // Khlliha 2 Minutes (bach t-lqat event dima)
+      final startData = endData.subtract(const Duration(minutes: 2));
 
-      // Query
       List<EventUsageInfo> events = await UsageStats.queryEvents(
         startData,
         endData,
       );
-
-      // Filter: Gher li banou f Foreground (type 1)
       var foregroundEvents = events.where((e) => e.eventType == '1').toList();
 
       if (foregroundEvents.isNotEmpty) {
-        // Sort: Jib jdid howa l-lewel
         foregroundEvents.sort(
           (a, b) => int.parse(b.timeStamp!).compareTo(int.parse(a.timeStamp!)),
         );
 
-        final currentEvent = foregroundEvents.first;
-        final currentPackage = currentEvent.packageName!;
+        final currentPackage = foregroundEvents.first.packageName!;
 
-        // Ignore self
         if (currentPackage == myLockerPackageName) {
-          await Future.delayed(const Duration(milliseconds: 500));
+          await Future.delayed(const Duration(milliseconds: 200));
           continue;
         }
 
-        // Check if this app is actually locked
-        final appConfig = HiveService.getAppConfig(currentPackage);
+        // --- SWITCH LOGIC ---
+        // Nta gulti "f dik lhda khso i3wd itekd"
+        // Hna Service ghadi y-checki Hive direct
+        if (lastPackageName != null && lastPackageName != currentPackage) {
+          print("🔄 Switched: $lastPackageName -> $currentPackage");
+          await MMKVService.setLockedPackage(null);
+          tempUnlockedPackage = null;
+          // Remove from temporary unlock list
+          await MMKVService.removeTemporarilyUnlocked(lastPackageName!);
+        }
 
-        // Check Local Cache FIRST (Fastest) or Hive (Slowest)
+        // --- LOCK CHECK ---
+        // MMKV auto-syncs, so getAppConfig always returns fresh data
+        final appConfig = MMKVService.getAppConfig(currentPackage);
+
+        // Debug chno 9rina
+        if (appConfig != null) {
+          // print("Check $currentPackage: Locked=${appConfig.isLocked}");
+        }
+
         final isUnlockedLocally = tempUnlockedPackage == currentPackage;
+        final isUnlockedMMKV = MMKVService.isTemporarilyUnlocked(
+          currentPackage,
+        );
 
         if (appConfig != null &&
             appConfig.isLocked &&
             !isUnlockedLocally &&
-            !HiveService.isTemporarilyUnlocked(currentPackage)) {
-          // This app is locked! Show the lock screen
-          print("🔒 App is LOCKED: $currentPackage");
+            !isUnlockedMMKV) {
+          print("🔒 LOCKING NOW: $currentPackage");
+          await MMKVService.setLockedPackage(currentPackage);
 
-          // 1. Save the locked package to Hive
-          await HiveService.setLockedPackage(currentPackage);
+          await Future.delayed(const Duration(milliseconds: 50));
 
-          // Debug Notification
-          if (service is AndroidServiceInstance) {
-            service.setForegroundNotificationInfo(
-              title: "App Locker Active",
-              content: "Locked: $currentPackage",
-            );
-          }
-
-          await Future.delayed(const Duration(milliseconds: 100));
-
-          // 2. Launch the lock screen intent via Main Channel
           final intent = AndroidIntent(
             action: 'android.intent.action.MAIN',
             package: myLockerPackageName,
@@ -171,22 +158,15 @@ void onStart(ServiceInstance service) async {
             ],
           );
           await intent.launch();
-
-          // Wait a bit to avoid spamming
-          await Future.delayed(const Duration(milliseconds: 1000));
-        } else {
-          // App is not locked or is allowed
-          if (isUnlockedLocally) {
-            print("🔓 Allowed (Locally): $currentPackage");
-          }
+          await Future.delayed(const Duration(milliseconds: 200));
         }
+
+        lastPackageName = currentPackage;
       }
     } catch (e) {
       print("Error in Loop: $e");
     }
-
-    // 5. Delay
-    await Future.delayed(const Duration(milliseconds: 500));
+    await Future.delayed(const Duration(milliseconds: 200));
   }
 }
 
@@ -285,37 +265,34 @@ class _MainAppState extends State<MainApp> with WidgetsBindingObserver {
 
       // HNA FIN KAYN SSER: Builder kay-ghellef l-app kamla
       builder: (context, child) {
-        return ValueListenableBuilder(
-          valueListenable: HiveService.lockStateBox.listenable(),
-          builder: (context, box, _) {
-            final lockedPackage = box.get('current_locked_package');
-            // Logic:
-            // Ila kanet kyna 'lockedPackage', affichi LockScreen FO9 kulchi.
-            // Ila makantch, affichi 'child' (li howa l-app l-3adya).
+        // Note: MMKV doesn't have ValueListenable like Hive
+        // We'll use a simple rebuild approach with the lockStateBox
+        final lockedPackage = MMKVService.lockStateBox.decodeString(
+          'current_locked_package',
+        );
+        // Logic:
+        // Ila kanet kyna 'lockedPackage', affichi LockScreen FO9 kulchi.
+        // Ila makantch, affichi 'child' (li howa l-app l-3adya).
 
-            return Stack(
-              children: [
-                // Tabaqa 1: L-App l-3adya (Home, Splash, etc..)
-                if (child != null) child,
+        return Stack(
+          children: [
+            // Layer 1: Normal app (Home, Splash, etc.)
+            if (child != null) child,
 
-                // Tabaqa 2: Lock Screen (Overlay)
-                // N-zido hta receivedLockedPackage f l-overlay bach yban dghya
-                if (lockedPackage != null)
-                  Positioned.fill(
-                    child: ScreenLockPage(lockedPackageName: lockedPackage),
-                  ),
+            // Layer 2: Lock Screen (Overlay)
+            if (lockedPackage != null)
+              Positioned.fill(
+                child: ScreenLockPage(lockedPackageName: lockedPackage),
+              ),
 
-                // Ila jana Intent f Background, ymken Hive mazal ma wslatch l update via Stream
-                // So n-forcew l-overlay hna
-                if (receivedLockedPackage != null && lockedPackage == null)
-                  Positioned.fill(
-                    child: ScreenLockPage(
-                      lockedPackageName: receivedLockedPackage!,
-                    ),
-                  ),
-              ],
-            );
-          },
+            // If we received an intent in background, show lock screen
+            if (receivedLockedPackage != null && lockedPackage == null)
+              Positioned.fill(
+                child: ScreenLockPage(
+                  lockedPackageName: receivedLockedPackage!,
+                ),
+              ),
+          ],
         );
       },
     );
@@ -339,12 +316,12 @@ class _SplashScreenState extends State<SplashScreen> {
 
   Future<void> _checkOnboardingStatus() async {
     // Small delay for splash effect
-    await Future.delayed(const Duration(milliseconds: 1500));
+    await Future.delayed(const Duration(milliseconds: 200));
 
     if (!mounted) return;
 
     // Check if user has completed onboarding
-    final settings = HiveService.getGlobalSettings();
+    final settings = MMKVService.getGlobalSettings();
 
     if (settings.hasCompletedOnboarding) {
       // User has completed onboarding, show auth screen

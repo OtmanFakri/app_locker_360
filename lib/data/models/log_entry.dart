@@ -1,53 +1,38 @@
-import 'package:hive/hive.dart';
-
-part 'log_entry.g.dart';
-
 /// Enum for log status
 enum LogStatus {
   success, // نجح في فتح التطبيق
   failed, // فشل في فتح التطبيق
 }
 
-@HiveType(typeId: 3)
-class LogEntry extends HiveObject {
+class LogEntry {
   /// معرف السجل (Auto-increment)
-  @HiveField(0)
   final int id;
 
   /// اسم حزمة التطبيق الذي تم محاولة فتحه
-  @HiveField(1)
   String packageName;
 
   /// اسم التطبيق (للعرض)
-  @HiveField(2)
   String? appName;
 
   /// وقت وتاريخ المحاولة
-  @HiveField(3)
   DateTime timestamp;
 
   /// حالة المحاولة (نجاح أو فشل)
-  @HiveField(4)
   LogStatus status;
 
   /// مسار صورة المتطفل (إذا فشلت المحاولة)
-  @HiveField(5)
   String? photoPath;
 
   /// الرمز الذي تم إدخاله (للتحليل - اختياري)
-  @HiveField(6)
   String? attemptedPin;
 
   /// عدد المحاولات الفاشلة المتتالية
-  @HiveField(7)
   int failedAttempts;
 
   /// عنوان IP (إذا كان متاحاً)
-  @HiveField(8)
   String? ipAddress;
 
   /// معلومات الجهاز
-  @HiveField(9)
   String? deviceInfo;
 
   LogEntry({

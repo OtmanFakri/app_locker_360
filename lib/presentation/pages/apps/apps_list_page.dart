@@ -3,7 +3,7 @@ import 'package:app_locker360/presentation/widgets/CustomSettings.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:device_apps/device_apps.dart';
-import 'package:app_locker360/data/datasources/hive_service.dart';
+import 'package:app_locker360/data/datasources/mmkv_service.dart';
 import 'package:app_locker360/data/models/apps_config.dart';
 
 /// Apps list page - main tab showing all installed apps
@@ -68,17 +68,17 @@ class _AppsListPageState extends State<AppsListPage> {
 
   void _toggleLock(Application app) {
     final config =
-        HiveService.getAppConfig(app.packageName) ??
+        MMKVService.getAppConfig(app.packageName) ??
         AppsConfig(packageName: app.packageName, appName: app.appName,lockType: LockType.global);
 
     final updatedConfig = config.copyWith(isLocked: !config.isLocked);
-    HiveService.addAppConfig(updatedConfig);
+    MMKVService.addAppConfig(updatedConfig);
     setState(() {});
   }
 
   void _toggleInternetBlock(Application app) {
     final config =
-        HiveService.getAppConfig(app.packageName) ??
+        MMKVService.getAppConfig(app.packageName) ??
         AppsConfig(packageName: app.packageName, appName: app.appName);
 
     // Cycle through: none -> wifi -> mobile -> all -> none
@@ -99,17 +99,17 @@ class _AppsListPageState extends State<AppsListPage> {
     }
 
     final updatedConfig = config.copyWith(blockInternet: nextBlock);
-    HiveService.addAppConfig(updatedConfig);
+    MMKVService.addAppConfig(updatedConfig);
     setState(() {});
   }
 
   void _toggleHidden(Application app) {
     final config =
-        HiveService.getAppConfig(app.packageName) ??
+        MMKVService.getAppConfig(app.packageName) ??
         AppsConfig(packageName: app.packageName, appName: app.appName);
 
     final updatedConfig = config.copyWith(isHidden: !config.isHidden);
-    HiveService.addAppConfig(updatedConfig);
+    MMKVService.addAppConfig(updatedConfig);
     setState(() {});
   }
 

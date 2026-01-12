@@ -1,55 +1,37 @@
 import 'dart:typed_data';
-import 'package:hive/hive.dart';
-
-part 'vault_item.g.dart';
 
 /// Enum for file types in vault
-@HiveType(typeId: 4)
 enum FileType {
-  @HiveField(0)
   image, // صورة
-  @HiveField(1)
   video, // فيديو
-  @HiveField(2)
   audio, // صوت
-  @HiveField(3)
   document, // مستند
-  @HiveField(4)
   other, // أخرى
 }
 
-@HiveType(typeId: 1)
-class VaultItem extends HiveObject {
+class VaultItem {
   /// معرف فريد للعنصر
-  @HiveField(0)
   final String id;
 
   /// المسار الأصلي للملف (قبل التشفير)
-  @HiveField(1)
   final String originalPath;
 
   /// المسار المشفر للملف
-  @HiveField(2)
   String encryptedPath;
 
   /// نوع الملف
-  @HiveField(3)
   FileType fileType;
 
   /// تاريخ الإضافة
-  @HiveField(4)
   DateTime addedDate;
 
   /// صورة مصغرة (thumbnail)
-  @HiveField(5)
   Uint8List? thumbnail;
 
   /// حجم الملف بالبايتات
-  @HiveField(6)
   int? fileSizeBytes;
 
   /// اسم الملف
-  @HiveField(7)
   String? fileName;
 
   VaultItem({
@@ -94,7 +76,7 @@ class VaultItem extends HiveObject {
       'encryptedPath': encryptedPath,
       'fileType': fileType.index,
       'addedDate': addedDate.toIso8601String(),
-      'thumbnail': thumbnail,
+      'thumbnail': thumbnail?.toList(), // Convert Uint8List to List<int>
       'fileSizeBytes': fileSizeBytes,
       'fileName': fileName,
     };
@@ -110,7 +92,9 @@ class VaultItem extends HiveObject {
       addedDate: map['addedDate'] != null
           ? DateTime.parse(map['addedDate'] as String)
           : DateTime.now(),
-      thumbnail: map['thumbnail'] as Uint8List?,
+      thumbnail: map['thumbnail'] != null
+          ? Uint8List.fromList(List<int>.from(map['thumbnail']))
+          : null,
       fileSizeBytes: map['fileSizeBytes'] as int?,
       fileName: map['fileName'] as String?,
     );

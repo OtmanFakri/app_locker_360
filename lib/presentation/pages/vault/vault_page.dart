@@ -5,7 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:photo_manager/photo_manager.dart';
 import 'package:wechat_assets_picker/wechat_assets_picker.dart';
 import 'package:file_picker/file_picker.dart' as picker;
-import 'package:app_locker360/data/datasources/hive_service.dart';
+import 'package:app_locker360/data/datasources/mmkv_service.dart';
 import 'package:app_locker360/data/models/vault_item.dart';
 import 'package:app_locker360/data/services/encryption_service.dart';
 import 'package:app_locker360/data/services/file_manager_service.dart';
@@ -25,7 +25,7 @@ class _VaultPageState extends State<VaultPage> {
 
   @override
   Widget build(BuildContext context) {
-    final vaultItems = HiveService.getVaultItemsByType(_selectedType);
+    final vaultItems = MMKVService.getVaultItemsByType(_selectedType);
 
     return Scaffold(
       backgroundColor: const Color(0xFF0A0E21),
@@ -434,7 +434,7 @@ class _VaultPageState extends State<VaultPage> {
     AssetEntity? originalAsset, // NEW: Optional asset for direct deletion
   }) async {
     // Get master PIN and salt
-    final settings = HiveService.getGlobalSettings();
+    final settings = MMKVService.getGlobalSettings();
     final masterPin = settings.masterPin;
 
     // Get or generate salt
@@ -445,7 +445,7 @@ class _VaultPageState extends State<VaultPage> {
     } else {
       salt = EncryptionService.generateSalt();
       final updatedSettings = settings.copyWith(encryptionSalt: salt);
-      await HiveService.updateGlobalSettings(updatedSettings);
+      await MMKVService.updateGlobalSettings(updatedSettings);
     }
 
     // Use VaultService to add file to vault

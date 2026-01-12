@@ -1,4 +1,4 @@
-import 'package:app_locker360/data/datasources/hive_service.dart';
+import 'package:app_locker360/data/datasources/mmkv_service.dart';
 import 'package:app_locker360/data/models/apps_config.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -21,7 +21,7 @@ class CustomSettingsSheetState extends State<CustomSettingsSheet> {
   void initState() {
     super.initState();
     _config =
-        HiveService.getAppConfig(widget.app.packageName) ??
+        MMKVService.getAppConfig(widget.app.packageName) ??
         AppsConfig(
           packageName: widget.app.packageName,
           appName: widget.app.appName,
@@ -29,7 +29,7 @@ class CustomSettingsSheetState extends State<CustomSettingsSheet> {
   }
 
   void _saveAndClose() {
-    HiveService.addAppConfig(_config);
+    MMKVService.addAppConfig(_config);
     Navigator.pop(context);
   }
 

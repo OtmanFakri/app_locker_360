@@ -2,7 +2,7 @@
 import 'package:app_locker360/presentation/widgets/ActionBuutton.dart';
 import 'package:flutter/material.dart';
 import 'package:device_apps/device_apps.dart';
-import 'package:app_locker360/data/datasources/hive_service.dart';
+import 'package:app_locker360/data/datasources/mmkv_service.dart';
 import 'package:app_locker360/data/models/apps_config.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -25,7 +25,7 @@ class AppListTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final config = HiveService.getAppConfig(app.packageName);
+    final config = MMKVService.getAppConfig(app.packageName);
     final isLocked = config?.isLocked ?? false;
     final isHidden = config?.isHidden ?? false;
     final blockInternet = config?.blockInternet ?? NetBlock.none;

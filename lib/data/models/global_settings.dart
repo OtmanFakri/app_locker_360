@@ -1,55 +1,38 @@
-import 'package:hive/hive.dart';
-
-part 'global_settings.g.dart';
-
-@HiveType(typeId: 2)
-class GlobalSettings extends HiveObject {
+class GlobalSettings {
   /// الرمز السري الرئيسي للتطبيق
-  @HiveField(0)
   String masterPin;
 
   /// ثيم التطبيق (Light, Dark, System)
-  @HiveField(1)
   String appTheme;
 
   /// مدة إعادة القفل بالثواني (0 = فوري)
-  @HiveField(2)
   int reLockTimeout;
 
   /// تفعيل البصمة
-  @HiveField(3)
   bool fingerprintEnabled;
 
   /// تفعيل صور المتطفلين
-  @HiveField(4)
   bool intruderSelfie;
 
   /// اللغة المفضلة
-  @HiveField(5)
   String? preferredLanguage;
 
   /// تفعيل الإشعارات
-  @HiveField(6)
   bool notificationsEnabled;
 
   /// عدد المحاولات المسموح بها قبل التنبيه
-  @HiveField(7)
   int maxAttempts;
 
   /// إخفاء التطبيق من قائمة التطبيقات
-  @HiveField(8)
   bool hideAppIcon;
 
   /// تفعيل الوضع الخفي (Stealth Mode)
-  @HiveField(9)
   bool stealthMode;
 
   /// هل أكمل المستخدم شاشة الإعداد الأولي
-  @HiveField(10)
   bool hasCompletedOnboarding;
 
   /// Salt for encryption key derivation
-  @HiveField(11)
   List<int>? encryptionSalt;
 
   GlobalSettings({

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:app_locker360/data/datasources/hive_service.dart';
+import 'package:app_locker360/data/datasources/mmkv_service.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:app_locker360/presentation/pages/home/home_page.dart';
 import 'package:app_locker360/presentation/pages/onboarding/permissions_page.dart';
@@ -543,7 +543,7 @@ class _PinSetupPageState extends State<PinSetupPage> {
 
   Future<void> _savePinAndComplete() async {
     // Get current settings
-    final settings = HiveService.getGlobalSettings();
+    final settings = MMKVService.getGlobalSettings();
 
     // Update with new PIN and mark onboarding as complete
     final updatedSettings = settings.copyWith(
@@ -551,7 +551,7 @@ class _PinSetupPageState extends State<PinSetupPage> {
       hasCompletedOnboarding: true,
     );
 
-    await HiveService.updateGlobalSettings(updatedSettings);
+    await MMKVService.updateGlobalSettings(updatedSettings);
 
     // Navigate to home (replace with your home page)
     if (mounted) {

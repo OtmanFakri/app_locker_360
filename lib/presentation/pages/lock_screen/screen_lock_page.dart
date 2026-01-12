@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:app_locker360/data/datasources/hive_service.dart';
+import 'package:app_locker360/data/datasources/mmkv_service.dart';
 import 'package:app_locker360/presentation/pages/auth/widgets/app_logo.dart';
 import 'package:app_locker360/presentation/pages/auth/widgets/pin_dots.dart';
 import 'package:app_locker360/presentation/pages/auth/widgets/error_message.dart';
@@ -83,7 +83,7 @@ class _ScreenLockPageState extends State<ScreenLockPage>
   }
 
   Future<void> _verifyPin() async {
-    final settings = HiveService.getGlobalSettings();
+    final settings = MMKVService.getGlobalSettings();
     if (_enteredPin == settings.masterPin) {
       // 1. Inform Background Service IMMEDIATELY (Fast)
       if (widget.lockedPackageName != null) {
@@ -96,11 +96,11 @@ class _ScreenLockPageState extends State<ScreenLockPage>
       }
 
       // 2. Reset Hive Trigger (Persistence)
-      await HiveService.setLockedPackage(null);
+      await MMKVService.setLockedPackage(null);
 
       // 3. Give Temporary Pass (Hive Backup)
       if (widget.lockedPackageName != null) {
-        await HiveService.setTemporarilyUnlocked(widget.lockedPackageName!);
+        await MMKVService.setTemporarilyUnlocked(widget.lockedPackageName!);
       }
 
       // 4. Exit App Locker
@@ -136,7 +136,7 @@ class _ScreenLockPageState extends State<ScreenLockPage>
 
   @override
   Widget build(BuildContext context) {
-    final settings = HiveService.getGlobalSettings();
+    final settings = MMKVService.getGlobalSettings();
 
     return PopScope(
       canPop: false,

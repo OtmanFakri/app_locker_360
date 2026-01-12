@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:app_locker360/data/datasources/hive_service.dart';
+import 'package:app_locker360/data/datasources/mmkv_service.dart';
 import 'package:app_locker360/presentation/pages/onboarding/page.dart';
 import 'package:app_locker360/presentation/pages/home/home_page.dart';
 import 'package:app_locker360/presentation/pages/auth/widgets/app_logo.dart';
@@ -85,7 +85,7 @@ class _AuthPageState extends State<AuthPage> with TickerProviderStateMixin {
   }
 
   Future<void> _verifyPin() async {
-    final settings = HiveService.getGlobalSettings();
+    final settings = MMKVService.getGlobalSettings();
 
     if (_enteredPin == settings.masterPin) {
       // Correct PIN - Navigate to home/dashboard
@@ -141,7 +141,7 @@ class _AuthPageState extends State<AuthPage> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-    final settings = HiveService.getGlobalSettings();
+    final settings = MMKVService.getGlobalSettings();
 
     return Scaffold(
       backgroundColor: const Color(0xFF0A0E21),

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:app_locker360/data/datasources/hive_service.dart';
+import 'package:app_locker360/data/datasources/mmkv_service.dart';
 import 'package:app_locker360/data/models/global_settings.dart';
 import 'package:app_locker360/presentation/pages/onboarding/page.dart';
 
@@ -163,13 +163,13 @@ class ForgotPasswordDialog extends StatelessWidget {
     );
 
     // Clear all data
-    await HiveService.clearAllLogs();
-    await HiveService.appsConfigBox.clear();
-    await HiveService.vaultItemsBox.clear();
+    await MMKVService.clearAllLogs();
+    // await MMKVService.appsConfigBox.clear();
+    // await MMKVService.vaultItemsBox.clear();
 
     // Reset global settings
     final newSettings = GlobalSettings(hasCompletedOnboarding: false);
-    await HiveService.updateGlobalSettings(newSettings);
+    await MMKVService.updateGlobalSettings(newSettings);
 
     // Small delay
     await Future.delayed(const Duration(milliseconds: 500));

@@ -1,61 +1,40 @@
-import 'package:hive/hive.dart';
-
-part 'apps_config.g.dart';
-
 /// Enum for lock type
-@HiveType(typeId: 5)
 enum LockType {
-  @HiveField(0)
   global, // استخدام  الرمز العام
-  @HiveField(1)
   custom, // استخدام رمز خاص
 }
 
 /// Enum for network blocking
-@HiveType(typeId: 6)
 enum NetBlock {
-  @HiveField(0)
   none, // النت خدام عادي
-  @HiveField(1)
   wifi, // قطع الواي فاي فقط
-  @HiveField(2)
   mobile, // قطع بيانات الموبايل فقط
-  @HiveField(3)
   all, // قطع كل الإنترنت
 }
 
-@HiveType(typeId: 0)
-class AppsConfig extends HiveObject {
+class AppsConfig {
   /// معرف التطبيق (Package Name) - Primary Key
-  @HiveField(0)
   final String packageName;
 
   /// اسم التطبيق
-  @HiveField(1)
   String appName;
 
   /// هل التطبيق مقفول؟
-  @HiveField(2)
   bool isLocked;
 
   /// هل التطبيق مخفي؟
-  @HiveField(3)
   bool isHidden;
 
   /// نوع القفل (عام أو خاص)
-  @HiveField(4)
   LockType lockType;
 
   /// الرمز الخاص (إذا كان نوع القفل custom)
-  @HiveField(5)
   String? customPin;
 
   /// حظر الإنترنت
-  @HiveField(6)
   NetBlock blockInternet;
 
   /// إظهار أيقونة العين في شاشة القفل
-  @HiveField(7)
   bool eyeIconVisible;
 
   AppsConfig({

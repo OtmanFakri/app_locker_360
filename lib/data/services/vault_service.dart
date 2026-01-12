@@ -5,7 +5,7 @@ import 'package:flutter/foundation.dart';
 import 'package:image/image.dart' as img;
 import 'package:video_thumbnail/video_thumbnail.dart';
 import 'package:photo_manager/photo_manager.dart';
-import 'package:app_locker360/data/datasources/hive_service.dart';
+import 'package:app_locker360/data/datasources/mmkv_service.dart';
 import 'package:app_locker360/data/models/vault_item.dart';
 import 'package:app_locker360/data/services/encryption_service.dart';
 import 'package:app_locker360/data/services/file_manager_service.dart';
@@ -95,7 +95,7 @@ class VaultService {
       );
 
       // Save to Hive
-      await HiveService.addVaultItem(vaultItem);
+      await MMKVService.addVaultItem(vaultItem);
 
       // Update progress
       onProgress?.call(0.9);
@@ -230,7 +230,7 @@ class VaultService {
       }
 
       // Remove from Hive
-      await HiveService.deleteVaultItem(item.id);
+      await MMKVService.deleteVaultItem(item.id);
     } catch (e) {
       throw Exception('Failed to delete vault item: $e');
     }

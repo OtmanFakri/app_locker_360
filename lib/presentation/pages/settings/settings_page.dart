@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:app_locker360/data/datasources/hive_service.dart';
+import 'package:app_locker360/data/datasources/mmkv_service.dart';
 
 /// Settings page - app configuration and dashboard
 class SettingsPage extends StatefulWidget {
@@ -13,7 +13,7 @@ class SettingsPage extends StatefulWidget {
 class _SettingsPageState extends State<SettingsPage> {
   @override
   Widget build(BuildContext context) {
-    final settings = HiveService.getGlobalSettings();
+    final settings = MMKVService.getGlobalSettings();
 
     return Scaffold(
       backgroundColor: const Color(0xFF0A0E21),
@@ -41,7 +41,7 @@ class _SettingsPageState extends State<SettingsPage> {
             value: settings.fingerprintEnabled,
             onChanged: (value) {
               final updated = settings.copyWith(fingerprintEnabled: value);
-              HiveService.updateGlobalSettings(updated);
+              MMKVService.updateGlobalSettings(updated);
               setState(() {});
             },
           ),
@@ -52,7 +52,7 @@ class _SettingsPageState extends State<SettingsPage> {
             value: settings.intruderSelfie,
             onChanged: (value) {
               final updated = settings.copyWith(intruderSelfie: value);
-              HiveService.updateGlobalSettings(updated);
+              MMKVService.updateGlobalSettings(updated);
               setState(() {});
             },
           ),
@@ -70,7 +70,7 @@ class _SettingsPageState extends State<SettingsPage> {
               final updated = settings.copyWith(
                 appTheme: value ? 'Dark' : 'Light',
               );
-              HiveService.updateGlobalSettings(updated);
+              MMKVService.updateGlobalSettings(updated);
               setState(() {});
             },
           ),
@@ -86,7 +86,7 @@ class _SettingsPageState extends State<SettingsPage> {
             value: settings.stealthMode,
             onChanged: (value) {
               final updated = settings.copyWith(stealthMode: value);
-              HiveService.updateGlobalSettings(updated);
+              MMKVService.updateGlobalSettings(updated);
               setState(() {});
             },
           ),
@@ -97,7 +97,7 @@ class _SettingsPageState extends State<SettingsPage> {
             value: settings.notificationsEnabled,
             onChanged: (value) {
               final updated = settings.copyWith(notificationsEnabled: value);
-              HiveService.updateGlobalSettings(updated);
+              MMKVService.updateGlobalSettings(updated);
               setState(() {});
             },
           ),
