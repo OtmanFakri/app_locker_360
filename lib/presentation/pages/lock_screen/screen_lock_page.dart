@@ -3,6 +3,7 @@ import 'package:app_locker360/core/services/BiometricService.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:app_locker360/data/datasources/mmkv_service.dart';
+import 'package:app_locker360/data/models/apps_config.dart';
 import 'package:app_locker360/presentation/pages/auth/widgets/app_logo.dart';
 import 'package:app_locker360/presentation/pages/auth/widgets/pin_dots.dart';
 import 'package:app_locker360/presentation/pages/auth/widgets/error_message.dart';
@@ -116,7 +117,20 @@ class _ScreenLockPageState extends State<ScreenLockPage>
 
   Future<void> _verifyPin() async {
     final settings = MMKVService.getGlobalSettings();
-    if (_enteredPin == settings.masterPin) {
+    String targetPin = settings.masterPin;
+
+    // Check for Custom PIN
+    if (widget.lockedPackageName != null) {
+      final appConfig = MMKVService.getAppConfig(widget.lockedPackageName!);
+      if (appConfig != null &&
+          appConfig.lockType == LockType.custom &&
+          appConfig.customPin != null &&
+          appConfig.customPin!.isNotEmpty) {
+        targetPin = appConfig.customPin!;
+      }
+    }
+
+    if (_enteredPin == targetPin) {
       await _unlockApp();
     } else {
       // Error Animation...

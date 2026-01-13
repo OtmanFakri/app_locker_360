@@ -2,6 +2,8 @@ import 'package:app_locker360/data/datasources/mmkv_service.dart';
 import 'package:app_locker360/data/models/apps_config.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:app_locker360/presentation/pages/auth/widgets/number_pad.dart';
+import 'package:app_locker360/presentation/pages/auth/widgets/pin_dots.dart';
 import 'package:device_apps/device_apps.dart';
 
 /// Custom settings bottom sheet
@@ -29,8 +31,94 @@ class CustomSettingsSheetState extends State<CustomSettingsSheet> {
   }
 
   void _saveAndClose() {
+    // Validate custom PIN
+    if (_config.lockType == LockType.custom &&
+        (_config.customPin == null || _config.customPin!.length < 4)) {
+      // Revert to global if invalid
+      _config = _config.copyWith(lockType: LockType.global);
+    }
     MMKVService.addAppConfig(_config);
     Navigator.pop(context);
+  }
+
+  Future<void> _showPinSetupDialog() async {
+    String pin = '';
+    await showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => StatefulBuilder(
+        builder: (context, setStateDialog) {
+          return Dialog(
+            backgroundColor: const Color(0xFF1A1F3A),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(24),
+              side: BorderSide(color: Colors.white.withOpacity(0.1)),
+            ),
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.all(24),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    'تعيين رمز خاص',
+                    style: GoogleFonts.cairo(
+                      color: Colors.white,
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 32),
+                  PinDots(filledCount: pin.length),
+                  const SizedBox(height: 32),
+                  SizedBox(
+                    height: 400,
+                    child: NumberPad(
+                      onNumberPressed: (num) {
+                        if (pin.length < 4) {
+                          setStateDialog(() {
+                            pin += num;
+                          });
+                          if (pin.length == 4) {
+                            Navigator.pop(context);
+                            setState(() {
+                              _config = _config.copyWith(
+                                lockType: LockType.custom,
+                                customPin: pin,
+                              );
+                            });
+                          }
+                        }
+                      },
+                      onDeletePressed: () {
+                        if (pin.isNotEmpty) {
+                          setStateDialog(() {
+                            pin = pin.substring(0, pin.length - 1);
+                          });
+                        }
+                      },
+                    ),
+                  ),
+                  TextButton(
+                    onPressed: () => Navigator.pop(context),
+                    child: Text(
+                      'إلغاء',
+                      style: GoogleFonts.cairo(color: Colors.white54),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          );
+        },
+      ),
+    );
+    // Revert if cancelled and invalid
+    if (_config.lockType == LockType.custom &&
+        (_config.customPin == null || _config.customPin!.isEmpty)) {
+      setState(() {
+        _config = _config.copyWith(lockType: LockType.global);
+      });
+    }
   }
 
   @override
@@ -109,11 +197,34 @@ class CustomSettingsSheetState extends State<CustomSettingsSheet> {
                     setState(() {
                       _config = _config.copyWith(lockType: LockType.custom);
                     });
+                    if (_config.customPin == null ||
+                        _config.customPin!.isEmpty) {
+                      _showPinSetupDialog();
+                    }
                   },
                 ),
               ),
             ],
           ),
+
+          if (_config.lockType == LockType.custom)
+            Center(
+              child: Padding(
+                padding: const EdgeInsets.only(top: 12.0),
+                child: TextButton(
+                  onPressed: _showPinSetupDialog,
+                  child: Text(
+                    _config.customPin != null && _config.customPin!.isNotEmpty
+                        ? 'تغيير الرمز الخاص'
+                        : 'تعيين الرمز الخاص',
+                    style: GoogleFonts.cairo(
+                      color: const Color(0xFF667EEA),
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ),
+            ),
 
           const SizedBox(height: 24),
 
