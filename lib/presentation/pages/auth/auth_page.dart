@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:app_locker360/core/services/BiometricService.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:app_locker360/data/datasources/mmkv_service.dart';
-import 'package:app_locker360/presentation/pages/onboarding/page.dart';
 import 'package:app_locker360/presentation/pages/home/home_page.dart';
 import 'package:app_locker360/presentation/pages/auth/widgets/app_logo.dart';
 import 'package:app_locker360/presentation/pages/auth/widgets/pin_dots.dart';
@@ -22,6 +22,7 @@ class AuthPage extends StatefulWidget {
 class _AuthPageState extends State<AuthPage> with TickerProviderStateMixin {
   String _enteredPin = '';
   bool _showError = false;
+  bool _showPinPad = true;
   int _failedAttempts = 0;
   late AnimationController _shakeController;
   late Animation<double> _shakeAnimation;
@@ -32,6 +33,14 @@ class _AuthPageState extends State<AuthPage> with TickerProviderStateMixin {
   void initState() {
     super.initState();
     _initializeAnimations();
+
+    final settings = MMKVService.getGlobalSettings();
+    if (settings.fingerprintEnabled) {
+      _showPinPad = false;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _onFingerprintPressed();
+      });
+    }
   }
 
   void _initializeAnimations() {
@@ -116,20 +125,15 @@ class _AuthPageState extends State<AuthPage> with TickerProviderStateMixin {
     }
   }
 
-  void _onFingerprintPressed() {
-    // TODO: Implement biometric authentication
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-          'البصمة قيد التطوير',
-          style: GoogleFonts.cairo(),
-          textAlign: TextAlign.center,
-        ),
-        backgroundColor: const Color(0xFF667EEA),
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      ),
-    );
+  Future<void> _onFingerprintPressed() async {
+    final authenticated = await BiometricService.authenticate();
+    if (authenticated) {
+      if (mounted) {
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(builder: (context) => const HomePage()),
+        );
+      }
+    }
   }
 
   void _onForgotPassword() {
@@ -207,7 +211,7 @@ class _AuthPageState extends State<AuthPage> with TickerProviderStateMixin {
                         const SizedBox(height: 24),
 
                         // Fingerprint button (if enabled)
-                        if (settings.fingerprintEnabled) ...[
+                        if (settings.fingerprintEnabled && !_showPinPad) ...[
                           FingerprintButton(
                             onPressed: _onFingerprintPressed,
                             pulseAnimation: _pulseAnimation,
@@ -218,10 +222,40 @@ class _AuthPageState extends State<AuthPage> with TickerProviderStateMixin {
                         const Spacer(),
 
                         // Number pad
-                        NumberPad(
-                          onNumberPressed: _onNumberPressed,
-                          onDeletePressed: _onDeletePressed,
-                        ),
+                        if (_showPinPad)
+                          NumberPad(
+                            onNumberPressed: _onNumberPressed,
+                            onDeletePressed: _onDeletePressed,
+                          )
+                        else
+                          Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 20),
+                            child: TextButton(
+                              onPressed: () {
+                                setState(() {
+                                  _showPinPad = true;
+                                });
+                              },
+                              style: TextButton.styleFrom(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 32,
+                                  vertical: 12,
+                                ),
+                                backgroundColor: Colors.white.withOpacity(0.1),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(30),
+                                ),
+                              ),
+                              child: Text(
+                                'استخدام الرمز السري',
+                                style: GoogleFonts.cairo(
+                                  fontSize: 16,
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                          ),
 
                         const SizedBox(height: 24),
 

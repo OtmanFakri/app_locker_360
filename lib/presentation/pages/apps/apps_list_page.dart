@@ -5,6 +5,8 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:device_apps/device_apps.dart';
 import 'package:app_locker360/data/datasources/mmkv_service.dart';
 import 'package:app_locker360/data/models/apps_config.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
+import 'package:app_locker360/data/services/ad_helper.dart';
 
 /// Apps list page - main tab showing all installed apps
 class AppsListPage extends StatefulWidget {
@@ -20,10 +22,36 @@ class _AppsListPageState extends State<AppsListPage> {
   bool _isLoading = true;
   String _searchQuery = '';
 
+  // Ad variables
+  BannerAd? _bannerAd;
+  bool _isBannerAdLoaded = false;
+
   @override
   void initState() {
     super.initState();
     _loadInstalledApps();
+    _loadBannerAd();
+  }
+
+  @override
+  void dispose() {
+    _bannerAd?.dispose();
+    super.dispose();
+  }
+
+  void _loadBannerAd() {
+    _bannerAd = AdHelper.createBannerAd(
+      adSize: AdSize.banner,
+      onAdLoaded: (ad) {
+        setState(() {
+          _isBannerAdLoaded = true;
+        });
+      },
+      onAdFailedToLoad: (ad, error) {
+        print('Banner ad failed to load: $error');
+        ad.dispose();
+      },
+    )..load();
   }
 
   Future<void> _loadInstalledApps() async {
@@ -69,7 +97,11 @@ class _AppsListPageState extends State<AppsListPage> {
   void _toggleLock(Application app) {
     final config =
         MMKVService.getAppConfig(app.packageName) ??
-        AppsConfig(packageName: app.packageName, appName: app.appName,lockType: LockType.global);
+        AppsConfig(
+          packageName: app.packageName,
+          appName: app.appName,
+          lockType: LockType.global,
+        );
 
     final updatedConfig = config.copyWith(isLocked: !config.isLocked);
     MMKVService.addAppConfig(updatedConfig);
@@ -204,11 +236,18 @@ class _AppsListPageState extends State<AppsListPage> {
                     },
                   ),
           ),
+
+          // Banner Ad at bottom
+          if (_isBannerAdLoaded && _bannerAd != null)
+            Container(
+              alignment: Alignment.center,
+              width: _bannerAd!.size.width.toDouble(),
+              height: _bannerAd!.size.height.toDouble(),
+              color: const Color(0xFF1A1F3A),
+              child: AdWidget(ad: _bannerAd!),
+            ),
         ],
       ),
     );
   }
 }
-
-
-

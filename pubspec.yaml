@@ -51,6 +51,12 @@ dependencies:
   device_info_plus: ^12.3.0
   package_info_plus: ^8.1.2
 
+  # ADS
+  google_mobile_ads: ^7.0.0
+
+  # AUTH 
+  local_auth: ^2.3.0
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

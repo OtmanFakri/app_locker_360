@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:app_locker360/core/services/BiometricService.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:app_locker360/data/datasources/mmkv_service.dart';
@@ -8,6 +9,8 @@ import 'package:app_locker360/presentation/pages/auth/widgets/error_message.dart
 import 'package:app_locker360/presentation/pages/auth/widgets/fingerprint_button.dart';
 import 'package:app_locker360/presentation/pages/auth/widgets/number_pad.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
+import 'package:app_locker360/data/services/ad_helper.dart';
 
 class ScreenLockPage extends StatefulWidget {
   final String? lockedPackageName;
@@ -21,15 +24,28 @@ class _ScreenLockPageState extends State<ScreenLockPage>
     with TickerProviderStateMixin {
   String _enteredPin = '';
   bool _showError = false;
+  bool _showPinPad = true;
   late AnimationController _shakeController;
   late Animation<double> _shakeAnimation;
   late AnimationController _pulseController;
   late Animation<double> _pulseAnimation;
 
-  @override
+  // Ad variables
+  BannerAd? _bannerAd;
+  bool _isBannerAdLoaded = false;
+
   void initState() {
     super.initState();
     _initializeAnimations();
+    _loadBannerAd();
+
+    final settings = MMKVService.getGlobalSettings();
+    if (settings.fingerprintEnabled) {
+      _showPinPad = false;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _onFingerprintPressed();
+      });
+    }
   }
 
   void _initializeAnimations() {
@@ -56,7 +72,23 @@ class _ScreenLockPageState extends State<ScreenLockPage>
   void dispose() {
     _shakeController.dispose();
     _pulseController.dispose();
+    _bannerAd?.dispose();
     super.dispose();
+  }
+
+  void _loadBannerAd() {
+    _bannerAd = AdHelper.createBannerAd(
+      adSize: AdSize.banner,
+      onAdLoaded: (ad) {
+        setState(() {
+          _isBannerAdLoaded = true;
+        });
+      },
+      onAdFailedToLoad: (ad, error) {
+        print('Banner ad failed to load: $error');
+        ad.dispose();
+      },
+    )..load();
   }
 
   void _onNumberPressed(String number) {
@@ -85,28 +117,7 @@ class _ScreenLockPageState extends State<ScreenLockPage>
   Future<void> _verifyPin() async {
     final settings = MMKVService.getGlobalSettings();
     if (_enteredPin == settings.masterPin) {
-      // 1. Inform Background Service IMMEDIATELY (Fast)
-      if (widget.lockedPackageName != null) {
-        print(
-          "🔓 Sending unlockPackage event for: ${widget.lockedPackageName}",
-        );
-        FlutterBackgroundService().invoke('unlockPackage', {
-          'package': widget.lockedPackageName,
-        });
-      }
-
-      // 2. Reset Hive Trigger (Persistence)
-      await MMKVService.setLockedPackage(null);
-
-      // 3. Give Temporary Pass (Hive Backup)
-      if (widget.lockedPackageName != null) {
-        await MMKVService.setTemporarilyUnlocked(widget.lockedPackageName!);
-      }
-
-      // 4. Exit App Locker
-      if (mounted) {
-        SystemNavigator.pop();
-      }
+      await _unlockApp();
     } else {
       // Error Animation...
       _shakeController.forward(from: 0);
@@ -118,20 +129,34 @@ class _ScreenLockPageState extends State<ScreenLockPage>
     }
   }
 
-  void _onFingerprintPressed() {
-    // TODO: Implement biometric authentication
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-          'البصمة قيد التطوير',
-          style: GoogleFonts.cairo(),
-          textAlign: TextAlign.center,
-        ),
-        backgroundColor: const Color(0xFF667EEA),
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      ),
-    );
+  Future<void> _unlockApp() async {
+    // 1. Inform Background Service IMMEDIATELY (Fast)
+    if (widget.lockedPackageName != null) {
+      print("🔓 Sending unlockPackage event for: ${widget.lockedPackageName}");
+      FlutterBackgroundService().invoke('unlockPackage', {
+        'package': widget.lockedPackageName,
+      });
+    }
+
+    // 2. Reset Hive Trigger (Persistence)
+    await MMKVService.setLockedPackage(null);
+
+    // 3. Give Temporary Pass (Hive Backup)
+    if (widget.lockedPackageName != null) {
+      await MMKVService.setTemporarilyUnlocked(widget.lockedPackageName!);
+    }
+
+    // 4. Exit App Locker
+    if (mounted) {
+      SystemNavigator.pop();
+    }
+  }
+
+  Future<void> _onFingerprintPressed() async {
+    final authenticated = await BiometricService.authenticate();
+    if (authenticated) {
+      await _unlockApp();
+    }
   }
 
   @override
@@ -204,7 +229,8 @@ class _ScreenLockPageState extends State<ScreenLockPage>
                           const SizedBox(height: 24),
 
                           // Fingerprint button (if enabled)
-                          if (settings.fingerprintEnabled) ...[
+                          // Fingerprint button (if enabled)
+                          if (settings.fingerprintEnabled && !_showPinPad) ...[
                             FingerprintButton(
                               onPressed: _onFingerprintPressed,
                               pulseAnimation: _pulseAnimation,
@@ -215,10 +241,42 @@ class _ScreenLockPageState extends State<ScreenLockPage>
                           const Spacer(),
 
                           // Number pad
-                          NumberPad(
-                            onNumberPressed: _onNumberPressed,
-                            onDeletePressed: _onDeletePressed,
-                          ),
+                          if (_showPinPad)
+                            NumberPad(
+                              onNumberPressed: _onNumberPressed,
+                              onDeletePressed: _onDeletePressed,
+                            )
+                          else
+                            Padding(
+                              padding: const EdgeInsets.symmetric(vertical: 20),
+                              child: TextButton(
+                                onPressed: () {
+                                  setState(() {
+                                    _showPinPad = true;
+                                  });
+                                },
+                                style: TextButton.styleFrom(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 32,
+                                    vertical: 12,
+                                  ),
+                                  backgroundColor: Colors.white.withOpacity(
+                                    0.1,
+                                  ),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(30),
+                                  ),
+                                ),
+                                child: Text(
+                                  'استخدام الرمز السري',
+                                  style: GoogleFonts.cairo(
+                                    fontSize: 16,
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ),
+                            ),
 
                           const SizedBox(height: 24),
 
@@ -236,6 +294,16 @@ class _ScreenLockPageState extends State<ScreenLockPage>
                           //   ),
                           // ),
                           const SizedBox(height: 16),
+
+                          // Banner Ad
+                          if (_isBannerAdLoaded && _bannerAd != null)
+                            Container(
+                              alignment: Alignment.center,
+                              width: _bannerAd!.size.width.toDouble(),
+                              height: _bannerAd!.size.height.toDouble(),
+                              child: AdWidget(ad: _bannerAd!),
+                            ),
+                          if (_isBannerAdLoaded) const SizedBox(height: 16),
                         ],
                       ),
                     ),

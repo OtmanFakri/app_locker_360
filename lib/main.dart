@@ -14,6 +14,7 @@ import 'dart:async';
 import 'package:socket_io_client/socket_io_client.dart' as io;
 import 'package:android_intent_plus/android_intent.dart';
 import 'package:android_intent_plus/flag.dart';
+import 'package:app_locker360/data/services/ad_helper.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -31,6 +32,9 @@ void main() async {
   await MMKVService.init();
   await MMKVService.openBoxes();
   await MMKVService.initializeGlobalSettings();
+
+  // Initialize Google Mobile Ads
+  await AdHelper.initialize();
 
   // Background service
   await initializeService();

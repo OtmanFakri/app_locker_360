@@ -2,11 +2,11 @@ package com.example.app_locker360
 
 import android.app.AppOpsManager
 import android.content.Context
-import io.flutter.embedding.android.FlutterActivity
 import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.plugin.common.MethodChannel
+import io.flutter.embedding.android.FlutterFragmentActivity
 
-class MainActivity: FlutterActivity() {
+class MainActivity: FlutterFragmentActivity() {
     private val CHANNEL = "com.example.app_locker360/media_scanner"
     private val INTENT_CHANNEL = "com.example.app_locker360/intent"
     private var intentMethodChannel: MethodChannel? = null
