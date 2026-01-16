@@ -9,7 +9,12 @@ import io.flutter.embedding.android.FlutterFragmentActivity
 class MainActivity: FlutterFragmentActivity() {
     private val CHANNEL = "com.example.app_locker360/media_scanner"
     private val INTENT_CHANNEL = "com.example.app_locker360/intent"
+    private val FIREWALL_CHANNEL = "com.example.app_locker360/firewall"
     private var intentMethodChannel: MethodChannel? = null
+    
+    companion object {
+        private const val VPN_REQUEST_CODE = 1001
+    }
 
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
         super.configureFlutterEngine(flutterEngine)
@@ -76,6 +81,95 @@ class MainActivity: FlutterFragmentActivity() {
                         } catch (ex: Exception) {
                             result.error("ERROR", "Failed to open permissions: ${ex.message}", null)
                         }
+                    }
+                }
+                else -> {
+                    result.notImplemented()
+                }
+            }
+        }
+
+        // Firewall Channel
+        MethodChannel(flutterEngine.dartExecutor.binaryMessenger, FIREWALL_CHANNEL).setMethodCallHandler { call, result ->
+            when (call.method) {
+                "checkVpnPermission" -> {
+                    val intent = android.net.VpnService.prepare(this)
+                    result.success(intent == null)
+                }
+                "updateInternetBlock" -> {
+                    val packageName = call.argument<String>("packageName")
+                    val blockWifi = call.argument<Boolean>("blockWifi") ?: false
+                    val blockMobile = call.argument<Boolean>("blockMobile") ?: false
+                    
+                    android.util.Log.d("FirewallChannel", "===== UPDATE INTERNET BLOCK =====")
+                    android.util.Log.d("FirewallChannel", "Package: $packageName")
+                    android.util.Log.d("FirewallChannel", "Block WiFi: $blockWifi")
+                    android.util.Log.d("FirewallChannel", "Block Mobile: $blockMobile")
+                    
+                    if (packageName == null) {
+                        result.error("INVALID_ARGUMENT", "Package name is required", null)
+                        return@setMethodCallHandler
+                    }
+                    
+                    try {
+                        // Check VPN permission first
+                        val vpnIntent = android.net.VpnService.prepare(this)
+                        if (vpnIntent != null) {
+                            // VPN permission not granted, request it
+                            android.util.Log.w("FirewallChannel", "VPN permission not granted, requesting...")
+                            startActivityForResult(vpnIntent, VPN_REQUEST_CODE)
+                            result.error("VPN_PERMISSION_REQUIRED", "VPN permission needed", null)
+                            return@setMethodCallHandler
+                        }
+                        
+                        android.util.Log.d("FirewallChannel", "VPN permission OK")
+                        
+                        // Update preferences
+                        val prefs = FirewallPreferences(this)
+                        prefs.setWifiBlocked(FirewallMode.VPN, packageName, blockWifi)
+                        prefs.setDataBlocked(FirewallMode.VPN, packageName, blockMobile)
+                        
+                        android.util.Log.d("FirewallChannel", "Preferences updated")
+                        
+                        // Check if any apps are blocked
+                        val blockedWifi = prefs.getBlockedPackagesForNetwork(FirewallMode.VPN, true)
+                        val blockedMobile = prefs.getBlockedPackagesForNetwork(FirewallMode.VPN, false)
+                        val hasBlockedApps = blockedWifi.isNotEmpty() || blockedMobile.isNotEmpty()
+                        
+                        android.util.Log.d("FirewallChannel", "Blocked WiFi apps: ${blockedWifi.size}")
+                        android.util.Log.d("FirewallChannel", "Blocked Mobile apps: ${blockedMobile.size}")
+                        android.util.Log.d("FirewallChannel", "Has blocked apps: $hasBlockedApps")
+                        
+                        if (hasBlockedApps) {
+                            // Start or refresh VPN service
+                            android.util.Log.d("FirewallChannel", "Starting/refreshing VPN service...")
+                            val serviceIntent = android.content.Intent(this, FirewallVpnService::class.java)
+                            serviceIntent.action = FirewallVpnService.ACTION_REFRESH
+                            startService(serviceIntent)
+                            prefs.setVpnEnabled(true)
+                            android.util.Log.i("FirewallChannel", "✅ VPN service started/refreshed")
+                        } else {
+                            // No apps blocked, stop VPN
+                            android.util.Log.d("FirewallChannel", "Stopping VPN service...")
+                            FirewallVpnService.stopVpn(this)
+                            prefs.setVpnEnabled(false)
+                            android.util.Log.i("FirewallChannel", "✅ VPN service stopped")
+                        }
+                        
+                        result.success(true)
+                    } catch (e: Exception) {
+                        android.util.Log.e("FirewallChannel", "❌ Error: ${e.message}", e)
+                        result.error("ERROR", "Failed to update internet block: ${e.message}", null)
+                    }
+                }
+                "stopVpnService" -> {
+                    try {
+                        FirewallVpnService.stopVpn(this)
+                        val prefs = FirewallPreferences(this)
+                        prefs.setVpnEnabled(false)
+                        result.success(true)
+                    } catch (e: Exception) {
+                        result.error("ERROR", "Failed to stop VPN: ${e.message}", null)
                     }
                 }
                 else -> {

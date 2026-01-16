@@ -1,6 +1,7 @@
 import 'package:app_locker360/presentation/widgets/ApplistTitle.dart';
 import 'package:app_locker360/presentation/widgets/CustomSettings.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:device_apps/device_apps.dart';
 import 'package:app_locker360/data/datasources/mmkv_service.dart';
@@ -110,7 +111,7 @@ class _AppsListPageState extends State<AppsListPage> {
     setState(() {});
   }
 
-  void _toggleInternetBlock(Application app) {
+  void _toggleInternetBlock(Application app) async {
     final config =
         MMKVService.getAppConfig(app.packageName) ??
         AppsConfig(packageName: app.packageName, appName: app.appName);
@@ -132,9 +133,80 @@ class _AppsListPageState extends State<AppsListPage> {
         break;
     }
 
+    // Save to MMKV first
     final updatedConfig = config.copyWith(blockInternet: nextBlock);
     MMKVService.addAppConfig(updatedConfig);
-    setState(() {});
+
+    // Determine blocking settings based on NetBlock
+    bool blockWifi = false;
+    bool blockMobile = false;
+
+    switch (nextBlock) {
+      case NetBlock.wifi:
+        blockWifi = true;
+        break;
+      case NetBlock.mobile:
+        blockMobile = true;
+        break;
+      case NetBlock.all:
+        blockWifi = true;
+        blockMobile = true;
+        break;
+      case NetBlock.none:
+        // Both remain false
+        break;
+    }
+
+    // Update native VPN service
+    try {
+      print('🔵 Toggling internet block for ${app.packageName}');
+      print('🔵 Block WiFi: $blockWifi, Block Mobile: $blockMobile');
+
+      const platform = MethodChannel('com.example.app_locker360/firewall');
+      final result = await platform.invokeMethod('updateInternetBlock', {
+        'packageName': app.packageName,
+        'blockWifi': blockWifi,
+        'blockMobile': blockMobile,
+      });
+
+      print('✅ VPN service updated successfully: $result');
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Internet blocking updated for ${app.appName}'),
+            backgroundColor: Colors.green,
+            duration: const Duration(seconds: 1),
+          ),
+        );
+      }
+
+      setState(() {});
+    } on PlatformException catch (e) {
+      print('❌ Platform exception: ${e.code} - ${e.message}');
+
+      if (e.code == 'VPN_PERMISSION_REQUIRED') {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('VPN permission required. Please try again.'),
+              backgroundColor: Colors.orange,
+            ),
+          );
+        }
+      } else {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Error updating block: ${e.message}'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+      }
+    } catch (e) {
+      print('❌ General error: $e');
+    }
   }
 
   void _toggleHidden(Application app) {
