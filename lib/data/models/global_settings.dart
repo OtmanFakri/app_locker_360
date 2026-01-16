@@ -14,8 +14,8 @@ class GlobalSettings {
   /// تفعيل صور المتطفلين
   bool intruderSelfie;
 
-  /// اللغة المفضلة
-  String? preferredLanguage;
+  /// اللغة المفضلة (ar = العربية, en = English)
+  String preferredLanguage;
 
   /// تفعيل الإشعارات
   bool notificationsEnabled;
@@ -41,7 +41,7 @@ class GlobalSettings {
     this.reLockTimeout = 0,
     this.fingerprintEnabled = false,
     this.intruderSelfie = true,
-    this.preferredLanguage,
+    this.preferredLanguage = 'ar',
     this.notificationsEnabled = true,
     this.maxAttempts = 3,
     this.hideAppIcon = false,
@@ -108,7 +108,7 @@ class GlobalSettings {
       reLockTimeout: map['reLockTimeout'] as int? ?? 0,
       fingerprintEnabled: map['fingerprintEnabled'] as bool? ?? false,
       intruderSelfie: map['intruderSelfie'] as bool? ?? true,
-      preferredLanguage: map['preferredLanguage'] as String?,
+      preferredLanguage: map['preferredLanguage'] as String? ?? 'ar',
       notificationsEnabled: map['notificationsEnabled'] as bool? ?? true,
       maxAttempts: map['maxAttempts'] as int? ?? 3,
       hideAppIcon: map['hideAppIcon'] as bool? ?? false,

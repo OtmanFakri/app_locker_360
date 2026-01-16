@@ -1,0 +1,232 @@
+{
+"@@locale": "ar",
+"appTitle": "App Locker 360",
+"@appTitle": {
+"description": "Application title"
+},
+
+"settings": "الإعدادات",
+"@settings": {
+"description": "Settings page title"
+},
+
+"security": "الأمان",
+"@security": {
+"description": "Security section title"
+},
+
+"fingerprint": "البصمة",
+"@fingerprint": {
+"description": "Fingerprint option"
+},
+
+"fingerprintDesc": "استخدام البصمة لفتح التطبيقات",
+"@fingerprintDesc": {
+"description": "Fingerprint description"
+},
+
+"intruderSelfie": "صور المتطفلين",
+"@intruderSelfie": {
+"description": "Intruder selfie option"
+},
+
+"intruderSelfieDesc": "التقاط صورة عند إدخال رمز خاطئ",
+"@intruderSelfieDesc": {
+"description": "Intruder selfie description"
+},
+
+"appearance": "المظهر",
+"@appearance": {
+"description": "Appearance section title"
+},
+
+"darkMode": "الوضع الداكن",
+"@darkMode": {
+"description": "Dark mode option"
+},
+
+"darkModeDesc": "تفعيل الوضع الداكن",
+"@darkModeDesc": {
+"description": "Dark mode description"
+},
+
+"language": "اللغة",
+"@language": {
+"description": "Language option"
+},
+
+"languageDesc": "اختر لغة التطبيق",
+"@languageDesc": {
+"description": "Language description"
+},
+
+"arabic": "العربية",
+"@arabic": {
+"description": "Arabic language"
+},
+
+"english": "English",
+"@english": {
+"description": "English language"
+},
+
+"privacy": "الخصوصية",
+"@privacy": {
+"description": "Privacy section title"
+},
+
+"stealthMode": "الوضع الخفي",
+"@stealthMode": {
+"description": "Stealth mode option"
+},
+
+"stealthModeDesc": "إخفاء التطبيق من قائمة التطبيقات",
+"@stealthModeDesc": {
+"description": "Stealth mode description"
+},
+
+"notifications": "الإشعارات",
+"@notifications": {
+"description": "Notifications option"
+},
+
+"notificationsDesc": "إظهار الإشعارات",
+"@notificationsDesc": {
+"description": "Notifications description"
+},
+
+"about": "حول",
+"@about": {
+"description": "About section title"
+},
+
+"version": "الإصدار",
+"@version": {
+"description": "Version label"
+},
+
+"developer": "المطور",
+"@developer": {
+"description": "Developer label"
+},
+
+"selectLanguage": "اختر اللغة",
+"@selectLanguage": {
+"description": "Select language dialog title"
+},
+
+"apps": "التطبيقات",
+"@apps": {
+"description": "Apps tab label"
+},
+
+"vault": "الخزنة",
+"@vault": {
+"description": "Vault tab label"
+},
+
+"searchApp": "ابحث عن تطبيق...",
+"@searchApp": {
+"description": "Search hint in apps list"
+},
+
+"noApps": "لا توجد تطبيقات",
+"@noApps": {
+"description": "No apps found message"
+},
+
+"noResults": "لا توجد نتائج",
+"@noResults": {
+"description": "No search results message"
+},
+
+"errorLoadingApps": "خطأ في تحميل التطبيقات",
+"@errorLoadingApps": {
+"description": "Error loading apps message"
+},
+
+"enterPin": "أدخل الرمز السري",
+"@enterPin": {
+"description": "Enter PIN title"
+},
+
+"accessDashboard": "للوصول إلى لوحة التحكم",
+"@accessDashboard": {
+"description": "Access dashboard subtitle"
+},
+
+"usePin": "استخدام الرمز السري",
+"@usePin": {
+"description": "Use PIN button"
+},
+
+"forgotPassword": "نسيت كلمة السر؟",
+"@forgotPassword": {
+"description": "Forgot password link"
+},
+
+"noFilesInVault": "لا توجد ملفات في الخزنة",
+"@noFilesInVault": {
+"description": "Empty vault message"
+},
+
+"tapToAddFiles": "اضغط على + لإضافة ملفات",
+"@tapToAddFiles": {
+"description": "Add files hint"
+},
+
+"images": "صور",
+"@images": {
+"description": "Images file type"
+},
+
+"videos": "فيديو",
+"@videos": {
+"description": "Videos file type"
+},
+
+"audio": "صوت",
+"@audio": {
+"description": "Audio file type"
+},
+
+"documents": "مستندات",
+"@documents": {
+"description": "Documents file type"
+},
+
+"chooseFileType": "اختر نوع الملف",
+"@chooseFileType": {
+"description": "Choose file type dialog title"
+},
+
+"otherFiles": "أخرى (MP3, PDF, APK...)",
+"@otherFiles": {
+"description": "Other file types option"
+},
+
+"fileEncryptedSuccess": "تم تشفير {count} ملف بنجاح",
+"@fileEncryptedSuccess": {
+"description": "File encrypted success message",
+"placeholders": {
+"count": {
+"type": "int"
+}
+}
+},
+
+"fileDeleted": "تم حذف الملف",
+"@fileDeleted": {
+"description": "File deleted message"
+},
+
+"fileDeleteFailed": "فشل حذف الملف",
+"@fileDeleteFailed": {
+"description": "File delete failed message"
+},
+
+"storagePermissionRequired": "يجب منح صلاحية الوصول للملفات",
+"@storagePermissionRequired":{
+"description": "Storage permission required message"
+}
+}

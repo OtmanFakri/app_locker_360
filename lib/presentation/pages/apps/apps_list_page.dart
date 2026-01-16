@@ -7,6 +7,7 @@ import 'package:app_locker360/data/datasources/mmkv_service.dart';
 import 'package:app_locker360/data/models/apps_config.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:app_locker360/data/services/ad_helper.dart';
+import 'package:app_locker360/l10n/app_localizations.dart';
 
 /// Apps list page - main tab showing all installed apps
 class AppsListPage extends StatefulWidget {
@@ -72,9 +73,10 @@ class _AppsListPageState extends State<AppsListPage> {
     } catch (e) {
       setState(() => _isLoading = false);
       if (mounted) {
+        final l10n = AppLocalizations.of(context)!;
         ScaffoldMessenger.of(
           context,
-        ).showSnackBar(SnackBar(content: Text('خطأ في تحميل التطبيقات: $e')));
+        ).showSnackBar(SnackBar(content: Text('${l10n.errorLoadingApps}: $e')));
       }
     }
   }
@@ -156,13 +158,15 @@ class _AppsListPageState extends State<AppsListPage> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Scaffold(
       backgroundColor: const Color(0xFF0A0E21),
       appBar: AppBar(
         backgroundColor: const Color(0xFF1A1F3A),
         elevation: 0,
         title: Text(
-          'التطبيقات',
+          l10n.apps,
           style: GoogleFonts.cairo(
             fontSize: 24,
             fontWeight: FontWeight.bold,
@@ -186,7 +190,7 @@ class _AppsListPageState extends State<AppsListPage> {
               onChanged: _filterApps,
               style: GoogleFonts.cairo(color: Colors.white),
               decoration: InputDecoration(
-                hintText: 'ابحث عن تطبيق...',
+                hintText: l10n.searchApp,
                 hintStyle: GoogleFonts.cairo(color: Colors.white60),
                 prefixIcon: const Icon(Icons.search, color: Colors.white60),
                 filled: true,
@@ -212,9 +216,7 @@ class _AppsListPageState extends State<AppsListPage> {
                 : _filteredApps.isEmpty
                 ? Center(
                     child: Text(
-                      _searchQuery.isEmpty
-                          ? 'لا توجد تطبيقات'
-                          : 'لا توجد نتائج',
+                      _searchQuery.isEmpty ? l10n.noApps : l10n.noResults,
                       style: GoogleFonts.cairo(
                         color: Colors.white60,
                         fontSize: 16,

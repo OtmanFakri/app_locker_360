@@ -9,6 +9,7 @@ import 'package:app_locker360/presentation/pages/auth/widgets/error_message.dart
 import 'package:app_locker360/presentation/pages/auth/widgets/fingerprint_button.dart';
 import 'package:app_locker360/presentation/pages/auth/widgets/number_pad.dart';
 import 'package:app_locker360/presentation/pages/auth/widgets/forgot_password_dialog.dart';
+import 'package:app_locker360/l10n/app_localizations.dart';
 
 /// شاشة القفل الرئيسية (Auth Screen)
 /// تظهر كل مرة يفتح فيها المستخدم التطبيق للدخول إلى لوحة التحكم
@@ -146,6 +147,7 @@ class _AuthPageState extends State<AuthPage> with TickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     final settings = MMKVService.getGlobalSettings();
+    final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
       backgroundColor: const Color(0xFF0A0E21),
@@ -169,7 +171,7 @@ class _AuthPageState extends State<AuthPage> with TickerProviderStateMixin {
 
                         // Title
                         Text(
-                          'أدخل الرمز السري',
+                          l10n.enterPin,
                           style: GoogleFonts.cairo(
                             fontSize: 28,
                             fontWeight: FontWeight.bold,
@@ -178,7 +180,7 @@ class _AuthPageState extends State<AuthPage> with TickerProviderStateMixin {
                         ),
                         const SizedBox(height: 8),
                         Text(
-                          'للوصول إلى لوحة التحكم',
+                          l10n.accessDashboard,
                           style: GoogleFonts.cairo(
                             fontSize: 16,
                             color: Colors.white60,
@@ -247,7 +249,7 @@ class _AuthPageState extends State<AuthPage> with TickerProviderStateMixin {
                                 ),
                               ),
                               child: Text(
-                                'استخدام الرمز السري',
+                                l10n.usePin,
                                 style: GoogleFonts.cairo(
                                   fontSize: 16,
                                   color: Colors.white,
@@ -263,7 +265,7 @@ class _AuthPageState extends State<AuthPage> with TickerProviderStateMixin {
                         TextButton(
                           onPressed: _onForgotPassword,
                           child: Text(
-                            'نسيت كلمة السر؟',
+                            l10n.forgotPassword,
                             style: GoogleFonts.cairo(
                               fontSize: 16,
                               color: const Color(0xFF667EEA),

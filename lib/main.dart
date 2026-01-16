@@ -15,6 +15,8 @@ import 'package:socket_io_client/socket_io_client.dart' as io;
 import 'package:android_intent_plus/android_intent.dart';
 import 'package:android_intent_plus/flag.dart';
 import 'package:app_locker360/data/services/ad_helper.dart';
+import 'package:app_locker360/l10n/app_localizations.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -174,6 +176,11 @@ void onStart(ServiceInstance service) async {
   }
 }
 
+// Global function to trigger app rebuild (for language switching)
+void rebuildMainApp() {
+  _MainAppState._rebuildApp();
+}
+
 class MainApp extends StatefulWidget {
   const MainApp({super.key, this.initialLockedPackage});
   final String? initialLockedPackage;
@@ -188,15 +195,31 @@ class _MainAppState extends State<MainApp> with WidgetsBindingObserver {
     'com.example.app_locker360/intent',
   );
 
+  // Locale state for language switching
+  late String _currentLocale;
+
+  // Static callback for settings page to trigger rebuild
+  static _MainAppState? _instance;
+
+  static void _rebuildApp() {
+    _instance?.setState(() {
+      _instance?._currentLocale =
+          MMKVService.getGlobalSettings().preferredLanguage;
+    });
+  }
+
   @override
   void initState() {
     super.initState();
+    _instance = this;
+    _currentLocale = MMKVService.getGlobalSettings().preferredLanguage;
     WidgetsBinding.instance.addObserver(this);
     _initLifecycleListeners();
   }
 
   @override
   void dispose() {
+    _instance = null;
     WidgetsBinding.instance.removeObserver(this);
     // MethodChannel doesn't need explicit disposal like a stream subscription here
     // but we should set handler to null if we want to be clean, though rarely needed for main app
@@ -253,10 +276,24 @@ class _MainAppState extends State<MainApp> with WidgetsBindingObserver {
 
   @override
   Widget build(BuildContext context) {
+    final locale = Locale(_currentLocale);
+
     return MaterialApp(
       title: 'App Locker 360',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(useMaterial3: true, brightness: Brightness.dark),
+      // Localization
+      localizationsDelegates: [
+        AppLocalizations.delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      supportedLocales: const [
+        Locale('ar'), // Arabic
+        Locale('en'), // English
+      ],
+      locale: locale,
       // Hada howa l-entree l-3adya (Splash -> Auth -> Home)
       // Ila jana locked package mn intent (Cold start awla Stream), n-affichiw ScreenLockPage
       home: receivedLockedPackage != null

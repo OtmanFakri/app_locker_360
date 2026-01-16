@@ -3,6 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:app_locker360/presentation/pages/apps/apps_list_page.dart';
 import 'package:app_locker360/presentation/pages/vault/vault_page.dart';
 import 'package:app_locker360/presentation/pages/settings/settings_page.dart';
+import 'package:app_locker360/l10n/app_localizations.dart';
 
 /// Main home page with bottom navigation
 class HomePage extends StatefulWidget {
@@ -23,6 +24,8 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Scaffold(
       body: IndexedStack(index: _currentIndex, children: _pages),
       bottomNavigationBar: Container(
@@ -44,17 +47,17 @@ class _HomePageState extends State<HomePage> {
               children: [
                 _buildNavItem(
                   icon: Icons.apps_rounded,
-                  label: 'التطبيقات',
+                  label: l10n.apps,
                   index: 0,
                 ),
                 _buildNavItem(
                   icon: Icons.folder_rounded,
-                  label: 'الخزنة',
+                  label: l10n.vault,
                   index: 1,
                 ),
                 _buildNavItem(
                   icon: Icons.settings_rounded,
-                  label: 'الإعدادات',
+                  label: l10n.settings,
                   index: 2,
                 ),
               ],

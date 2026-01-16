@@ -1,0 +1,232 @@
+{
+"@@locale": "en",
+"appTitle": "App Locker 360",
+"@appTitle": {
+"description": "Application title"
+},
+
+"settings": "Settings",
+"@settings": {
+"description": "Settings page title"
+},
+
+"security": "Security",
+"@security": {
+"description": "Security section title"
+},
+
+"fingerprint": "Fingerprint",
+"@fingerprint": {
+"description": "Fingerprint option"
+},
+
+"fingerprintDesc": "Use fingerprint to unlock apps",
+"@fingerprintDesc": {
+"description": "Fingerprint description"
+},
+
+"intruderSelfie": "Intruder Selfie",
+"@intruderSelfie": {
+"description": "Intruder selfie option"
+},
+
+"intruderSelfieDesc": "Capture photo when wrong PIN is entered",
+"@intruderSelfieDesc": {
+"description": "Intruder selfie description"
+},
+
+"appearance": "Appearance",
+"@appearance": {
+"description": "Appearance section title"
+},
+
+"darkMode": "Dark Mode",
+"@darkMode": {
+"description": "Dark mode option"
+},
+
+"darkModeDesc": "Enable dark mode",
+"@darkModeDesc": {
+"description": "Dark mode description"
+},
+
+"language": "Language",
+"@language": {
+"description": "Language option"
+},
+
+"languageDesc": "Choose app language",
+"@languageDesc": {
+"description": "Language description"
+},
+
+"arabic": "العربية",
+"@arabic": {
+"description": "Arabic language"
+},
+
+"english": "English",
+"@english": {
+"description": "English language"
+},
+
+"privacy": "Privacy",
+"@privacy": {
+"description": "Privacy section title"
+},
+
+"stealthMode": "Stealth Mode",
+"@stealthMode": {
+"description": "Stealth mode option"
+},
+
+"stealthModeDesc": "Hide app from app list",
+"@stealthModeDesc": {
+"description": "Stealth mode description"
+},
+
+"notifications": "Notifications",
+"@notifications": {
+"description": "Notifications option"
+},
+
+"notificationsDesc": "Show notifications",
+"@notificationsDesc": {
+"description": "Notifications description"
+},
+
+"about": "About",
+"@about": {
+"description": "About section title"
+},
+
+"version": "Version",
+"@version": {
+"description": "Version label"
+},
+
+"developer": "Developer",
+"@developer": {
+"description": "Developer label"
+},
+
+"selectLanguage": "Select Language",
+"@selectLanguage": {
+"description": "Select language dialog title"
+},
+
+"apps": "Apps",
+"@apps": {
+"description": "Apps tab label"
+},
+
+"vault": "Vault",
+"@vault": {
+"description": "Vault tab label"
+},
+
+"searchApp": "Search for an app...",
+"@searchApp": {
+"description": "Search hint in apps list"
+},
+
+"noApps": "No apps found",
+"@noApps": {
+"description": "No apps found message"
+},
+
+"noResults": "No results found",
+"@noResults": {
+"description": "No search results message"
+},
+
+"errorLoadingApps": "Error loading apps",
+"@errorLoadingApps": {
+"description": "Error loading apps message"
+},
+
+"enterPin": "Enter PIN",
+"@enterPin": {
+"description": "Enter PIN title"
+},
+
+"accessDashboard": "To access the dashboard",
+"@accessDashboard": {
+"description": "Access dashboard subtitle"
+},
+
+"usePin": "Use PIN",
+"@usePin": {
+"description": "Use PIN button"
+},
+
+"forgotPassword": "Forgot Password?",
+"@forgotPassword": {
+"description": "Forgot password link"
+},
+
+"noFilesInVault": "No files in vault",
+"@noFilesInVault": {
+"description": "Empty vault message"
+},
+
+"tapToAddFiles": "Tap + to add files",
+"@tapToAddFiles": {
+"description": "Add files hint"
+},
+
+"images": "Images",
+"@images": {
+"description": "Images file type"
+},
+
+"videos": "Videos",
+"@videos": {
+"description": "Videos file type"
+},
+
+"audio": "Audio",
+"@audio": {
+"description": "Audio file type"
+},
+
+"documents": "Documents",
+"@documents": {
+"description": "Documents file type"
+},
+
+"chooseFileType": "Choose File Type",
+"@chooseFileType": {
+"description": "Choose file type dialog title"
+},
+
+"otherFiles": "Other (MP3, PDF, APK...)",
+"@otherFiles": {
+"description": "Other file types option"
+},
+
+"fileEncryptedSuccess": "{count} file(s) encrypted successfully",
+"@fileEncryptedSuccess": {
+"description": "File encrypted success message",
+"placeholders": {
+"count": {
+"type": "int"
+}
+}
+},
+
+"fileDeleted": "File deleted",
+"@fileDeleted": {
+"description": "File deleted message"
+},
+
+"fileDeleteFailed": "Failed to delete file",
+"@fileDeleteFailed": {
+"description": "File delete failed message"
+},
+
+"storagePermissionRequired": "Storage permission is required",
+"@storagePermissionRequired": {
+"description": "Storage permission required message"
+}
+}

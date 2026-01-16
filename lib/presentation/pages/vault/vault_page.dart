@@ -10,6 +10,7 @@ import 'package:app_locker360/data/models/vault_item.dart';
 import 'package:app_locker360/data/services/encryption_service.dart';
 import 'package:app_locker360/data/services/file_manager_service.dart';
 import 'package:app_locker360/data/services/vault_service.dart';
+import 'package:app_locker360/l10n/app_localizations.dart';
 
 /// Vault page - shows encrypted files
 class VaultPage extends StatefulWidget {
@@ -26,6 +27,7 @@ class _VaultPageState extends State<VaultPage> {
   @override
   Widget build(BuildContext context) {
     final vaultItems = MMKVService.getVaultItemsByType(_selectedType);
+    final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
       backgroundColor: const Color(0xFF0A0E21),
@@ -33,7 +35,7 @@ class _VaultPageState extends State<VaultPage> {
         backgroundColor: const Color(0xFF1A1F3A),
         elevation: 0,
         title: Text(
-          'الخزنة',
+          l10n.vault,
           style: GoogleFonts.cairo(
             fontSize: 24,
             fontWeight: FontWeight.bold,
@@ -57,24 +59,28 @@ class _VaultPageState extends State<VaultPage> {
               scrollDirection: Axis.horizontal,
               child: Row(
                 children: [
-                  _buildTypeChip(FileType.image, Icons.image_rounded, 'صور'),
+                  _buildTypeChip(
+                    FileType.image,
+                    Icons.image_rounded,
+                    l10n.images,
+                  ),
                   const SizedBox(width: 8),
                   _buildTypeChip(
                     FileType.video,
                     Icons.videocam_rounded,
-                    'فيديو',
+                    l10n.videos,
                   ),
                   const SizedBox(width: 8),
                   _buildTypeChip(
                     FileType.audio,
                     Icons.audiotrack_rounded,
-                    'صوت',
+                    l10n.audio,
                   ),
                   const SizedBox(width: 8),
                   _buildTypeChip(
                     FileType.document,
                     Icons.description_rounded,
-                    'مستندات',
+                    l10n.documents,
                   ),
                 ],
               ),
@@ -103,7 +109,7 @@ class _VaultPageState extends State<VaultPage> {
                         ),
                         const SizedBox(height: 16),
                         Text(
-                          'لا توجد ملفات في الخزنة',
+                          l10n.noFilesInVault,
                           style: GoogleFonts.cairo(
                             color: Colors.white60,
                             fontSize: 16,
@@ -111,7 +117,7 @@ class _VaultPageState extends State<VaultPage> {
                         ),
                         const SizedBox(height: 8),
                         Text(
-                          'اضغط على + لإضافة ملفات',
+                          l10n.tapToAddFiles,
                           style: GoogleFonts.cairo(
                             color: Colors.white.withOpacity(0.4),
                             fontSize: 14,
@@ -190,7 +196,8 @@ class _VaultPageState extends State<VaultPage> {
         final granted = await FileManagerService.requestStoragePermission();
         if (!granted) {
           if (mounted) {
-            _showError('يجب منح صلاحية الوصول للملفات');
+            final l10n = AppLocalizations.of(context)!;
+            _showError(l10n.storagePermissionRequired);
           }
           return;
         }
@@ -462,13 +469,15 @@ class _VaultPageState extends State<VaultPage> {
   }
 
   Future<String?> _showFileTypeDialog() async {
+    final l10n = AppLocalizations.of(context)!;
+
     return await showDialog<String>(
       context: context,
       builder: (context) => AlertDialog(
         backgroundColor: const Color(0xFF1A1F3A),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         title: Text(
-          'اختر نوع الملف',
+          l10n.chooseFileType,
           style: GoogleFonts.cairo(
             color: Colors.white,
             fontWeight: FontWeight.bold,
@@ -482,7 +491,10 @@ class _VaultPageState extends State<VaultPage> {
                 Icons.image_rounded,
                 color: Color(0xFF667EEA),
               ),
-              title: Text('صور', style: GoogleFonts.cairo(color: Colors.white)),
+              title: Text(
+                l10n.images,
+                style: GoogleFonts.cairo(color: Colors.white),
+              ),
               onTap: () => Navigator.pop(context, 'image'),
             ),
             ListTile(
@@ -491,7 +503,7 @@ class _VaultPageState extends State<VaultPage> {
                 color: Color(0xFF667EEA),
               ),
               title: Text(
-                'فيديو',
+                l10n.videos,
                 style: GoogleFonts.cairo(color: Colors.white),
               ),
               onTap: () => Navigator.pop(context, 'video'),
@@ -502,7 +514,7 @@ class _VaultPageState extends State<VaultPage> {
                 color: Color(0xFF667EEA),
               ),
               title: Text(
-                'أخرى (MP3, PDF, APK...)',
+                l10n.otherFiles,
                 style: GoogleFonts.cairo(color: Colors.white),
               ),
               onTap: () => Navigator.pop(context, 'other'),
@@ -520,13 +532,15 @@ class _VaultPageState extends State<VaultPage> {
       setState(() {});
 
       if (mounted) {
+        final l10n = AppLocalizations.of(context)!;
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('تم حذف الملف', style: GoogleFonts.cairo())),
+          SnackBar(content: Text(l10n.fileDeleted, style: GoogleFonts.cairo())),
         );
       }
     } catch (e) {
       if (mounted) {
-        _showError('فشل حذف الملف: $e');
+        final l10n = AppLocalizations.of(context)!;
+        _showError('${l10n.fileDeleteFailed}: $e');
       }
     }
   }

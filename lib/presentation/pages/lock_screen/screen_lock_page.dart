@@ -12,6 +12,7 @@ import 'package:app_locker360/presentation/pages/auth/widgets/number_pad.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:app_locker360/data/services/ad_helper.dart';
+import 'package:app_locker360/l10n/app_localizations.dart';
 
 class ScreenLockPage extends StatefulWidget {
   final String? lockedPackageName;
@@ -176,6 +177,7 @@ class _ScreenLockPageState extends State<ScreenLockPage>
   @override
   Widget build(BuildContext context) {
     final settings = MMKVService.getGlobalSettings();
+    final l10n = AppLocalizations.of(context)!;
 
     return PopScope(
       canPop: false,
@@ -201,7 +203,7 @@ class _ScreenLockPageState extends State<ScreenLockPage>
 
                           // Title
                           Text(
-                            'أدخل الرمز السري',
+                            l10n.enterPin,
                             style: GoogleFonts.cairo(
                               fontSize: 28,
                               fontWeight: FontWeight.bold,
@@ -210,7 +212,7 @@ class _ScreenLockPageState extends State<ScreenLockPage>
                           ),
                           const SizedBox(height: 8),
                           Text(
-                            'للوصول إلى لوحة التحكم',
+                            l10n.accessDashboard,
                             style: GoogleFonts.cairo(
                               fontSize: 16,
                               color: Colors.white60,
@@ -282,7 +284,7 @@ class _ScreenLockPageState extends State<ScreenLockPage>
                                   ),
                                 ),
                                 child: Text(
-                                  'استخدام الرمز السري',
+                                  l10n.usePin,
                                   style: GoogleFonts.cairo(
                                     fontSize: 16,
                                     color: Colors.white,
