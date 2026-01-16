@@ -228,5 +228,190 @@
 "storagePermissionRequired": "يجب منح صلاحية الوصول للملفات",
 "@storagePermissionRequired":{
 "description": "Storage permission required message"
+},
+
+"permissionsRequired": "الأذونات المطلوبة",
+"@permissionsRequired": {
+"description": "Permissions page title"
+},
+
+"permissionsSubtitle": "نحتاج هذه الأذونات لحماية تطبيقاتك وملفاتك",
+"@permissionsSubtitle": {
+"description": "Permissions page subtitle"
+},
+
+"continueButton": "متابعة",
+"@continueButton": {
+"description": "Continue button"
+},
+
+"grantPermission": "منح الإذن",
+"@grantPermission": {
+"description": "Grant permission button"
+},
+
+"storagePermission": "الوصول للملفات",
+"@storagePermission": {
+"description": "Storage permission title"
+},
+
+"storagePermissionDesc": "لحفظ وتشفير صورك وفيديوهاتك في الخزنة",
+"@storagePermissionDesc": {
+"description": "Storage permission description"
+},
+
+"usageStatsPermission": "إحصائيات الاستخدام",
+"@usageStatsPermission": {
+"description": "Usage stats permission title"
+},
+
+"usageStatsPermissionDesc": "لمراقبة التطبيقات المقفلة وحمايتها",
+"@usageStatsPermissionDesc": {
+"description": "Usage stats permission description"
+},
+
+"systemAlertPermission": "العرض فوق التطبيقات",
+"@systemAlertPermission": {
+"description": "System alert permission title"
+},
+
+"systemAlertPermissionDesc": "لعرض شاشة القفل عند فتح تطبيق محمي",
+"@systemAlertPermissionDesc": {
+"description": "System alert permission description"
+},
+
+"xiaomiPopupPermission": "عرض النوافذ المنبثقة في الخلفية",
+"@xiaomiPopupPermission": {
+"description": "Xiaomi popup permission title"
+},
+
+"xiaomiPopupPermissionDesc": "للسماح بعرض شاشة القفل أثناء تشغيل التطبيقات في الخلفية (Xiaomi)",
+"@xiaomiPopupPermissionDesc": {
+"description": "Xiaomi popup permission description"
+},
+
+"importantInstructions": "تعليمات مهمة",
+"@importantInstructions": {
+"description": "Important instructions dialog title"
+},
+
+"xiaomiInstructions": "في الصفحة التالية:\\n\\n1. اضغط على \"أذونات أخرى\"\\n2. ابحث عن \"عرض النوافذ المنبثقة أثناء التشغيل في الخلفية\"\\n3. قم بتفعيل هذا الإذن\\n4. ارجع للتطبيق",
+"@xiaomiInstructions": {
+"description": "Xiaomi permission instructions"
+},
+
+"understoodOpenSettings": "فهمت، افتح الإعدادات",
+"@understoodOpenSettings": {
+"description": "Understood open settings button"
+},
+
+"skip": "تخطي",
+"@skip": {
+"description": "Skip button"
+},
+
+"welcomeTo": "مرحباً بك في",
+"@welcomeTo": {
+"description": "Welcome to"
+},
+
+"onboardingWelcomeDesc": "حماية متقدمة لتطبيقاتك وملفاتك الشخصية\\nمع أمان من الدرجة الأولى",
+"@onboardingWelcomeDesc": {
+"description": "Onboarding welcome description"
+},
+
+"powerfulFeatures": "مميزات قوية",
+"@powerfulFeatures": {
+"description": "Powerful features title"
+},
+
+"featuresSubtitle": "كل ما تحتاجه لحماية خصوصيتك",
+"@featuresSubtitle": {
+"description": "Features subtitle"
+},
+
+"lockApps": "قفل التطبيقات",
+"@lockApps": {
+"description": "Lock apps feature"
+},
+
+"lockAppsDesc": "حماية تطبيقاتك برمز سري أو بصمة",
+"@lockAppsDesc": {
+"description": "Lock apps description"
+},
+
+"fileVault": "خزنة الملفات",
+"@fileVault": {
+"description": "File vault feature"
+},
+
+"fileVaultDesc": "إخفاء وتشفير صورك وفيديوهاتك",
+"@fileVaultDesc": {
+"description": "File vault description"
+},
+
+"intruderDetection": "كشف المتطفلين",
+"@intruderDetection": {
+"description": "Intruder detection feature"
+},
+
+"intruderDetectionDesc": "التقاط صورة لمن يحاول فتح تطبيقاتك",
+"@intruderDetectionDesc": {
+"description": "Intruder detection description"
+},
+
+"topLevelSecurity": "أمان من الدرجة الأولى",
+"@topLevelSecurity": {
+"description": "Top level security title"
+},
+
+"securityDesc": "نستخدم أحدث تقنيات التشفير لحماية بياناتك.\\nخصوصيتك هي أولويتنا القصوى.",
+"@securityDesc": {
+"description": "Security description"
+},
+
+"aes256Encryption": "تشفير AES-256",
+"@aes256Encryption": {
+"description": "AES-256 encryption badge"
+},
+
+"fingerprintProtection": "حماية بالبصمة",
+"@fingerprintProtection": {
+"description": "Fingerprint protection badge"
+},
+
+"next": "التالي",
+"@next": {
+"description": "Next button"
+},
+
+"getStarted": "ابدأ الآن",
+"@getStarted": {
+"description": "Get started button"
+},
+
+"createPin": "إنشاء رمز سري",
+"@createPin": {
+"description": "Create PIN title"
+},
+
+"confirmPin": "تأكيد الرمز السري",
+"@confirmPin": {
+"description": "Confirm PIN title"
+},
+
+"enterFourDigitPin": "أدخل رمز سري مكون من 4 أرقام",
+"@enterFourDigitPin": {
+"description": "Enter 4-digit PIN subtitle"
+},
+
+"reEnterPin": "أدخل الرمز مرة أخرى للتأكيد",
+"@reEnterPin": {
+"description": "Re-enter PIN for confirmation"
+},
+
+"pinMismatch": "الرمز غير متطابق، حاول مرة أخرى",
+"@pinMismatch": {
+"description": "PIN mismatch error"
 }
 }

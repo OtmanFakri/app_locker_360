@@ -3,6 +3,8 @@ import 'package:app_locker360/data/datasources/mmkv_service.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:app_locker360/presentation/pages/home/home_page.dart';
 import 'package:app_locker360/presentation/pages/onboarding/permissions_page.dart';
+import 'package:app_locker360/l10n/app_localizations.dart';
+import 'package:app_locker360/presentation/pages/onboarding/widgets/language_selector.dart';
 
 /// شاشة الإعداد الأولي (Onboarding)
 /// تظهر فقط عند تثبيت التطبيق لأول مرة
@@ -72,28 +74,20 @@ class _OnboardingPageState extends State<OnboardingPage>
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Scaffold(
       backgroundColor: const Color(0xFF0A0E21),
       body: SafeArea(
         child: Column(
           children: [
-            // Skip button
+            // Language selector (top right)
             if (_currentPage < 2)
-              Align(
+              const Align(
                 alignment: Alignment.topRight,
                 child: Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: TextButton(
-                    onPressed: _skipToEnd,
-                    child: Text(
-                      'تخطي',
-                      style: GoogleFonts.cairo(
-                        color: Colors.white70,
-                        fontSize: 16,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ),
+                  padding: EdgeInsets.all(16.0),
+                  child: LanguageSelector(),
                 ),
               )
             else
@@ -105,9 +99,9 @@ class _OnboardingPageState extends State<OnboardingPage>
                 controller: _pageController,
                 onPageChanged: _onPageChanged,
                 children: [
-                  _buildWelcomePage(),
-                  _buildFeaturesPage(),
-                  _buildSecurityPage(),
+                  _buildWelcomePage(l10n),
+                  _buildFeaturesPage(l10n),
+                  _buildSecurityPage(l10n),
                 ],
               ),
             ),
@@ -118,7 +112,7 @@ class _OnboardingPageState extends State<OnboardingPage>
             // Next/Get Started button
             Padding(
               padding: const EdgeInsets.all(24.0),
-              child: _buildActionButton(),
+              child: _buildActionButton(l10n),
             ),
           ],
         ),
@@ -126,7 +120,7 @@ class _OnboardingPageState extends State<OnboardingPage>
     );
   }
 
-  Widget _buildWelcomePage() {
+  Widget _buildWelcomePage(AppLocalizations l10n) {
     return FadeTransition(
       opacity: _fadeAnimation,
       child: Padding(
@@ -163,7 +157,7 @@ class _OnboardingPageState extends State<OnboardingPage>
 
             // Welcome title
             Text(
-              'مرحباً بك في',
+              l10n.welcomeTo,
               style: GoogleFonts.cairo(
                 fontSize: 24,
                 color: Colors.white70,
@@ -176,7 +170,7 @@ class _OnboardingPageState extends State<OnboardingPage>
                 colors: [Color(0xFF667EEA), Color(0xFF764BA2)],
               ).createShader(bounds),
               child: Text(
-                'App Locker 360',
+                l10n.appTitle,
                 style: GoogleFonts.cairo(
                   fontSize: 40,
                   fontWeight: FontWeight.bold,
@@ -188,7 +182,7 @@ class _OnboardingPageState extends State<OnboardingPage>
 
             // Description
             Text(
-              'حماية متقدمة لتطبيقاتك وملفاتك الشخصية\nمع أمان من الدرجة الأولى',
+              l10n.onboardingWelcomeDesc,
               textAlign: TextAlign.center,
               style: GoogleFonts.cairo(
                 fontSize: 16,
@@ -202,7 +196,7 @@ class _OnboardingPageState extends State<OnboardingPage>
     );
   }
 
-  Widget _buildFeaturesPage() {
+  Widget _buildFeaturesPage(AppLocalizations l10n) {
     return FadeTransition(
       opacity: _fadeAnimation,
       child: Padding(
@@ -212,7 +206,7 @@ class _OnboardingPageState extends State<OnboardingPage>
           children: [
             // Title
             Text(
-              'مميزات قوية',
+              l10n.powerfulFeatures,
               style: GoogleFonts.cairo(
                 fontSize: 36,
                 fontWeight: FontWeight.bold,
@@ -221,7 +215,7 @@ class _OnboardingPageState extends State<OnboardingPage>
             ),
             const SizedBox(height: 16),
             Text(
-              'كل ما تحتاجه لحماية خصوصيتك',
+              l10n.featuresSubtitle,
               style: GoogleFonts.cairo(fontSize: 16, color: Colors.white60),
             ),
             const SizedBox(height: 48),
@@ -229,22 +223,22 @@ class _OnboardingPageState extends State<OnboardingPage>
             // Features list
             _buildFeatureItem(
               icon: Icons.apps_rounded,
-              title: 'قفل التطبيقات',
-              description: 'حماية تطبيقاتك برمز سري أو بصمة',
+              title: l10n.lockApps,
+              description: l10n.lockAppsDesc,
               gradient: const [Color(0xFF667EEA), Color(0xFF764BA2)],
             ),
             const SizedBox(height: 24),
             _buildFeatureItem(
               icon: Icons.folder_rounded,
-              title: 'خزنة الملفات',
-              description: 'إخفاء وتشفير صورك وفيديوهاتك',
+              title: l10n.fileVault,
+              description: l10n.fileVaultDesc,
               gradient: const [Color(0xFFF093FB), Color(0xFFF5576C)],
             ),
             const SizedBox(height: 24),
             _buildFeatureItem(
               icon: Icons.camera_alt_rounded,
-              title: 'كشف المتطفلين',
-              description: 'التقاط صورة لمن يحاول فتح تطبيقاتك',
+              title: l10n.intruderDetection,
+              description: l10n.intruderDetectionDesc,
               gradient: const [Color(0xFF4FACFE), Color(0xFF00F2FE)],
             ),
           ],
@@ -253,7 +247,7 @@ class _OnboardingPageState extends State<OnboardingPage>
     );
   }
 
-  Widget _buildSecurityPage() {
+  Widget _buildSecurityPage(AppLocalizations l10n) {
     return FadeTransition(
       opacity: _fadeAnimation,
       child: Padding(
@@ -290,7 +284,7 @@ class _OnboardingPageState extends State<OnboardingPage>
 
             // Title
             Text(
-              'أمان من الدرجة الأولى',
+              l10n.topLevelSecurity,
               style: GoogleFonts.cairo(
                 fontSize: 32,
                 fontWeight: FontWeight.bold,
@@ -302,7 +296,7 @@ class _OnboardingPageState extends State<OnboardingPage>
 
             // Description
             Text(
-              'نستخدم أحدث تقنيات التشفير لحماية بياناتك.\nخصوصيتك هي أولويتنا القصوى.',
+              l10n.securityDesc,
               textAlign: TextAlign.center,
               style: GoogleFonts.cairo(
                 fontSize: 16,
@@ -313,11 +307,9 @@ class _OnboardingPageState extends State<OnboardingPage>
             const SizedBox(height: 48),
 
             // Security features
-            _buildSecurityBadge('تشفير AES-256'),
+            _buildSecurityBadge(l10n.aes256Encryption),
             const SizedBox(height: 12),
-            _buildSecurityBadge('حماية بالبصمة'),
-            // const SizedBox(height: 12),
-            // _buildSecurityBadge('بدون إعلانات'),
+            _buildSecurityBadge(l10n.fingerprintProtection),
           ],
         ),
       ),
@@ -431,7 +423,7 @@ class _OnboardingPageState extends State<OnboardingPage>
     );
   }
 
-  Widget _buildActionButton() {
+  Widget _buildActionButton(AppLocalizations l10n) {
     return GestureDetector(
       onTap: _nextPage,
       child: Container(
@@ -454,7 +446,7 @@ class _OnboardingPageState extends State<OnboardingPage>
         ),
         child: Center(
           child: Text(
-            _currentPage < 2 ? 'التالي' : 'ابدأ الآن',
+            _currentPage < 2 ? l10n.next : l10n.getStarted,
             style: GoogleFonts.cairo(
               fontSize: 18,
               fontWeight: FontWeight.bold,
@@ -547,13 +539,13 @@ class _PinSetupPageState extends State<PinSetupPage> {
 
     // Update with new PIN and mark onboarding as complete
     final updatedSettings = settings.copyWith(
-      masterPin: _pin, // في التطبيق الحقيقي، استخدم hash
+      masterPin: _pin,
       hasCompletedOnboarding: true,
     );
 
     await MMKVService.updateGlobalSettings(updatedSettings);
 
-    // Navigate to home (replace with your home page)
+    // Navigate to home
     if (mounted) {
       Navigator.of(context).pushReplacement(
         MaterialPageRoute(builder: (context) => const HomePage()),
@@ -563,6 +555,8 @@ class _PinSetupPageState extends State<PinSetupPage> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Scaffold(
       backgroundColor: const Color(0xFF0A0E21),
       body: SafeArea(
@@ -574,7 +568,7 @@ class _PinSetupPageState extends State<PinSetupPage> {
 
               // Title
               Text(
-                _isConfirming ? 'تأكيد الرمز السري' : 'إنشاء رمز سري',
+                _isConfirming ? l10n.confirmPin : l10n.createPin,
                 style: GoogleFonts.cairo(
                   fontSize: 28,
                   fontWeight: FontWeight.bold,
@@ -583,9 +577,7 @@ class _PinSetupPageState extends State<PinSetupPage> {
               ),
               const SizedBox(height: 12),
               Text(
-                _isConfirming
-                    ? 'أدخل الرمز مرة أخرى للتأكيد'
-                    : 'أدخل رمز سري مكون من 4 أرقام',
+                _isConfirming ? l10n.reEnterPin : l10n.enterFourDigitPin,
                 style: GoogleFonts.cairo(fontSize: 16, color: Colors.white60),
               ),
 
@@ -597,7 +589,7 @@ class _PinSetupPageState extends State<PinSetupPage> {
               if (_showError) ...[
                 const SizedBox(height: 20),
                 Text(
-                  'الرمز غير متطابق، حاول مرة أخرى',
+                  l10n.pinMismatch,
                   style: GoogleFonts.cairo(
                     fontSize: 14,
                     color: Colors.redAccent,

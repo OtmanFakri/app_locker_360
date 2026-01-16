@@ -364,6 +364,228 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Storage permission is required'**
   String get storagePermissionRequired;
+
+  /// Permissions page title
+  ///
+  /// In en, this message translates to:
+  /// **'Required Permissions'**
+  String get permissionsRequired;
+
+  /// Permissions page subtitle
+  ///
+  /// In en, this message translates to:
+  /// **'We need these permissions to protect your apps and files'**
+  String get permissionsSubtitle;
+
+  /// Continue button
+  ///
+  /// In en, this message translates to:
+  /// **'Continue'**
+  String get continueButton;
+
+  /// Grant permission button
+  ///
+  /// In en, this message translates to:
+  /// **'Grant Permission'**
+  String get grantPermission;
+
+  /// Storage permission title
+  ///
+  /// In en, this message translates to:
+  /// **'File Access'**
+  String get storagePermission;
+
+  /// Storage permission description
+  ///
+  /// In en, this message translates to:
+  /// **'To save and encrypt your photos and videos in the vault'**
+  String get storagePermissionDesc;
+
+  /// Usage stats permission title
+  ///
+  /// In en, this message translates to:
+  /// **'Usage Statistics'**
+  String get usageStatsPermission;
+
+  /// Usage stats permission description
+  ///
+  /// In en, this message translates to:
+  /// **'To monitor and protect locked apps'**
+  String get usageStatsPermissionDesc;
+
+  /// System alert permission title
+  ///
+  /// In en, this message translates to:
+  /// **'Display Over Apps'**
+  String get systemAlertPermission;
+
+  /// System alert permission description
+  ///
+  /// In en, this message translates to:
+  /// **'To show lock screen when opening a protected app'**
+  String get systemAlertPermissionDesc;
+
+  /// Xiaomi popup permission title
+  ///
+  /// In en, this message translates to:
+  /// **'Display Popup Windows in Background'**
+  String get xiaomiPopupPermission;
+
+  /// Xiaomi popup permission description
+  ///
+  /// In en, this message translates to:
+  /// **'To allow lock screen display while apps are running in background (Xiaomi)'**
+  String get xiaomiPopupPermissionDesc;
+
+  /// Important instructions dialog title
+  ///
+  /// In en, this message translates to:
+  /// **'Important Instructions'**
+  String get importantInstructions;
+
+  /// Xiaomi permission instructions
+  ///
+  /// In en, this message translates to:
+  /// **'On the next page:\n\n1. Tap on \"Other permissions\"\n2. Find \"Display popup windows while running in the background\"\n3. Enable this permission\n4. Return to the app'**
+  String get xiaomiInstructions;
+
+  /// Understood open settings button
+  ///
+  /// In en, this message translates to:
+  /// **'Got it, Open Settings'**
+  String get understoodOpenSettings;
+
+  /// Skip button
+  ///
+  /// In en, this message translates to:
+  /// **'Skip'**
+  String get skip;
+
+  /// Welcome to
+  ///
+  /// In en, this message translates to:
+  /// **'Welcome to'**
+  String get welcomeTo;
+
+  /// Onboarding welcome description
+  ///
+  /// In en, this message translates to:
+  /// **'Advanced protection for your apps and personal files\\nwith top-level security'**
+  String get onboardingWelcomeDesc;
+
+  /// Powerful features title
+  ///
+  /// In en, this message translates to:
+  /// **'Powerful Features'**
+  String get powerfulFeatures;
+
+  /// Features subtitle
+  ///
+  /// In en, this message translates to:
+  /// **'Everything you need to protect your privacy'**
+  String get featuresSubtitle;
+
+  /// Lock apps feature
+  ///
+  /// In en, this message translates to:
+  /// **'Lock Apps'**
+  String get lockApps;
+
+  /// Lock apps description
+  ///
+  /// In en, this message translates to:
+  /// **'Protect your apps with PIN or fingerprint'**
+  String get lockAppsDesc;
+
+  /// File vault feature
+  ///
+  /// In en, this message translates to:
+  /// **'File Vault'**
+  String get fileVault;
+
+  /// File vault description
+  ///
+  /// In en, this message translates to:
+  /// **'Hide and encrypt your photos and videos'**
+  String get fileVaultDesc;
+
+  /// Intruder detection feature
+  ///
+  /// In en, this message translates to:
+  /// **'Intruder Detection'**
+  String get intruderDetection;
+
+  /// Intruder detection description
+  ///
+  /// In en, this message translates to:
+  /// **'Capture photo of anyone trying to open your apps'**
+  String get intruderDetectionDesc;
+
+  /// Top level security title
+  ///
+  /// In en, this message translates to:
+  /// **'Top-Level Security'**
+  String get topLevelSecurity;
+
+  /// Security description
+  ///
+  /// In en, this message translates to:
+  /// **'We use the latest encryption technologies to protect your data.\\nYour privacy is our top priority.'**
+  String get securityDesc;
+
+  /// AES-256 encryption badge
+  ///
+  /// In en, this message translates to:
+  /// **'AES-256 Encryption'**
+  String get aes256Encryption;
+
+  /// Fingerprint protection badge
+  ///
+  /// In en, this message translates to:
+  /// **'Fingerprint Protection'**
+  String get fingerprintProtection;
+
+  /// Next button
+  ///
+  /// In en, this message translates to:
+  /// **'Next'**
+  String get next;
+
+  /// Get started button
+  ///
+  /// In en, this message translates to:
+  /// **'Get Started'**
+  String get getStarted;
+
+  /// Create PIN title
+  ///
+  /// In en, this message translates to:
+  /// **'Create PIN'**
+  String get createPin;
+
+  /// Confirm PIN title
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm PIN'**
+  String get confirmPin;
+
+  /// Enter 4-digit PIN subtitle
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a 4-digit PIN'**
+  String get enterFourDigitPin;
+
+  /// Re-enter PIN for confirmation
+  ///
+  /// In en, this message translates to:
+  /// **'Re-enter PIN for confirmation'**
+  String get reEnterPin;
+
+  /// PIN mismatch error
+  ///
+  /// In en, this message translates to:
+  /// **'PINs don\'t match, try again'**
+  String get pinMismatch;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

@@ -228,5 +228,190 @@
 "storagePermissionRequired": "Storage permission is required",
 "@storagePermissionRequired": {
 "description": "Storage permission required message"
+},
+
+"permissionsRequired": "Required Permissions",
+"@permissionsRequired": {
+"description": "Permissions page title"
+},
+
+"permissionsSubtitle": "We need these permissions to protect your apps and files",
+"@permissionsSubtitle": {
+"description": "Permissions page subtitle"
+},
+
+"continueButton": "Continue",
+"@continueButton": {
+"description": "Continue button"
+},
+
+"grantPermission": "Grant Permission",
+"@grantPermission": {
+"description": "Grant permission button"
+},
+
+"storagePermission": "File Access",
+"@storagePermission": {
+"description": "Storage permission title"
+},
+
+"storagePermissionDesc": "To save and encrypt your photos and videos in the vault",
+"@storagePermissionDesc": {
+"description": "Storage permission description"
+},
+
+"usageStatsPermission": "Usage Statistics",
+"@usageStatsPermission": {
+"description": "Usage stats permission title"
+},
+
+"usageStatsPermissionDesc": "To monitor and protect locked apps",
+"@usageStatsPermissionDesc": {
+"description": "Usage stats permission description"
+},
+
+"systemAlertPermission": "Display Over Apps",
+"@systemAlertPermission": {
+"description": "System alert permission title"
+},
+
+"systemAlertPermissionDesc": "To show lock screen when opening a protected app",
+"@systemAlertPermissionDesc": {
+"description": "System alert permission description"
+},
+
+"xiaomiPopupPermission": "Display Popup Windows in Background",
+"@xiaomiPopupPermission": {
+"description": "Xiaomi popup permission title"
+},
+
+"xiaomiPopupPermissionDesc": "To allow lock screen display while apps are running in background (Xiaomi)",
+"@xiaomiPopupPermissionDesc": {
+"description": "Xiaomi popup permission description"
+},
+
+"importantInstructions": "Important Instructions",
+"@importantInstructions": {
+"description": "Important instructions dialog title"
+},
+
+"xiaomiInstructions": "On the next page:\n\n1. Tap on \"Other permissions\"\n2. Find \"Display popup windows while running in the background\"\n3. Enable this permission\n4. Return to the app",
+"@xiaomiInstructions": {
+"description": "Xiaomi permission instructions"
+},
+
+"understoodOpenSettings": "Got it, Open Settings",
+"@understoodOpenSettings": {
+"description": "Understood open settings button"
+},
+
+"skip": "Skip",
+"@skip": {
+"description": "Skip button"
+},
+
+"welcomeTo": "Welcome to",
+"@welcomeTo": {
+"description": "Welcome to"
+},
+
+"onboardingWelcomeDesc": "Advanced protection for your apps and personal files\\nwith top-level security",
+"@onboardingWelcomeDesc": {
+"description": "Onboarding welcome description"
+},
+
+"powerfulFeatures": "Powerful Features",
+"@powerfulFeatures": {
+"description": "Powerful features title"
+},
+
+"featuresSubtitle": "Everything you need to protect your privacy",
+"@featuresSubtitle": {
+"description": "Features subtitle"
+},
+
+"lockApps": "Lock Apps",
+"@lockApps": {
+"description": "Lock apps feature"
+},
+
+"lockAppsDesc": "Protect your apps with PIN or fingerprint",
+"@lockAppsDesc": {
+"description": "Lock apps description"
+},
+
+"fileVault": "File Vault",
+"@fileVault": {
+"description": "File vault feature"
+},
+
+"fileVaultDesc": "Hide and encrypt your photos and videos",
+"@fileVaultDesc": {
+"description": "File vault description"
+},
+
+"intruderDetection": "Intruder Detection",
+"@intruderDetection": {
+"description": "Intruder detection feature"
+},
+
+"intruderDetectionDesc": "Capture photo of anyone trying to open your apps",
+"@intruderDetectionDesc": {
+"description": "Intruder detection description"
+},
+
+"topLevelSecurity": "Top-Level Security",
+"@topLevelSecurity": {
+"description": "Top level security title"
+},
+
+"securityDesc": "We use the latest encryption technologies to protect your data.\\nYour privacy is our top priority.",
+"@securityDesc": {
+"description": "Security description"
+},
+
+"aes256Encryption": "AES-256 Encryption",
+"@aes256Encryption": {
+"description": "AES-256 encryption badge"
+},
+
+"fingerprintProtection": "Fingerprint Protection",
+"@fingerprintProtection": {
+"description": "Fingerprint protection badge"
+},
+
+"next": "Next",
+"@next": {
+"description": "Next button"
+},
+
+"getStarted": "Get Started",
+"@getStarted": {
+"description": "Get started button"
+},
+
+"createPin": "Create PIN",
+"@createPin": {
+"description": "Create PIN title"
+},
+
+"confirmPin": "Confirm PIN",
+"@confirmPin": {
+"description": "Confirm PIN title"
+},
+
+"enterFourDigitPin": "Enter a 4-digit PIN",
+"@enterFourDigitPin": {
+"description": "Enter 4-digit PIN subtitle"
+},
+
+"reEnterPin": "Re-enter PIN for confirmation",
+"@reEnterPin": {
+"description": "Re-enter PIN for confirmation"
+},
+
+"pinMismatch": "PINs don't match, try again",
+"@pinMismatch": {
+"description": "PIN mismatch error"
 }
 }

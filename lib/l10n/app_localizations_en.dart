@@ -144,4 +144,115 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get storagePermissionRequired => 'Storage permission is required';
+
+  @override
+  String get permissionsRequired => 'Required Permissions';
+
+  @override
+  String get permissionsSubtitle => 'We need these permissions to protect your apps and files';
+
+  @override
+  String get continueButton => 'Continue';
+
+  @override
+  String get grantPermission => 'Grant Permission';
+
+  @override
+  String get storagePermission => 'File Access';
+
+  @override
+  String get storagePermissionDesc => 'To save and encrypt your photos and videos in the vault';
+
+  @override
+  String get usageStatsPermission => 'Usage Statistics';
+
+  @override
+  String get usageStatsPermissionDesc => 'To monitor and protect locked apps';
+
+  @override
+  String get systemAlertPermission => 'Display Over Apps';
+
+  @override
+  String get systemAlertPermissionDesc => 'To show lock screen when opening a protected app';
+
+  @override
+  String get xiaomiPopupPermission => 'Display Popup Windows in Background';
+
+  @override
+  String get xiaomiPopupPermissionDesc => 'To allow lock screen display while apps are running in background (Xiaomi)';
+
+  @override
+  String get importantInstructions => 'Important Instructions';
+
+  @override
+  String get xiaomiInstructions => 'On the next page:\n\n1. Tap on \"Other permissions\"\n2. Find \"Display popup windows while running in the background\"\n3. Enable this permission\n4. Return to the app';
+
+  @override
+  String get understoodOpenSettings => 'Got it, Open Settings';
+
+  @override
+  String get skip => 'Skip';
+
+  @override
+  String get welcomeTo => 'Welcome to';
+
+  @override
+  String get onboardingWelcomeDesc => 'Advanced protection for your apps and personal files\\nwith top-level security';
+
+  @override
+  String get powerfulFeatures => 'Powerful Features';
+
+  @override
+  String get featuresSubtitle => 'Everything you need to protect your privacy';
+
+  @override
+  String get lockApps => 'Lock Apps';
+
+  @override
+  String get lockAppsDesc => 'Protect your apps with PIN or fingerprint';
+
+  @override
+  String get fileVault => 'File Vault';
+
+  @override
+  String get fileVaultDesc => 'Hide and encrypt your photos and videos';
+
+  @override
+  String get intruderDetection => 'Intruder Detection';
+
+  @override
+  String get intruderDetectionDesc => 'Capture photo of anyone trying to open your apps';
+
+  @override
+  String get topLevelSecurity => 'Top-Level Security';
+
+  @override
+  String get securityDesc => 'We use the latest encryption technologies to protect your data.\\nYour privacy is our top priority.';
+
+  @override
+  String get aes256Encryption => 'AES-256 Encryption';
+
+  @override
+  String get fingerprintProtection => 'Fingerprint Protection';
+
+  @override
+  String get next => 'Next';
+
+  @override
+  String get getStarted => 'Get Started';
+
+  @override
+  String get createPin => 'Create PIN';
+
+  @override
+  String get confirmPin => 'Confirm PIN';
+
+  @override
+  String get enterFourDigitPin => 'Enter a 4-digit PIN';
+
+  @override
+  String get reEnterPin => 'Re-enter PIN for confirmation';
+
+  @override
+  String get pinMismatch => 'PINs don\'t match, try again';
 }

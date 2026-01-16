@@ -144,4 +144,115 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get storagePermissionRequired => 'يجب منح صلاحية الوصول للملفات';
+
+  @override
+  String get permissionsRequired => 'الأذونات المطلوبة';
+
+  @override
+  String get permissionsSubtitle => 'نحتاج هذه الأذونات لحماية تطبيقاتك وملفاتك';
+
+  @override
+  String get continueButton => 'متابعة';
+
+  @override
+  String get grantPermission => 'منح الإذن';
+
+  @override
+  String get storagePermission => 'الوصول للملفات';
+
+  @override
+  String get storagePermissionDesc => 'لحفظ وتشفير صورك وفيديوهاتك في الخزنة';
+
+  @override
+  String get usageStatsPermission => 'إحصائيات الاستخدام';
+
+  @override
+  String get usageStatsPermissionDesc => 'لمراقبة التطبيقات المقفلة وحمايتها';
+
+  @override
+  String get systemAlertPermission => 'العرض فوق التطبيقات';
+
+  @override
+  String get systemAlertPermissionDesc => 'لعرض شاشة القفل عند فتح تطبيق محمي';
+
+  @override
+  String get xiaomiPopupPermission => 'عرض النوافذ المنبثقة في الخلفية';
+
+  @override
+  String get xiaomiPopupPermissionDesc => 'للسماح بعرض شاشة القفل أثناء تشغيل التطبيقات في الخلفية (Xiaomi)';
+
+  @override
+  String get importantInstructions => 'تعليمات مهمة';
+
+  @override
+  String get xiaomiInstructions => 'في الصفحة التالية:\\n\\n1. اضغط على \"أذونات أخرى\"\\n2. ابحث عن \"عرض النوافذ المنبثقة أثناء التشغيل في الخلفية\"\\n3. قم بتفعيل هذا الإذن\\n4. ارجع للتطبيق';
+
+  @override
+  String get understoodOpenSettings => 'فهمت، افتح الإعدادات';
+
+  @override
+  String get skip => 'تخطي';
+
+  @override
+  String get welcomeTo => 'مرحباً بك في';
+
+  @override
+  String get onboardingWelcomeDesc => 'حماية متقدمة لتطبيقاتك وملفاتك الشخصية\\nمع أمان من الدرجة الأولى';
+
+  @override
+  String get powerfulFeatures => 'مميزات قوية';
+
+  @override
+  String get featuresSubtitle => 'كل ما تحتاجه لحماية خصوصيتك';
+
+  @override
+  String get lockApps => 'قفل التطبيقات';
+
+  @override
+  String get lockAppsDesc => 'حماية تطبيقاتك برمز سري أو بصمة';
+
+  @override
+  String get fileVault => 'خزنة الملفات';
+
+  @override
+  String get fileVaultDesc => 'إخفاء وتشفير صورك وفيديوهاتك';
+
+  @override
+  String get intruderDetection => 'كشف المتطفلين';
+
+  @override
+  String get intruderDetectionDesc => 'التقاط صورة لمن يحاول فتح تطبيقاتك';
+
+  @override
+  String get topLevelSecurity => 'أمان من الدرجة الأولى';
+
+  @override
+  String get securityDesc => 'نستخدم أحدث تقنيات التشفير لحماية بياناتك.\\nخصوصيتك هي أولويتنا القصوى.';
+
+  @override
+  String get aes256Encryption => 'تشفير AES-256';
+
+  @override
+  String get fingerprintProtection => 'حماية بالبصمة';
+
+  @override
+  String get next => 'التالي';
+
+  @override
+  String get getStarted => 'ابدأ الآن';
+
+  @override
+  String get createPin => 'إنشاء رمز سري';
+
+  @override
+  String get confirmPin => 'تأكيد الرمز السري';
+
+  @override
+  String get enterFourDigitPin => 'أدخل رمز سري مكون من 4 أرقام';
+
+  @override
+  String get reEnterPin => 'أدخل الرمز مرة أخرى للتأكيد';
+
+  @override
+  String get pinMismatch => 'الرمز غير متطابق، حاول مرة أخرى';
 }
