@@ -99,10 +99,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get enterPin => 'Enter PIN';
 
   @override
-  String get accessDashboard => 'To access the dashboard';
+  String get accessDashboard => 'To access the App Locker 360';
 
   @override
   String get usePin => 'Use PIN';
+
+  @override
+  String get useFingerprint => 'Use Fingerprint';
 
   @override
   String get forgotPassword => 'Forgot Password?';

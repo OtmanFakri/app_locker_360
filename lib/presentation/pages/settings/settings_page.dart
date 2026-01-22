@@ -3,6 +3,8 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:app_locker360/data/datasources/mmkv_service.dart';
 import 'package:app_locker360/l10n/app_localizations.dart';
 import 'package:app_locker360/main.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
+import 'package:app_locker360/data/services/ad_helper.dart';
 
 /// Settings page - app configuration and dashboard
 class SettingsPage extends StatefulWidget {
@@ -13,6 +15,37 @@ class SettingsPage extends StatefulWidget {
 }
 
 class _SettingsPageState extends State<SettingsPage> {
+  // Ad variables
+  BannerAd? _bannerAd;
+  bool _isBannerAdLoaded = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadBannerAd();
+  }
+
+  @override
+  void dispose() {
+    _bannerAd?.dispose();
+    super.dispose();
+  }
+
+  void _loadBannerAd() {
+    _bannerAd = AdHelper.createBannerAd(
+      adSize: AdSize.banner,
+      onAdLoaded: (ad) {
+        setState(() {
+          _isBannerAdLoaded = true;
+        });
+      },
+      onAdFailedToLoad: (ad, error) {
+        print('Banner ad failed to load: $error');
+        ad.dispose();
+      },
+    )..load();
+  }
+
   void _showLanguageDialog() {
     final settings = MMKVService.getGlobalSettings();
     final l10n = AppLocalizations.of(context)!;
@@ -121,102 +154,123 @@ class _SettingsPageState extends State<SettingsPage> {
           ),
         ),
       ),
-      body: ListView(
-        padding: const EdgeInsets.all(16),
+      body: Column(
         children: [
-          // Security section
-          _buildSectionTitle(l10n.security),
-          _buildSettingTile(
-            icon: Icons.fingerprint_rounded,
-            title: l10n.fingerprint,
-            subtitle: l10n.fingerprintDesc,
-            value: settings.fingerprintEnabled,
-            onChanged: (value) {
-              final updated = settings.copyWith(fingerprintEnabled: value);
-              MMKVService.updateGlobalSettings(updated);
-              setState(() {});
-            },
-          ),
-          _buildSettingTile(
-            icon: Icons.camera_alt_rounded,
-            title: l10n.intruderSelfie,
-            subtitle: l10n.intruderSelfieDesc,
-            value: settings.intruderSelfie,
-            onChanged: (value) {
-              final updated = settings.copyWith(intruderSelfie: value);
-              MMKVService.updateGlobalSettings(updated);
-              setState(() {});
-            },
+          // Settings list
+          Expanded(
+            child: ListView(
+              padding: const EdgeInsets.all(16),
+              children: [
+                // Security section
+                _buildSectionTitle(l10n.security),
+                _buildSettingTile(
+                  icon: Icons.fingerprint_rounded,
+                  title: l10n.fingerprint,
+                  subtitle: l10n.fingerprintDesc,
+                  value: settings.fingerprintEnabled,
+                  onChanged: (value) {
+                    final updated = settings.copyWith(
+                      fingerprintEnabled: value,
+                    );
+                    MMKVService.updateGlobalSettings(updated);
+                    setState(() {});
+                  },
+                ),
+                _buildSettingTile(
+                  icon: Icons.camera_alt_rounded,
+                  title: l10n.intruderSelfie,
+                  subtitle: l10n.intruderSelfieDesc,
+                  value: settings.intruderSelfie,
+                  onChanged: (value) {
+                    final updated = settings.copyWith(intruderSelfie: value);
+                    MMKVService.updateGlobalSettings(updated);
+                    setState(() {});
+                  },
+                ),
+
+                const SizedBox(height: 24),
+
+                // Appearance section
+                _buildSectionTitle(l10n.appearance),
+                _buildSettingTile(
+                  icon: Icons.dark_mode_rounded,
+                  title: l10n.darkMode,
+                  subtitle: l10n.darkModeDesc,
+                  value: settings.isDarkTheme,
+                  onChanged: (value) {
+                    final updated = settings.copyWith(
+                      appTheme: value ? 'Dark' : 'Light',
+                    );
+                    MMKVService.updateGlobalSettings(updated);
+                    setState(() {});
+                  },
+                ),
+                _buildLanguageTile(
+                  icon: Icons.language_rounded,
+                  title: l10n.language,
+                  subtitle: l10n.languageDesc,
+                  currentLanguage: settings.preferredLanguage == 'ar'
+                      ? l10n.arabic
+                      : l10n.english,
+                  onTap: _showLanguageDialog,
+                ),
+
+                const SizedBox(height: 24),
+
+                // Privacy section
+                _buildSectionTitle(l10n.privacy),
+                _buildSettingTile(
+                  icon: Icons.visibility_off_rounded,
+                  title: l10n.stealthMode,
+                  subtitle: l10n.stealthModeDesc,
+                  value: settings.stealthMode,
+                  onChanged: (value) {
+                    final updated = settings.copyWith(stealthMode: value);
+                    MMKVService.updateGlobalSettings(updated);
+                    setState(() {});
+                  },
+                ),
+                _buildSettingTile(
+                  icon: Icons.notifications_rounded,
+                  title: l10n.notifications,
+                  subtitle: l10n.notificationsDesc,
+                  value: settings.notificationsEnabled,
+                  onChanged: (value) {
+                    final updated = settings.copyWith(
+                      notificationsEnabled: value,
+                    );
+                    MMKVService.updateGlobalSettings(updated);
+                    setState(() {});
+                  },
+                ),
+
+                const SizedBox(height: 24),
+
+                // About section
+                _buildSectionTitle(l10n.about),
+                _buildInfoTile(
+                  icon: Icons.info_rounded,
+                  title: l10n.version,
+                  subtitle: '1.0.0',
+                ),
+                _buildInfoTile(
+                  icon: Icons.code_rounded,
+                  title: l10n.developer,
+                  subtitle: 'App Locker 360 Team',
+                ),
+              ],
+            ),
           ),
 
-          const SizedBox(height: 24),
-
-          // Appearance section
-          _buildSectionTitle(l10n.appearance),
-          _buildSettingTile(
-            icon: Icons.dark_mode_rounded,
-            title: l10n.darkMode,
-            subtitle: l10n.darkModeDesc,
-            value: settings.isDarkTheme,
-            onChanged: (value) {
-              final updated = settings.copyWith(
-                appTheme: value ? 'Dark' : 'Light',
-              );
-              MMKVService.updateGlobalSettings(updated);
-              setState(() {});
-            },
-          ),
-          _buildLanguageTile(
-            icon: Icons.language_rounded,
-            title: l10n.language,
-            subtitle: l10n.languageDesc,
-            currentLanguage: settings.preferredLanguage == 'ar'
-                ? l10n.arabic
-                : l10n.english,
-            onTap: _showLanguageDialog,
-          ),
-
-          const SizedBox(height: 24),
-
-          // Privacy section
-          _buildSectionTitle(l10n.privacy),
-          _buildSettingTile(
-            icon: Icons.visibility_off_rounded,
-            title: l10n.stealthMode,
-            subtitle: l10n.stealthModeDesc,
-            value: settings.stealthMode,
-            onChanged: (value) {
-              final updated = settings.copyWith(stealthMode: value);
-              MMKVService.updateGlobalSettings(updated);
-              setState(() {});
-            },
-          ),
-          _buildSettingTile(
-            icon: Icons.notifications_rounded,
-            title: l10n.notifications,
-            subtitle: l10n.notificationsDesc,
-            value: settings.notificationsEnabled,
-            onChanged: (value) {
-              final updated = settings.copyWith(notificationsEnabled: value);
-              MMKVService.updateGlobalSettings(updated);
-              setState(() {});
-            },
-          ),
-
-          const SizedBox(height: 24),
-
-          // About section
-          _buildSectionTitle(l10n.about),
-          _buildInfoTile(
-            icon: Icons.info_rounded,
-            title: l10n.version,
-            subtitle: '1.0.0',
-          ),
-          _buildInfoTile(
-            icon: Icons.code_rounded,
-            title: l10n.developer,
-            subtitle: 'App Locker 360 Team',
-          ),
+          // Banner Ad at bottom
+          if (_isBannerAdLoaded && _bannerAd != null)
+            Container(
+              alignment: Alignment.center,
+              width: _bannerAd!.size.width.toDouble(),
+              height: _bannerAd!.size.height.toDouble(),
+              color: const Color(0xFF1A1F3A),
+              child: AdWidget(ad: _bannerAd!),
+            ),
         ],
       ),
     );

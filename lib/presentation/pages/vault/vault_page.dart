@@ -11,6 +11,8 @@ import 'package:app_locker360/data/services/encryption_service.dart';
 import 'package:app_locker360/data/services/file_manager_service.dart';
 import 'package:app_locker360/data/services/vault_service.dart';
 import 'package:app_locker360/l10n/app_localizations.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
+import 'package:app_locker360/data/services/ad_helper.dart';
 
 /// Vault page - shows encrypted files
 class VaultPage extends StatefulWidget {
@@ -23,6 +25,37 @@ class VaultPage extends StatefulWidget {
 class _VaultPageState extends State<VaultPage> {
   FileType _selectedType = FileType.image;
   bool _isLoading = false;
+
+  // Ad variables
+  BannerAd? _bannerAd;
+  bool _isBannerAdLoaded = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadBannerAd();
+  }
+
+  @override
+  void dispose() {
+    _bannerAd?.dispose();
+    super.dispose();
+  }
+
+  void _loadBannerAd() {
+    _bannerAd = AdHelper.createBannerAd(
+      adSize: AdSize.banner,
+      onAdLoaded: (ad) {
+        setState(() {
+          _isBannerAdLoaded = true;
+        });
+      },
+      onAdFailedToLoad: (ad, error) {
+        print('Banner ad failed to load: $error');
+        ad.dispose();
+      },
+    )..load();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -145,6 +178,16 @@ class _VaultPageState extends State<VaultPage> {
                     },
                   ),
           ),
+
+          // Banner Ad at bottom
+          if (_isBannerAdLoaded && _bannerAd != null)
+            Container(
+              alignment: Alignment.center,
+              width: _bannerAd!.size.width.toDouble(),
+              height: _bannerAd!.size.height.toDouble(),
+              color: const Color(0xFF1A1F3A),
+              child: AdWidget(ad: _bannerAd!),
+            ),
         ],
       ),
     );

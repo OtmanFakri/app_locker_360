@@ -150,7 +150,7 @@
 "description": "Enter PIN title"
 },
 
-"accessDashboard": "للوصول إلى لوحة التحكم",
+"accessDashboard": "للوصول إلى التطبيق",
 "@accessDashboard": {
 "description": "Access dashboard subtitle"
 },
@@ -158,6 +158,11 @@
 "usePin": "استخدام الرمز السري",
 "@usePin": {
 "description": "Use PIN button"
+},
+
+"useFingerprint": "استخدام البصمة",
+"@useFingerprint": {
+"description": "Use fingerprint button"
 },
 
 "forgotPassword": "نسيت كلمة السر؟",

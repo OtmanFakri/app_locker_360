@@ -99,10 +99,13 @@ class AppLocalizationsAr extends AppLocalizations {
   String get enterPin => 'أدخل الرمز السري';
 
   @override
-  String get accessDashboard => 'للوصول إلى لوحة التحكم';
+  String get accessDashboard => 'للوصول إلى التطبيق';
 
   @override
   String get usePin => 'استخدام الرمز السري';
+
+  @override
+  String get useFingerprint => 'استخدام البصمة';
 
   @override
   String get forgotPassword => 'نسيت كلمة السر؟';

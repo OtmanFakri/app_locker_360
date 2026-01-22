@@ -150,7 +150,7 @@
 "description": "Enter PIN title"
 },
 
-"accessDashboard": "To access the dashboard",
+"accessDashboard": "To access the App Locker 360",
 "@accessDashboard": {
 "description": "Access dashboard subtitle"
 },
@@ -158,6 +158,11 @@
 "usePin": "Use PIN",
 "@usePin": {
 "description": "Use PIN button"
+},
+
+"useFingerprint": "Use Fingerprint",
+"@useFingerprint": {
+"description": "Use fingerprint button"
 },
 
 "forgotPassword": "Forgot Password?",

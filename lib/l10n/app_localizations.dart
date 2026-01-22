@@ -278,7 +278,7 @@ abstract class AppLocalizations {
   /// Access dashboard subtitle
   ///
   /// In en, this message translates to:
-  /// **'To access the dashboard'**
+  /// **'To access the App Locker 360'**
   String get accessDashboard;
 
   /// Use PIN button
@@ -286,6 +286,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Use PIN'**
   String get usePin;
+
+  /// Use fingerprint button
+  ///
+  /// In en, this message translates to:
+  /// **'Use Fingerprint'**
+  String get useFingerprint;
 
   /// Forgot password link
   ///
