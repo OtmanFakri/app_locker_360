@@ -2,6 +2,9 @@ class GlobalSettings {
   /// الرمز السري الرئيسي للتطبيق
   String masterPin;
 
+  /// رمز النسخ الاحتياطي للاسترجاع
+  String backupPin;
+
   /// ثيم التطبيق (Light, Dark, System)
   String appTheme;
 
@@ -37,6 +40,7 @@ class GlobalSettings {
 
   GlobalSettings({
     this.masterPin = "",
+    this.backupPin = "",
     this.appTheme = "Light",
     this.reLockTimeout = 0,
     this.fingerprintEnabled = false,
@@ -53,6 +57,7 @@ class GlobalSettings {
   /// Create a copy with modified fields
   GlobalSettings copyWith({
     String? masterPin,
+    String? backupPin,
     String? appTheme,
     int? reLockTimeout,
     bool? fingerprintEnabled,
@@ -67,6 +72,7 @@ class GlobalSettings {
   }) {
     return GlobalSettings(
       masterPin: masterPin ?? this.masterPin,
+      backupPin: backupPin ?? this.backupPin,
       appTheme: appTheme ?? this.appTheme,
       reLockTimeout: reLockTimeout ?? this.reLockTimeout,
       fingerprintEnabled: fingerprintEnabled ?? this.fingerprintEnabled,
@@ -86,6 +92,7 @@ class GlobalSettings {
   Map<String, dynamic> toMap() {
     return {
       'masterPin': masterPin,
+      'backupPin': backupPin,
       'appTheme': appTheme,
       'reLockTimeout': reLockTimeout,
       'fingerprintEnabled': fingerprintEnabled,
@@ -104,6 +111,7 @@ class GlobalSettings {
   factory GlobalSettings.fromMap(Map<String, dynamic> map) {
     return GlobalSettings(
       masterPin: map['masterPin'] as String? ?? "",
+      backupPin: map['backupPin'] as String? ?? "",
       appTheme: map['appTheme'] as String? ?? "Light",
       reLockTimeout: map['reLockTimeout'] as int? ?? 0,
       fingerprintEnabled: map['fingerprintEnabled'] as bool? ?? false,

@@ -245,10 +245,10 @@ class AppLocalizationsAr extends AppLocalizations {
   String get getStarted => 'ابدأ الآن';
 
   @override
-  String get createPin => 'إنشاء رمز سري';
+  String get createPin => 'إنشاء رمز جديد';
 
   @override
-  String get confirmPin => 'تأكيد الرمز السري';
+  String get confirmPin => 'تأكيد الرمز';
 
   @override
   String get enterFourDigitPin => 'أدخل رمز سري مكون من 4 أرقام';
@@ -257,5 +257,65 @@ class AppLocalizationsAr extends AppLocalizations {
   String get reEnterPin => 'أدخل الرمز مرة أخرى للتأكيد';
 
   @override
-  String get pinMismatch => 'الرمز غير متطابق، حاول مرة أخرى';
+  String get pinMismatch => 'الرموز غير متطابقة. حاول مرة أخرى.';
+
+  @override
+  String get backupPin => 'رمز النسخ الاحتياطي';
+
+  @override
+  String get backupPinTitle => 'احفظ رمز النسخ الاحتياطي';
+
+  @override
+  String get backupPinDescription => 'يمكن استخدام رمز النسخ الاحتياطي هذا لاستعادة الوصول إذا نسيت الرمز السري الرئيسي. احفظه في مكان آمن.';
+
+  @override
+  String get backupPinWarning => 'لن تتمكن من رؤية هذا مرة أخرى!';
+
+  @override
+  String get copyToClipboard => 'نسخ إلى الحافظة';
+
+  @override
+  String get saveToGallery => 'حفظ في المعرض';
+
+  @override
+  String get copiedToClipboard => 'تم النسخ إلى الحافظة!';
+
+  @override
+  String get savedToGallery => 'تم الحفظ في المعرض!';
+
+  @override
+  String get continueToApp => 'المتابعة إلى التطبيق';
+
+  @override
+  String get createPinDesc => 'أدخل رمز مرور جديد مكون من 4 أرقام';
+
+  @override
+  String get confirmPinDesc => 'أعد إدخال الرمز الجديد للتأكيد';
+
+  @override
+  String get recoverAccount => 'استرجاع الحساب';
+
+  @override
+  String get enterBackupPin => 'أدخل رمز النسخ الاحتياطي';
+
+  @override
+  String get invalidBackupPin => 'رمز النسخ الاحتياطي غير صحيح';
+
+  @override
+  String get verifyAndReset => 'تحقق وإعادة تعيين';
+
+  @override
+  String get resetAppData => 'إعادة تعيين البيانات';
+
+  @override
+  String get resetDataConfirmation => 'إعادة تعيين بيانات التطبيق؟';
+
+  @override
+  String get resetDataWarning => 'سيتم حذف جميع البيانات بما في ذلك الملفات المقفلة والمخفية. لا يمكن التراجع عن هذا الإجراء.';
+
+  @override
+  String get cancel => 'إلغاء';
+
+  @override
+  String get resetEverything => 'إعادة تعيين الكل';
 }

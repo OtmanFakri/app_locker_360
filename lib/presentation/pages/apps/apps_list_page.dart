@@ -27,6 +27,8 @@ class _AppsListPageState extends State<AppsListPage> {
   // Ad variables
   BannerAd? _bannerAd;
   bool _isBannerAdLoaded = false;
+  BannerAd? _topBannerAd;
+  bool _isTopBannerAdLoaded = false;
 
   @override
   void initState() {
@@ -38,6 +40,7 @@ class _AppsListPageState extends State<AppsListPage> {
   @override
   void dispose() {
     _bannerAd?.dispose();
+    _topBannerAd?.dispose();
     super.dispose();
   }
 
@@ -51,6 +54,20 @@ class _AppsListPageState extends State<AppsListPage> {
       },
       onAdFailedToLoad: (ad, error) {
         print('Banner ad failed to load: $error');
+        ad.dispose();
+      },
+    )..load();
+
+    // Load top banner ad (Medium Rectangle)
+    _topBannerAd = AdHelper.createBannerAd(
+      adSize: AdSize.mediumRectangle,
+      onAdLoaded: (ad) {
+        setState(() {
+          _isTopBannerAdLoaded = true;
+        });
+      },
+      onAdFailedToLoad: (ad, error) {
+        print('Top banner ad failed to load: $error');
         ad.dispose();
       },
     )..load();
@@ -275,7 +292,7 @@ class _AppsListPageState extends State<AppsListPage> {
             ),
           ),
 
-          // Apps list
+          // Apps list with top ad
           Expanded(
             child: _isLoading
                 ? const Center(
@@ -297,9 +314,31 @@ class _AppsListPageState extends State<AppsListPage> {
                   )
                 : ListView.builder(
                     padding: const EdgeInsets.all(16),
-                    itemCount: _filteredApps.length,
+                    itemCount: _filteredApps.length + 1, // +1 for ad
                     itemBuilder: (context, index) {
-                      final app = _filteredApps[index];
+                      // Show ad as first item
+                      if (index == 0) {
+                        if (_isTopBannerAdLoaded && _topBannerAd != null) {
+                          return Container(
+                            alignment: Alignment.center,
+                            margin: const EdgeInsets.only(bottom: 16),
+                            width: _topBannerAd!.size.width.toDouble(),
+                            height: _topBannerAd!.size.height.toDouble(),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(12),
+                              color: const Color(0xFF1A1F3A),
+                            ),
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(12),
+                              child: AdWidget(ad: _topBannerAd!),
+                            ),
+                          );
+                        }
+                        return const SizedBox.shrink();
+                      }
+
+                      // Show app items (index - 1 because of ad)
+                      final app = _filteredApps[index - 1];
                       return AppListTile(
                         app: app,
                         onLockToggle: () => _toggleLock(app),

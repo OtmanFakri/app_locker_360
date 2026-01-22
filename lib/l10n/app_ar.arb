@@ -418,5 +418,64 @@
 "pinMismatch": "الرمز غير متطابق، حاول مرة أخرى",
 "@pinMismatch": {
 "description": "PIN mismatch error"
-}
+},
+
+"backupPin": "رمز النسخ الاحتياطي",
+"@backupPin": {
+"description": "Backup PIN label"
+},
+
+"backupPinTitle": "احفظ رمز النسخ الاحتياطي",
+"@backupPinTitle": {
+"description": "Backup PIN page title"
+},
+
+"backupPinDescription": "يمكن استخدام رمز النسخ الاحتياطي هذا لاستعادة الوصول إذا نسيت الرمز السري الرئيسي. احفظه في مكان آمن.",
+"@backupPinDescription": {
+"description": "Backup PIN description"
+},
+
+"backupPinWarning": "لن تتمكن من رؤية هذا مرة أخرى!",
+"@backupPinWarning": {
+"description": "Backup PIN warning message"
+},
+
+"copyToClipboard": "نسخ إلى الحافظة",
+"@copyToClipboard": {
+"description": "Copy to clipboard button"
+},
+
+"saveToGallery": "حفظ في المعرض",
+"@saveToGallery": {
+"description": "Save to gallery button"
+},
+
+"copiedToClipboard": "تم النسخ إلى الحافظة!",
+"@copiedToClipboard": {
+"description": "Copied to clipboard success message"
+},
+
+"savedToGallery": "تم الحفظ في المعرض!",
+"@savedToGallery": {
+"description": "Saved to gallery success message"
+},
+
+"continueToApp": "المتابعة إلى التطبيق",
+"@continueToApp": {
+"description": "Continue to app button"
+},
+"createPin": "إنشاء رمز جديد",
+"createPinDesc": "أدخل رمز مرور جديد مكون من 4 أرقام",
+"confirmPin": "تأكيد الرمز",
+"confirmPinDesc": "أعد إدخال الرمز الجديد للتأكيد",
+"pinMismatch": "الرموز غير متطابقة. حاول مرة أخرى.",
+"recoverAccount": "استرجاع الحساب",
+"enterBackupPin": "أدخل رمز النسخ الاحتياطي",
+"invalidBackupPin": "رمز النسخ الاحتياطي غير صحيح",
+"verifyAndReset": "تحقق وإعادة تعيين",
+"resetAppData": "إعادة تعيين البيانات",
+"resetDataConfirmation": "إعادة تعيين بيانات التطبيق؟",
+"resetDataWarning": "سيتم حذف جميع البيانات بما في ذلك الملفات المقفلة والمخفية. لا يمكن التراجع عن هذا الإجراء.",
+"cancel": "إلغاء",
+"resetEverything": "إعادة تعيين الكل"
 }

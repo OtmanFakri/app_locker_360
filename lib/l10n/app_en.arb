@@ -418,5 +418,64 @@
 "pinMismatch": "PINs don't match, try again",
 "@pinMismatch": {
 "description": "PIN mismatch error"
-}
+},
+
+"backupPin": "Backup PIN",
+"@backupPin": {
+"description": "Backup PIN label"
+},
+
+"backupPinTitle": "Save Your Backup PIN",
+"@backupPinTitle": {
+"description": "Backup PIN page title"
+},
+
+"backupPinDescription": "This backup PIN can be used to recover access if you forget your main PIN. Save it in a safe place.",
+"@backupPinDescription": {
+"description": "Backup PIN description"
+},
+
+"backupPinWarning": "You won't be able to see this again!",
+"@backupPinWarning": {
+"description": "Backup PIN warning message"
+},
+
+"copyToClipboard": "Copy to Clipboard",
+"@copyToClipboard": {
+"description": "Copy to clipboard button"
+},
+
+"saveToGallery": "Save to Gallery",
+"@saveToGallery": {
+"description": "Save to gallery button"
+},
+
+"copiedToClipboard": "Copied to clipboard!",
+"@copiedToClipboard": {
+"description": "Copied to clipboard success message"
+},
+
+"savedToGallery": "Saved to gallery!",
+"@savedToGallery": {
+"description": "Saved to gallery success message"
+},
+
+"continueToApp": "Continue to App",
+"@continueToApp": {
+"description": "Continue to app button"
+},
+"createPin": "Create New PIN",
+"createPinDesc": "Enter a new 4-digit PIN for your locker",
+"confirmPin": "Confirm PIN",
+"confirmPinDesc": "Re-enter your new PIN to confirm",
+"pinMismatch": "PINs do not match. Try again.",
+"recoverAccount": "Recover Account",
+"enterBackupPin": "Enter Backup PIN",
+"invalidBackupPin": "Invalid Backup PIN",
+"verifyAndReset": "Verify & Reset PIN",
+"resetAppData": "Reset App Data",
+"resetDataConfirmation": "Reset App Data?",
+"resetDataWarning": "This will delete ALL data including locked/hidden files. This action cannot be undone.",
+"cancel": "Cancel",
+"resetEverything": "Reset Everything"
 }

@@ -13,6 +13,7 @@ import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:app_locker360/data/services/ad_helper.dart';
 import 'package:app_locker360/l10n/app_localizations.dart';
 import 'package:device_apps/device_apps.dart';
+import 'package:app_locker360/presentation/pages/auth/widgets/forgot_password_dialog.dart';
 
 class ScreenLockPage extends StatefulWidget {
   final String? lockedPackageName;
@@ -131,6 +132,13 @@ class _ScreenLockPageState extends State<ScreenLockPage>
         _showError = false;
       });
     }
+  }
+
+  void _onForgotPassword() {
+    showDialog(
+      context: context,
+      builder: (context) => const ForgotPasswordDialog(),
+    );
   }
 
   Future<void> _verifyPin() async {
@@ -435,6 +443,21 @@ class _ScreenLockPageState extends State<ScreenLockPage>
             NumberPad(
               onNumberPressed: _onNumberPressed,
               onDeletePressed: _onDeletePressed,
+            ),
+
+            const SizedBox(height: 16),
+
+            // Forgot Password Button
+            TextButton(
+              onPressed: _onForgotPassword,
+              child: Text(
+                l10n.forgotPassword,
+                style: GoogleFonts.cairo(
+                  fontSize: 14,
+                  color: Colors.white70,
+                  decoration: TextDecoration.underline,
+                ),
+              ),
             ),
           ],
 

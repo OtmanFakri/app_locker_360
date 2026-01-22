@@ -566,7 +566,7 @@ abstract class AppLocalizations {
   /// Create PIN title
   ///
   /// In en, this message translates to:
-  /// **'Create PIN'**
+  /// **'Create New PIN'**
   String get createPin;
 
   /// Confirm PIN title
@@ -590,8 +590,128 @@ abstract class AppLocalizations {
   /// PIN mismatch error
   ///
   /// In en, this message translates to:
-  /// **'PINs don\'t match, try again'**
+  /// **'PINs do not match. Try again.'**
   String get pinMismatch;
+
+  /// Backup PIN label
+  ///
+  /// In en, this message translates to:
+  /// **'Backup PIN'**
+  String get backupPin;
+
+  /// Backup PIN page title
+  ///
+  /// In en, this message translates to:
+  /// **'Save Your Backup PIN'**
+  String get backupPinTitle;
+
+  /// Backup PIN description
+  ///
+  /// In en, this message translates to:
+  /// **'This backup PIN can be used to recover access if you forget your main PIN. Save it in a safe place.'**
+  String get backupPinDescription;
+
+  /// Backup PIN warning message
+  ///
+  /// In en, this message translates to:
+  /// **'You won\'t be able to see this again!'**
+  String get backupPinWarning;
+
+  /// Copy to clipboard button
+  ///
+  /// In en, this message translates to:
+  /// **'Copy to Clipboard'**
+  String get copyToClipboard;
+
+  /// Save to gallery button
+  ///
+  /// In en, this message translates to:
+  /// **'Save to Gallery'**
+  String get saveToGallery;
+
+  /// Copied to clipboard success message
+  ///
+  /// In en, this message translates to:
+  /// **'Copied to clipboard!'**
+  String get copiedToClipboard;
+
+  /// Saved to gallery success message
+  ///
+  /// In en, this message translates to:
+  /// **'Saved to gallery!'**
+  String get savedToGallery;
+
+  /// Continue to app button
+  ///
+  /// In en, this message translates to:
+  /// **'Continue to App'**
+  String get continueToApp;
+
+  /// No description provided for @createPinDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a new 4-digit PIN for your locker'**
+  String get createPinDesc;
+
+  /// No description provided for @confirmPinDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Re-enter your new PIN to confirm'**
+  String get confirmPinDesc;
+
+  /// No description provided for @recoverAccount.
+  ///
+  /// In en, this message translates to:
+  /// **'Recover Account'**
+  String get recoverAccount;
+
+  /// No description provided for @enterBackupPin.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter Backup PIN'**
+  String get enterBackupPin;
+
+  /// No description provided for @invalidBackupPin.
+  ///
+  /// In en, this message translates to:
+  /// **'Invalid Backup PIN'**
+  String get invalidBackupPin;
+
+  /// No description provided for @verifyAndReset.
+  ///
+  /// In en, this message translates to:
+  /// **'Verify & Reset PIN'**
+  String get verifyAndReset;
+
+  /// No description provided for @resetAppData.
+  ///
+  /// In en, this message translates to:
+  /// **'Reset App Data'**
+  String get resetAppData;
+
+  /// No description provided for @resetDataConfirmation.
+  ///
+  /// In en, this message translates to:
+  /// **'Reset App Data?'**
+  String get resetDataConfirmation;
+
+  /// No description provided for @resetDataWarning.
+  ///
+  /// In en, this message translates to:
+  /// **'This will delete ALL data including locked/hidden files. This action cannot be undone.'**
+  String get resetDataWarning;
+
+  /// No description provided for @cancel.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get cancel;
+
+  /// No description provided for @resetEverything.
+  ///
+  /// In en, this message translates to:
+  /// **'Reset Everything'**
+  String get resetEverything;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

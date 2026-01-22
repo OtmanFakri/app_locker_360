@@ -245,7 +245,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get getStarted => 'Get Started';
 
   @override
-  String get createPin => 'Create PIN';
+  String get createPin => 'Create New PIN';
 
   @override
   String get confirmPin => 'Confirm PIN';
@@ -257,5 +257,65 @@ class AppLocalizationsEn extends AppLocalizations {
   String get reEnterPin => 'Re-enter PIN for confirmation';
 
   @override
-  String get pinMismatch => 'PINs don\'t match, try again';
+  String get pinMismatch => 'PINs do not match. Try again.';
+
+  @override
+  String get backupPin => 'Backup PIN';
+
+  @override
+  String get backupPinTitle => 'Save Your Backup PIN';
+
+  @override
+  String get backupPinDescription => 'This backup PIN can be used to recover access if you forget your main PIN. Save it in a safe place.';
+
+  @override
+  String get backupPinWarning => 'You won\'t be able to see this again!';
+
+  @override
+  String get copyToClipboard => 'Copy to Clipboard';
+
+  @override
+  String get saveToGallery => 'Save to Gallery';
+
+  @override
+  String get copiedToClipboard => 'Copied to clipboard!';
+
+  @override
+  String get savedToGallery => 'Saved to gallery!';
+
+  @override
+  String get continueToApp => 'Continue to App';
+
+  @override
+  String get createPinDesc => 'Enter a new 4-digit PIN for your locker';
+
+  @override
+  String get confirmPinDesc => 'Re-enter your new PIN to confirm';
+
+  @override
+  String get recoverAccount => 'Recover Account';
+
+  @override
+  String get enterBackupPin => 'Enter Backup PIN';
+
+  @override
+  String get invalidBackupPin => 'Invalid Backup PIN';
+
+  @override
+  String get verifyAndReset => 'Verify & Reset PIN';
+
+  @override
+  String get resetAppData => 'Reset App Data';
+
+  @override
+  String get resetDataConfirmation => 'Reset App Data?';
+
+  @override
+  String get resetDataWarning => 'This will delete ALL data including locked/hidden files. This action cannot be undone.';
+
+  @override
+  String get cancel => 'Cancel';
+
+  @override
+  String get resetEverything => 'Reset Everything';
 }

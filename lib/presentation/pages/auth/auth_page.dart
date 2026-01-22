@@ -97,7 +97,9 @@ class _AuthPageState extends State<AuthPage> with TickerProviderStateMixin {
   Future<void> _verifyPin() async {
     final settings = MMKVService.getGlobalSettings();
 
-    if (_enteredPin == settings.masterPin) {
+    // Check if entered PIN matches either master PIN or backup PIN
+    if (_enteredPin == settings.masterPin ||
+        _enteredPin == settings.backupPin) {
       // Correct PIN - Navigate to home/dashboard
       if (mounted) {
         Navigator.of(context).pushReplacement(
@@ -148,7 +150,6 @@ class _AuthPageState extends State<AuthPage> with TickerProviderStateMixin {
   Widget build(BuildContext context) {
     final settings = MMKVService.getGlobalSettings();
     final l10n = AppLocalizations.of(context)!;
-
     return Scaffold(
       backgroundColor: const Color(0xFF0A0E21),
       body: SafeArea(

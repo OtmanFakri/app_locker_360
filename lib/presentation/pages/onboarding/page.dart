@@ -5,6 +5,8 @@ import 'package:app_locker360/presentation/pages/home/home_page.dart';
 import 'package:app_locker360/presentation/pages/onboarding/permissions_page.dart';
 import 'package:app_locker360/l10n/app_localizations.dart';
 import 'package:app_locker360/presentation/pages/onboarding/widgets/language_selector.dart';
+import 'package:app_locker360/core/utils/backup_pin_generator.dart';
+import 'package:app_locker360/presentation/pages/onboarding/backup_pin_display_page.dart';
 
 /// شاشة الإعداد الأولي (Onboarding)
 /// تظهر فقط عند تثبيت التطبيق لأول مرة
@@ -534,21 +536,27 @@ class _PinSetupPageState extends State<PinSetupPage> {
   }
 
   Future<void> _savePinAndComplete() async {
+    // Generate backup PIN
+    final backupPin = BackupPinGenerator.generate();
+
     // Get current settings
     final settings = MMKVService.getGlobalSettings();
 
-    // Update with new PIN and mark onboarding as complete
+    // Update with new PIN, backup PIN, and mark onboarding as complete
     final updatedSettings = settings.copyWith(
       masterPin: _pin,
+      backupPin: backupPin,
       hasCompletedOnboarding: true,
     );
 
     await MMKVService.updateGlobalSettings(updatedSettings);
 
-    // Navigate to home
+    // Navigate to backup PIN display page
     if (mounted) {
       Navigator.of(context).pushReplacement(
-        MaterialPageRoute(builder: (context) => const HomePage()),
+        MaterialPageRoute(
+          builder: (context) => BackupPinDisplayPage(backupPin: backupPin),
+        ),
       );
     }
   }
