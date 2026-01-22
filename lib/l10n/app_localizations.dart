@@ -137,6 +137,12 @@ abstract class AppLocalizations {
   /// **'Capture photo when wrong PIN is entered'**
   String get intruderSelfieDesc;
 
+  /// Camera permission denied message
+  ///
+  /// In en, this message translates to:
+  /// **'Camera permission is required for intruder selfie feature'**
+  String get cameraPermissionDenied;
+
   /// Appearance section title
   ///
   /// In en, this message translates to:

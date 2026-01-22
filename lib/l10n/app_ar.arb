@@ -35,6 +35,11 @@
 "description": "Intruder selfie description"
 },
 
+"cameraPermissionDenied": "إذن الكاميرا مطلوب لتفعيل خاصية صور المتطفلين",
+"@cameraPermissionDenied": {
+"description": "Camera permission denied message"
+},
+
 "appearance": "المظهر",
 "@appearance": {
 "description": "Appearance section title"

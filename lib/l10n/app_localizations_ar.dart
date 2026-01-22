@@ -30,6 +30,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get intruderSelfieDesc => 'التقاط صورة عند إدخال رمز خاطئ';
 
   @override
+  String get cameraPermissionDenied => 'إذن الكاميرا مطلوب لتفعيل خاصية صور المتطفلين';
+
+  @override
   String get appearance => 'المظهر';
 
   @override

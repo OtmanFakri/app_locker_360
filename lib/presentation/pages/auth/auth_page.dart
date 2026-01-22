@@ -10,6 +10,7 @@ import 'package:app_locker360/presentation/pages/auth/widgets/fingerprint_button
 import 'package:app_locker360/presentation/pages/auth/widgets/number_pad.dart';
 import 'package:app_locker360/presentation/pages/auth/widgets/forgot_password_dialog.dart';
 import 'package:app_locker360/l10n/app_localizations.dart';
+import 'package:app_locker360/core/services/intruder_detection_service.dart';
 
 /// شاشة القفل الرئيسية (Auth Screen)
 /// تظهر كل مرة يفتح فيها المستخدم التطبيق للدخول إلى لوحة التحكم
@@ -100,18 +101,31 @@ class _AuthPageState extends State<AuthPage> with TickerProviderStateMixin {
     // Check if entered PIN matches either master PIN or backup PIN
     if (_enteredPin == settings.masterPin ||
         _enteredPin == settings.backupPin) {
-      // Correct PIN - Navigate to home/dashboard
+      // Correct PIN - Reset failed attempts counter
+      _failedAttempts = 0;
+
+      // Navigate to home/dashboard
       if (mounted) {
         Navigator.of(context).pushReplacement(
           MaterialPageRoute(builder: (context) => const HomePage()),
         );
       }
     } else {
-      // Wrong PIN - Show error
+      // Wrong PIN - Increment failed attempts
       setState(() {
         _showError = true;
         _failedAttempts++;
       });
+
+      // Check if we should capture intruder photo
+      if (settings.intruderSelfie && _failedAttempts >= settings.maxAttempts) {
+        // Capture photo silently in background
+        IntruderDetectionService.captureIntruderPhoto().then((path) {
+          if (path != null) {
+            print('🚨 Intruder photo captured: $path');
+          }
+        });
+      }
 
       // Shake animation
       await _shakeController.forward();

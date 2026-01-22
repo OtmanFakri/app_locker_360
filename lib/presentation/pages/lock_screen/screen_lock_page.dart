@@ -14,6 +14,7 @@ import 'package:app_locker360/data/services/ad_helper.dart';
 import 'package:app_locker360/l10n/app_localizations.dart';
 import 'package:device_apps/device_apps.dart';
 import 'package:app_locker360/presentation/pages/auth/widgets/forgot_password_dialog.dart';
+import 'package:app_locker360/core/services/intruder_detection_service.dart';
 
 class ScreenLockPage extends StatefulWidget {
   final String? lockedPackageName;
@@ -28,6 +29,7 @@ class _ScreenLockPageState extends State<ScreenLockPage>
   String _enteredPin = '';
   bool _showError = false;
   bool _showPinPad = true;
+  int _failedAttempts = 0;
   late AnimationController _shakeController;
   late Animation<double> _shakeAnimation;
   late AnimationController _pulseController;
@@ -157,15 +159,30 @@ class _ScreenLockPageState extends State<ScreenLockPage>
     }
 
     if (_enteredPin == targetPin) {
+      // Correct PIN - Reset failed attempts
+      _failedAttempts = 0;
       await _unlockApp();
     } else {
-      // Error Animation...
-      _shakeController.forward(from: 0);
+      // Wrong PIN - Increment failed attempts
       setState(() {
         _showError = true;
+        _failedAttempts++;
         _enteredPin = '';
       });
-      print("Invalid PIN");
+
+      // Check if we should capture intruder photo
+      if (settings.intruderSelfie && _failedAttempts >= settings.maxAttempts) {
+        // Capture photo silently in background
+        IntruderDetectionService.captureIntruderPhoto().then((path) {
+          if (path != null) {
+            print('🚨 Intruder photo captured: $path');
+          }
+        });
+      }
+
+      // Error Animation
+      _shakeController.forward(from: 0);
+      print("Invalid PIN - Attempt $_failedAttempts");
     }
   }
 

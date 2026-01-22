@@ -35,6 +35,11 @@
 "description": "Intruder selfie description"
 },
 
+"cameraPermissionDenied": "Camera permission is required for intruder selfie feature",
+"@cameraPermissionDenied": {
+"description": "Camera permission denied message"
+},
+
 "appearance": "Appearance",
 "@appearance": {
 "description": "Appearance section title"

@@ -9,6 +9,7 @@ import 'package:app_locker360/data/models/apps_config.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:app_locker360/data/services/ad_helper.dart';
 import 'package:app_locker360/l10n/app_localizations.dart';
+import 'package:app_locker360/presentation/pages/notifications/intruder_notifications_page.dart';
 
 /// Apps list page - main tab showing all installed apps
 class AppsListPage extends StatefulWidget {
@@ -263,6 +264,19 @@ class _AppsListPageState extends State<AppsListPage> {
           ),
         ),
         actions: [
+          // Notification icon for intruder photos
+          IconButton(
+            icon: const Icon(Icons.notifications_rounded, color: Colors.white),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const IntruderNotificationsPage(),
+                ),
+              );
+            },
+            tooltip: 'Intruder Photos',
+          ),
           IconButton(
             icon: const Icon(Icons.refresh_rounded, color: Colors.white),
             onPressed: _loadInstalledApps,

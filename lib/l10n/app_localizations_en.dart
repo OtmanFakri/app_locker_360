@@ -30,6 +30,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get intruderSelfieDesc => 'Capture photo when wrong PIN is entered';
 
   @override
+  String get cameraPermissionDenied => 'Camera permission is required for intruder selfie feature';
+
+  @override
   String get appearance => 'Appearance';
 
   @override

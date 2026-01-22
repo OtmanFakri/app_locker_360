@@ -5,6 +5,7 @@ import 'package:app_locker360/l10n/app_localizations.dart';
 import 'package:app_locker360/main.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:app_locker360/data/services/ad_helper.dart';
+import 'package:app_locker360/core/services/intruder_detection_service.dart';
 
 /// Settings page - app configuration and dashboard
 class SettingsPage extends StatefulWidget {
@@ -181,7 +182,33 @@ class _SettingsPageState extends State<SettingsPage> {
                   title: l10n.intruderSelfie,
                   subtitle: l10n.intruderSelfieDesc,
                   value: settings.intruderSelfie,
-                  onChanged: (value) {
+                  onChanged: (value) async {
+                    if (value) {
+                      // Request camera permission when enabling the feature
+                      final hasPermission =
+                          await IntruderDetectionService.checkAndRequestPermissions();
+
+                      if (!hasPermission) {
+                        // Permission denied - show message and don't enable
+                        if (mounted) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(
+                                l10n.cameraPermissionDenied ??
+                                    'Camera permission is required for intruder selfie feature',
+                                style: GoogleFonts.cairo(),
+                              ),
+                              backgroundColor: Colors.red,
+                              duration: const Duration(seconds: 3),
+                            ),
+                          );
+                        }
+                        // Don't update the setting
+                        return;
+                      }
+                    }
+
+                    // Permission granted or feature is being disabled
                     final updated = settings.copyWith(intruderSelfie: value);
                     MMKVService.updateGlobalSettings(updated);
                     setState(() {});
