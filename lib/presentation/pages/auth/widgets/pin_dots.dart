@@ -5,7 +5,14 @@ class PinDots extends StatelessWidget {
   final int filledCount;
   final bool showError;
 
-  const PinDots({super.key, required this.filledCount, this.showError = false});
+  final Color? borderColor;
+
+  const PinDots({
+    super.key,
+    required this.filledCount,
+    this.showError = false,
+    this.borderColor,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -24,11 +31,13 @@ class PinDots extends StatelessWidget {
                     colors: [Color(0xFF667EEA), Color(0xFF764BA2)],
                   )
                 : null,
-            color: index < filledCount ? null : Colors.white24,
+            color: index < filledCount ? null : (borderColor ?? Colors.white24),
             border: Border.all(
               color: showError
                   ? Colors.redAccent
-                  : (index < filledCount ? Colors.transparent : Colors.white24),
+                  : (index < filledCount
+                        ? Colors.transparent
+                        : (borderColor ?? Colors.white24)),
               width: 2,
             ),
           ),

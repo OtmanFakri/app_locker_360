@@ -145,7 +145,27 @@ void onStart(ServiceInstance service) async {
             appConfig.isLocked &&
             !isUnlockedLocally &&
             !isUnlockedMMKV) {
-          print("🔒 LOCKING NOW: $currentPackage");
+          // Check if this is a system installer package
+          final isSystemInstaller = [
+            'com.android.packageinstaller',
+            'com.google.android.packageinstaller',
+            'com.android.settings',
+            'com.android.vending',
+            'com.miui.packageinstaller',
+            'com.miui.securitycenter',
+          ].contains(currentPackage);
+
+          if (isSystemInstaller) {
+            print('🚨 ========================================');
+            print('🚨 SYSTEM INSTALLER DETECTED!');
+            print('🚨 Package: $currentPackage');
+            print('🚨 User is trying to uninstall an app!');
+            print('🚨 Showing PIN screen...');
+            print('🚨 ========================================');
+          } else {
+            print("🔒 LOCKING NOW: $currentPackage");
+          }
+
           await MMKVService.setLockedPackage(currentPackage);
 
           await Future.delayed(const Duration(milliseconds: 50));

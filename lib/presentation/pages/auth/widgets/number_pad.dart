@@ -5,11 +5,17 @@ import 'package:google_fonts/google_fonts.dart';
 class NumberPad extends StatelessWidget {
   final Function(String) onNumberPressed;
   final VoidCallback onDeletePressed;
+  final Color? textColor;
+  final Color? buttonColor;
+  final Color? buttonBorderColor;
 
   const NumberPad({
     super.key,
     required this.onNumberPressed,
     required this.onDeletePressed,
+    this.textColor,
+    this.buttonColor,
+    this.buttonBorderColor,
   });
 
   @override
@@ -37,17 +43,24 @@ class NumberPad extends StatelessWidget {
         if (number == 'delete') {
           return _NumberButton(
             onPressed: onDeletePressed,
-            child: const Icon(Icons.backspace_outlined, color: Colors.white),
+            color: buttonColor,
+            borderColor: buttonBorderColor,
+            child: Icon(
+              Icons.backspace_outlined,
+              color: textColor ?? Colors.white,
+            ),
           );
         }
         return _NumberButton(
           onPressed: () => onNumberPressed(number),
+          color: buttonColor,
+          borderColor: buttonBorderColor,
           child: Text(
             number,
             style: GoogleFonts.cairo(
               fontSize: 28,
               fontWeight: FontWeight.w600,
-              color: Colors.white,
+              color: textColor ?? Colors.white,
             ),
           ),
         );
@@ -59,8 +72,15 @@ class NumberPad extends StatelessWidget {
 class _NumberButton extends StatelessWidget {
   final Widget child;
   final VoidCallback onPressed;
+  final Color? color;
+  final Color? borderColor;
 
-  const _NumberButton({required this.child, required this.onPressed});
+  const _NumberButton({
+    required this.child,
+    required this.onPressed,
+    this.color,
+    this.borderColor,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -70,9 +90,12 @@ class _NumberButton extends StatelessWidget {
         width: 80,
         height: 80,
         decoration: BoxDecoration(
-          color: Colors.white.withOpacity(0.05),
+          color: color ?? Colors.white.withOpacity(0.05),
           shape: BoxShape.circle,
-          border: Border.all(color: Colors.white.withOpacity(0.1), width: 1),
+          border: Border.all(
+            color: borderColor ?? Colors.white.withOpacity(0.1),
+            width: 1,
+          ),
         ),
         child: Center(child: child),
       ),

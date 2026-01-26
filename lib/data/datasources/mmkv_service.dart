@@ -201,9 +201,9 @@ class MMKVService {
     return getAllAppConfigs().where((app) => app.isLocked).toList();
   }
 
-  /// Get all hidden apps
-  static List<AppsConfig> getHiddenApps() {
-    return getAllAppConfigs().where((app) => app.isHidden).toList();
+  /// Get all apps with uninstall protection
+  static List<AppsConfig> getProtectedApps() {
+    return getAllAppConfigs().where((app) => app.uninstallProtection).toList();
   }
 
   /// Delete app config

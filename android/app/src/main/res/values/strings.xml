@@ -1,4 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">App Locker 360</string>
+    <string name="accessibility_service_description">Monitor apps and system dialogs to detect
+        uninstall attempts</string>
 </resources>

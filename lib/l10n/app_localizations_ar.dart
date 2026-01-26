@@ -321,4 +321,64 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get resetEverything => 'إعادة تعيين الكل';
+
+  @override
+  String get enterCodeToUnlockApp => 'ادخل الرمز لفتح التطبيق';
+
+  @override
+  String get enterCustomCodeToUnlockApp => 'ادخل الرمز الخاص لفتح التطبيق';
+
+  @override
+  String get unlockToUseApp => 'افتح القفل لاستخدام التطبيق';
+
+  @override
+  String get setCustomPin => 'تعيين رمز خاص';
+
+  @override
+  String get changeCustomPin => 'تغيير الرمز الخاص';
+
+  @override
+  String get lockMethod => 'طريقة القفل';
+
+  @override
+  String get fingerprintGlobalPin => 'بصمة + رمز عام';
+
+  @override
+  String get fingerprintGlobalPinDesc => 'القفل بالبصمة أو الرمز العام للتطبيق';
+
+  @override
+  String get fingerprintCustomPin => 'بصمة + رمز خاص';
+
+  @override
+  String get fingerprintCustomPinDesc => 'القفل بالبصمة أو رمز خاص لهذا التطبيق';
+
+  @override
+  String get fingerprintSystemLock => 'بصمة + رمز الهاتف';
+
+  @override
+  String get fingerprintSystemLockDesc => 'القفل باستخدام أمان الهاتف (بصمة/نمط)';
+
+  @override
+  String get pinOnly => 'رمز فقط';
+
+  @override
+  String get pinOnlyDesc => 'القفل بالرمز فقط (بدون بصمة)';
+
+  @override
+  String get fingerprintOnly => 'بصمة فقط';
+
+  @override
+  String get fingerprintOnlyDesc => 'القفل بالبصمة فقط (بدون رمز)';
+
+  @override
+  String get selectedGlobalPin => 'المحدد: رمز عام';
+
+  @override
+  String get selectedCustomPin => 'المحدد: رمز خاص';
+
+  @override
+  String get switchAction => 'تبديل';
+
+  @override
+  String get save => 'حفظ';
 }

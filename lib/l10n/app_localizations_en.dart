@@ -321,4 +321,64 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get resetEverything => 'Reset Everything';
+
+  @override
+  String get enterCodeToUnlockApp => 'Enter the code to unlock the application';
+
+  @override
+  String get enterCustomCodeToUnlockApp => 'Enter the custom code to unlock the application';
+
+  @override
+  String get unlockToUseApp => 'Unlock to use app';
+
+  @override
+  String get setCustomPin => 'Set Custom PIN';
+
+  @override
+  String get changeCustomPin => 'Change Custom PIN';
+
+  @override
+  String get lockMethod => 'Lock Method';
+
+  @override
+  String get fingerprintGlobalPin => 'Fingerprint + Global PIN';
+
+  @override
+  String get fingerprintGlobalPinDesc => 'Use fingerprint or global app PIN';
+
+  @override
+  String get fingerprintCustomPin => 'Fingerprint + Custom PIN';
+
+  @override
+  String get fingerprintCustomPinDesc => 'Use fingerprint or custom app PIN';
+
+  @override
+  String get fingerprintSystemLock => 'Fingerprint + System Lock';
+
+  @override
+  String get fingerprintSystemLockDesc => 'Use device security (fingerprint/pattern)';
+
+  @override
+  String get pinOnly => 'PIN Only';
+
+  @override
+  String get pinOnlyDesc => 'Use PIN only (no fingerprint)';
+
+  @override
+  String get fingerprintOnly => 'Fingerprint Only';
+
+  @override
+  String get fingerprintOnlyDesc => 'Use fingerprint only (no PIN)';
+
+  @override
+  String get selectedGlobalPin => 'Selected: Global PIN';
+
+  @override
+  String get selectedCustomPin => 'Selected: Custom PIN';
+
+  @override
+  String get switchAction => 'Switch';
+
+  @override
+  String get save => 'Save';
 }

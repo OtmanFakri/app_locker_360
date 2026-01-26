@@ -718,6 +718,126 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Reset Everything'**
   String get resetEverything;
+
+  /// Text to display when general code is required
+  ///
+  /// In en, this message translates to:
+  /// **'Enter the code to unlock the application'**
+  String get enterCodeToUnlockApp;
+
+  /// Text to display when custom code is required
+  ///
+  /// In en, this message translates to:
+  /// **'Enter the custom code to unlock the application'**
+  String get enterCustomCodeToUnlockApp;
+
+  /// Unlock generic text
+  ///
+  /// In en, this message translates to:
+  /// **'Unlock to use app'**
+  String get unlockToUseApp;
+
+  /// Set Custom PIN button text
+  ///
+  /// In en, this message translates to:
+  /// **'Set Custom PIN'**
+  String get setCustomPin;
+
+  /// Change Custom PIN button text
+  ///
+  /// In en, this message translates to:
+  /// **'Change Custom PIN'**
+  String get changeCustomPin;
+
+  /// Lock Method section title
+  ///
+  /// In en, this message translates to:
+  /// **'Lock Method'**
+  String get lockMethod;
+
+  /// Fingerprint and Global PIN option
+  ///
+  /// In en, this message translates to:
+  /// **'Fingerprint + Global PIN'**
+  String get fingerprintGlobalPin;
+
+  /// Fingerprint and Global PIN description
+  ///
+  /// In en, this message translates to:
+  /// **'Use fingerprint or global app PIN'**
+  String get fingerprintGlobalPinDesc;
+
+  /// Fingerprint and Custom PIN option
+  ///
+  /// In en, this message translates to:
+  /// **'Fingerprint + Custom PIN'**
+  String get fingerprintCustomPin;
+
+  /// Fingerprint and Custom PIN description
+  ///
+  /// In en, this message translates to:
+  /// **'Use fingerprint or custom app PIN'**
+  String get fingerprintCustomPinDesc;
+
+  /// Fingerprint and System Lock option
+  ///
+  /// In en, this message translates to:
+  /// **'Fingerprint + System Lock'**
+  String get fingerprintSystemLock;
+
+  /// Fingerprint and System Lock description
+  ///
+  /// In en, this message translates to:
+  /// **'Use device security (fingerprint/pattern)'**
+  String get fingerprintSystemLockDesc;
+
+  /// PIN Only option
+  ///
+  /// In en, this message translates to:
+  /// **'PIN Only'**
+  String get pinOnly;
+
+  /// PIN Only description
+  ///
+  /// In en, this message translates to:
+  /// **'Use PIN only (no fingerprint)'**
+  String get pinOnlyDesc;
+
+  /// Fingerprint Only option
+  ///
+  /// In en, this message translates to:
+  /// **'Fingerprint Only'**
+  String get fingerprintOnly;
+
+  /// Fingerprint Only description
+  ///
+  /// In en, this message translates to:
+  /// **'Use fingerprint only (no PIN)'**
+  String get fingerprintOnlyDesc;
+
+  /// Label indicating global PIN is selected
+  ///
+  /// In en, this message translates to:
+  /// **'Selected: Global PIN'**
+  String get selectedGlobalPin;
+
+  /// Label indicating custom PIN is selected
+  ///
+  /// In en, this message translates to:
+  /// **'Selected: Custom PIN'**
+  String get selectedCustomPin;
+
+  /// Switch button text
+  ///
+  /// In en, this message translates to:
+  /// **'Switch'**
+  String get switchAction;
+
+  /// Save button text
+  ///
+  /// In en, this message translates to:
+  /// **'Save'**
+  String get save;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

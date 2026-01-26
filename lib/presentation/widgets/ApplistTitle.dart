@@ -1,4 +1,3 @@
-
 import 'package:app_locker360/presentation/widgets/ActionBuutton.dart';
 import 'package:flutter/material.dart';
 import 'package:device_apps/device_apps.dart';
@@ -6,20 +5,18 @@ import 'package:app_locker360/data/datasources/mmkv_service.dart';
 import 'package:app_locker360/data/models/apps_config.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-
-
 class AppListTile extends StatelessWidget {
   final Application app;
   final VoidCallback onLockToggle;
   final VoidCallback onInternetToggle;
-  final VoidCallback onHiddenToggle;
+  final VoidCallback onUninstallProtectionToggle;
   final VoidCallback onLongPress;
 
   const AppListTile({
     required this.app,
     required this.onLockToggle,
     required this.onInternetToggle,
-    required this.onHiddenToggle,
+    required this.onUninstallProtectionToggle,
     required this.onLongPress,
   });
 
@@ -27,7 +24,7 @@ class AppListTile extends StatelessWidget {
   Widget build(BuildContext context) {
     final config = MMKVService.getAppConfig(app.packageName);
     final isLocked = config?.isLocked ?? false;
-    final isHidden = config?.isHidden ?? false;
+    final hasUninstallProtection = config?.uninstallProtection ?? false;
     final blockInternet = config?.blockInternet ?? NetBlock.none;
 
     return Container(
@@ -105,13 +102,15 @@ class AppListTile extends StatelessWidget {
                 Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    // Hidden toggle
+                    // Uninstall Protection toggle
                     ActionButton(
-                      icon: isHidden
-                          ? Icons.visibility_off_rounded
-                          : Icons.visibility_rounded,
-                      color: isHidden ? Colors.orange : Colors.white60,
-                      onTap: onHiddenToggle,
+                      icon: hasUninstallProtection
+                          ? Icons.admin_panel_settings_rounded
+                          : Icons.no_encryption_rounded,
+                      color: hasUninstallProtection
+                          ? const Color(0xFF9C27B0)
+                          : Colors.white60,
+                      onTap: onUninstallProtectionToggle,
                     ),
 
                     const SizedBox(width: 4),

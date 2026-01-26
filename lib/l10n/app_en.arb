@@ -482,5 +482,52 @@
 "resetDataConfirmation": "Reset App Data?",
 "resetDataWarning": "This will delete ALL data including locked/hidden files. This action cannot be undone.",
 "cancel": "Cancel",
-"resetEverything": "Reset Everything"
+"resetEverything": "Reset Everything",
+"enterCodeToUnlockApp": "Enter the code to unlock the application",
+"@enterCodeToUnlockApp": {
+"description": "Text to display when general code is required"
+},
+"enterCustomCodeToUnlockApp": "Enter the custom code to unlock the application",
+"@enterCustomCodeToUnlockApp": {
+"description": "Text to display when custom code is required"
+},
+"unlockToUseApp": "Unlock to use app",
+"@unlockToUseApp": {
+"description": "Unlock generic text"
+}
+,
+  "setCustomPin": "Set Custom PIN",
+  "@setCustomPin": { "description": "Set Custom PIN button text" },
+  "changeCustomPin": "Change Custom PIN",
+  "@changeCustomPin": { "description": "Change Custom PIN button text" },
+  "lockMethod": "Lock Method",
+  "@lockMethod": { "description": "Lock Method section title" },
+  "fingerprintGlobalPin": "Fingerprint + Global PIN",
+  "@fingerprintGlobalPin": { "description": "Fingerprint and Global PIN option" },
+  "fingerprintGlobalPinDesc": "Use fingerprint or global app PIN",
+  "@fingerprintGlobalPinDesc": { "description": "Fingerprint and Global PIN description" },
+  "fingerprintCustomPin": "Fingerprint + Custom PIN",
+  "@fingerprintCustomPin": { "description": "Fingerprint and Custom PIN option" },
+  "fingerprintCustomPinDesc": "Use fingerprint or custom app PIN",
+  "@fingerprintCustomPinDesc": { "description": "Fingerprint and Custom PIN description" },
+  "fingerprintSystemLock": "Fingerprint + System Lock",
+  "@fingerprintSystemLock": { "description": "Fingerprint and System Lock option" },
+  "fingerprintSystemLockDesc": "Use device security (fingerprint/pattern)",
+  "@fingerprintSystemLockDesc": { "description": "Fingerprint and System Lock description" },
+  "pinOnly": "PIN Only",
+  "@pinOnly": { "description": "PIN Only option" },
+  "pinOnlyDesc": "Use PIN only (no fingerprint)",
+  "@pinOnlyDesc": { "description": "PIN Only description" },
+  "fingerprintOnly": "Fingerprint Only",
+  "@fingerprintOnly": { "description": "Fingerprint Only option" },
+  "fingerprintOnlyDesc": "Use fingerprint only (no PIN)",
+  "@fingerprintOnlyDesc": { "description": "Fingerprint Only description" },
+  "selectedGlobalPin": "Selected: Global PIN",
+  "@selectedGlobalPin": { "description": "Label indicating global PIN is selected" },
+  "selectedCustomPin": "Selected: Custom PIN",
+  "@selectedCustomPin": { "description": "Label indicating custom PIN is selected" },
+  "switchAction": "Switch",
+  "@switchAction": { "description": "Switch button text" },
+  "save": "Save",
+  "@save": { "description": "Save button text" }
 }

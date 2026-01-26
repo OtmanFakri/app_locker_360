@@ -2,6 +2,8 @@
 enum LockType {
   global, // استخدام  الرمز العام
   custom, // استخدام رمز خاص
+  system, // استخدام رمز الهاتف
+  fingerprintOnly, // بصمة فقط
 }
 
 /// Enum for network blocking
@@ -22,8 +24,8 @@ class AppsConfig {
   /// هل التطبيق مقفول؟
   bool isLocked;
 
-  /// هل التطبيق مخفي؟
-  bool isHidden;
+  /// حماية من إلغاء التثبيت (يتطلب رمز PIN)
+  bool uninstallProtection;
 
   /// نوع القفل (عام أو خاص)
   LockType lockType;
@@ -37,15 +39,19 @@ class AppsConfig {
   /// إظهار أيقونة العين في شاشة القفل
   bool eyeIconVisible;
 
+  /// تفعيل البصمة لهذا التطبيق (يعمل مع global و custom)
+  bool enableFingerprint;
+
   AppsConfig({
     required this.packageName,
     this.appName = "Unknown App",
     this.isLocked = false,
-    this.isHidden = false,
+    this.uninstallProtection = false,
     this.lockType = LockType.global,
     this.customPin,
     this.blockInternet = NetBlock.none,
     this.eyeIconVisible = true,
+    this.enableFingerprint = true,
   });
 
   /// Create a copy with modified fields
@@ -53,21 +59,23 @@ class AppsConfig {
     String? packageName,
     String? appName,
     bool? isLocked,
-    bool? isHidden,
+    bool? uninstallProtection,
     LockType? lockType,
     String? customPin,
     NetBlock? blockInternet,
     bool? eyeIconVisible,
+    bool? enableFingerprint,
   }) {
     return AppsConfig(
       packageName: packageName ?? this.packageName,
       appName: appName ?? this.appName,
       isLocked: isLocked ?? this.isLocked,
-      isHidden: isHidden ?? this.isHidden,
+      uninstallProtection: uninstallProtection ?? this.uninstallProtection,
       lockType: lockType ?? this.lockType,
       customPin: customPin ?? this.customPin,
       blockInternet: blockInternet ?? this.blockInternet,
       eyeIconVisible: eyeIconVisible ?? this.eyeIconVisible,
+      enableFingerprint: enableFingerprint ?? this.enableFingerprint,
     );
   }
 
@@ -77,11 +85,12 @@ class AppsConfig {
       'packageName': packageName,
       'appName': appName,
       'isLocked': isLocked,
-      'isHidden': isHidden,
+      'uninstallProtection': uninstallProtection,
       'lockType': lockType.index,
       'customPin': customPin,
       'blockInternet': blockInternet.index,
       'eyeIconVisible': eyeIconVisible,
+      'enableFingerprint': enableFingerprint,
     };
   }
 
@@ -91,16 +100,17 @@ class AppsConfig {
       packageName: map['packageName'] as String,
       appName: map['appName'] as String? ?? "Unknown App",
       isLocked: map['isLocked'] as bool? ?? false,
-      isHidden: map['isHidden'] as bool? ?? false,
+      uninstallProtection: map['uninstallProtection'] as bool? ?? false,
       lockType: LockType.values[map['lockType'] as int? ?? 0],
       customPin: map['customPin'] as String?,
       blockInternet: NetBlock.values[map['blockInternet'] as int? ?? 0],
       eyeIconVisible: map['eyeIconVisible'] as bool? ?? true,
+      enableFingerprint: map['enableFingerprint'] as bool? ?? true,
     );
   }
 
   @override
   String toString() {
-    return 'AppsConfig(packageName: $packageName, appName: $appName, isLocked: $isLocked, isHidden: $isHidden, lockType: $lockType, customPin: $customPin, blockInternet: $blockInternet, eyeIconVisible: $eyeIconVisible)';
+    return 'AppsConfig(packageName: $packageName, appName: $appName, isLocked: $isLocked, uninstallProtection: $uninstallProtection, lockType: $lockType, customPin: $customPin, blockInternet: $blockInternet, eyeIconVisible: $eyeIconVisible, enableFingerprint: $enableFingerprint)';
   }
 }

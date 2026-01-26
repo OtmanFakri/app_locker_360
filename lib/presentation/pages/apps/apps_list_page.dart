@@ -227,14 +227,88 @@ class _AppsListPageState extends State<AppsListPage> {
     }
   }
 
-  void _toggleHidden(Application app) {
+  // System packages that need to be locked to prevent uninstallation
+  static const List<String> _systemInstallerPackages = [
+    'com.android.packageinstaller',
+    'com.google.android.packageinstaller',
+    'com.android.settings',
+    'com.android.vending',
+    'com.miui.packageinstaller', // Xiaomi (older versions)
+    'com.miui.securitycenter', // Xiaomi security center
+  ];
+
+  void _toggleUninstallProtection(Application app) {
     final config =
         MMKVService.getAppConfig(app.packageName) ??
         AppsConfig(packageName: app.packageName, appName: app.appName);
 
-    final updatedConfig = config.copyWith(isHidden: !config.isHidden);
+    final newProtectionState = !config.uninstallProtection;
+    final updatedConfig = config.copyWith(
+      uninstallProtection: newProtectionState,
+    );
     MMKVService.addAppConfig(updatedConfig);
+
+    // Lock or unlock system installer packages
+    if (newProtectionState) {
+      // Enabling protection - lock system packages
+      _lockSystemInstallerPackages();
+    } else {
+      // Disabling protection - check if we should unlock system packages
+      _unlockSystemInstallerPackagesIfNeeded();
+    }
+
     setState(() {});
+  }
+
+  /// Lock system installer packages to intercept uninstall attempts
+  void _lockSystemInstallerPackages() {
+    print('🔒 ========================================');
+    print('🔒 LOCKING SYSTEM INSTALLER PACKAGES');
+    print('🔒 ========================================');
+
+    for (final packageName in _systemInstallerPackages) {
+      final config =
+          MMKVService.getAppConfig(packageName) ??
+          AppsConfig(packageName: packageName, appName: 'System Package');
+
+      // Lock the package if not already locked
+      if (!config.isLocked) {
+        final updatedConfig = config.copyWith(isLocked: true);
+        MMKVService.addAppConfig(updatedConfig);
+        print('🔒 LOCKED: $packageName');
+      } else {
+        print('🔒 ALREADY LOCKED: $packageName');
+      }
+    }
+
+    print('🔒 ========================================');
+    print('🔒 All system packages locked');
+    print('🔒 NOW: Try to uninstall an app and watch console');
+    print('🔒 for the package name that appears!');
+    print('🔒 ========================================');
+  }
+
+  /// Unlock system installer packages only if no apps have uninstall protection
+  void _unlockSystemInstallerPackagesIfNeeded() {
+    // Check if any apps still have uninstall protection enabled
+    final protectedApps = MMKVService.getProtectedApps();
+
+    // Filter out system packages from protected apps
+    final userProtectedApps = protectedApps
+        .where((app) => !_systemInstallerPackages.contains(app.packageName))
+        .toList();
+
+    // Only unlock system packages if no user apps are protected
+    if (userProtectedApps.isEmpty) {
+      for (final packageName in _systemInstallerPackages) {
+        final config = MMKVService.getAppConfig(packageName);
+        if (config != null && config.isLocked) {
+          final updatedConfig = config.copyWith(isLocked: false);
+          MMKVService.addAppConfig(updatedConfig);
+        }
+      }
+      print('🔓 System installer packages unlocked');
+    }
   }
 
   void _showCustomSettings(Application app) {
@@ -357,7 +431,8 @@ class _AppsListPageState extends State<AppsListPage> {
                         app: app,
                         onLockToggle: () => _toggleLock(app),
                         onInternetToggle: () => _toggleInternetBlock(app),
-                        onHiddenToggle: () => _toggleHidden(app),
+                        onUninstallProtectionToggle: () =>
+                            _toggleUninstallProtection(app),
                         onLongPress: () => _showCustomSettings(app),
                       );
                     },

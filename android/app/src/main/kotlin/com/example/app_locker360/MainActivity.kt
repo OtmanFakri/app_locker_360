@@ -190,7 +190,16 @@ class MainActivity: FlutterFragmentActivity() {
         val extras = intent.extras ?: return null
         val map = mutableMapOf<String, Any?>()
         for (key in extras.keySet()) {
-            map[key] = extras.get(key)
+            val value = extras.get(key)
+            // Only include primitive types that Flutter can handle
+            when (value) {
+                is String, is Boolean, is Int, is Long, is Double, is Float -> map[key] = value
+                null -> map[key] = null
+                // Skip UserHandle and other complex types
+                else -> {
+                    android.util.Log.d("IntentChannel", "Skipping non-serializable extra: $key = ${value::class.java.simpleName}")
+                }
+            }
         }
         return map
     }

@@ -8,7 +8,8 @@ class BiometricService {
   static Future<bool> isBiometricAvailable() async {
     try {
       final canAuthenticateWithBiometrics = await _auth.canCheckBiometrics;
-      final canAuthenticate = canAuthenticateWithBiometrics || await _auth.isDeviceSupported();
+      final canAuthenticate =
+          canAuthenticateWithBiometrics || await _auth.isDeviceSupported();
       return canAuthenticate;
     } catch (e) {
       print("Biometric Check Error: $e");
@@ -33,6 +34,26 @@ class BiometricService {
     } on PlatformException catch (e) {
       print("Auth Error: $e");
       return false; // Ila user dar Cancel aw error
+    }
+  }
+
+  // 3. System Auth (Fingerprint OR PIN/Pattern)
+  static Future<bool> authenticateSystem() async {
+    try {
+      final isDeviceSupported = await _auth.isDeviceSupported();
+      if (!isDeviceSupported) return false;
+
+      return await _auth.authenticate(
+        localizedReason: 'Unlock using system security',
+        options: const AuthenticationOptions(
+          stickyAuth: true,
+          biometricOnly: false, // Allow PIN/Pattern
+          useErrorDialogs: true,
+        ),
+      );
+    } on PlatformException catch (e) {
+      print("System Auth Error: $e");
+      return false;
     }
   }
 }

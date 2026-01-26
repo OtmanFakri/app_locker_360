@@ -482,5 +482,35 @@
 "resetDataConfirmation": "إعادة تعيين بيانات التطبيق؟",
 "resetDataWarning": "سيتم حذف جميع البيانات بما في ذلك الملفات المقفلة والمخفية. لا يمكن التراجع عن هذا الإجراء.",
 "cancel": "إلغاء",
-"resetEverything": "إعادة تعيين الكل"
+"resetEverything": "إعادة تعيين الكل",
+"enterCodeToUnlockApp": "ادخل الرمز لفتح التطبيق",
+"@enterCodeToUnlockApp": {
+"description": "Text to display when general code is required"
+},
+"enterCustomCodeToUnlockApp": "ادخل الرمز الخاص لفتح التطبيق",
+"@enterCustomCodeToUnlockApp": {
+"description": "Text to display when custom code is required"
+},
+"unlockToUseApp": "افتح القفل لاستخدام التطبيق",
+"@unlockToUseApp": {
+"description": "Unlock generic text"
+}
+,
+  "setCustomPin": "تعيين رمز خاص",
+  "changeCustomPin": "تغيير الرمز الخاص",
+  "lockMethod": "طريقة القفل",
+  "fingerprintGlobalPin": "بصمة + رمز عام",
+  "fingerprintGlobalPinDesc": "القفل بالبصمة أو الرمز العام للتطبيق",
+  "fingerprintCustomPin": "بصمة + رمز خاص",
+  "fingerprintCustomPinDesc": "القفل بالبصمة أو رمز خاص لهذا التطبيق",
+  "fingerprintSystemLock": "بصمة + رمز الهاتف",
+  "fingerprintSystemLockDesc": "القفل باستخدام أمان الهاتف (بصمة/نمط)",
+  "pinOnly": "رمز فقط",
+  "pinOnlyDesc": "القفل بالرمز فقط (بدون بصمة)",
+  "fingerprintOnly": "بصمة فقط",
+  "fingerprintOnlyDesc": "القفل بالبصمة فقط (بدون رمز)",
+  "selectedGlobalPin": "المحدد: رمز عام",
+  "selectedCustomPin": "المحدد: رمز خاص",
+  "switchAction": "تبديل",
+  "save": "حفظ"
 }
