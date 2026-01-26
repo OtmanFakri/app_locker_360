@@ -517,5 +517,11 @@
 "unlockUsingAppLocker": "فتح القفل باستخدام القفل 360",
 "usePrivatePin": "استخدام الرمز الخاص",
 "scanFingerprint": "مسح البصمة",
-"phoneCode": "رمز الهاتف"
+"phoneCode": "رمز الهاتف",
+"maxAttempts": "عدد المحاولات",
+"reLockTimeout": "مهلة القفل التلقائي",
+"immediately": "فوراً",
+"seconds": "ثواني",
+"minute": "دقيقة",
+"minutes": "دقائق"
 }

@@ -539,5 +539,17 @@
 "scanFingerprint": "Scan Fingerprint",
 "@scanFingerprint": { "description": "Scan Fingerprint button text" },
 "phoneCode": "Phone Code",
-"@phoneCode": { "description": "Phone Code button text" }
+"@phoneCode": { "description": "Phone Code button text" },
+"maxAttempts": "Max Attempts",
+"@maxAttempts": { "description": "Max attempts setting title" },
+"reLockTimeout": "Re-Lock Timeout",
+"@reLockTimeout": { "description": "Re-lock timeout setting title" },
+"immediately": "Immediately",
+"@immediately": { "description": "Immediate timeout option" },
+"seconds": "Seconds",
+"@seconds": { "description": "Seconds unit" },
+"minute": "Minute",
+"@minute": { "description": "Minute unit" },
+"minutes": "Minutes",
+"@minutes": { "description": "Minutes unit" }
 }
