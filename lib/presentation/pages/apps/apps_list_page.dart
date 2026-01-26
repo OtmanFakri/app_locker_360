@@ -325,22 +325,25 @@ class _AppsListPageState extends State<AppsListPage> {
     final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
-      backgroundColor: const Color(0xFF0A0E21),
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
-        backgroundColor: const Color(0xFF1A1F3A),
+        backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
         elevation: 0,
         title: Text(
           l10n.apps,
           style: GoogleFonts.cairo(
             fontSize: 24,
             fontWeight: FontWeight.bold,
-            color: Colors.white,
+            color: Theme.of(context).appBarTheme.foregroundColor,
           ),
         ),
         actions: [
           // Notification icon for intruder photos
           IconButton(
-            icon: const Icon(Icons.notifications_rounded, color: Colors.white),
+            icon: Icon(
+              Icons.notifications_rounded,
+              color: Theme.of(context).appBarTheme.foregroundColor,
+            ),
             onPressed: () {
               Navigator.push(
                 context,
@@ -352,7 +355,10 @@ class _AppsListPageState extends State<AppsListPage> {
             tooltip: 'Intruder Photos',
           ),
           IconButton(
-            icon: const Icon(Icons.refresh_rounded, color: Colors.white),
+            icon: Icon(
+              Icons.refresh_rounded,
+              color: Theme.of(context).appBarTheme.foregroundColor,
+            ),
             onPressed: _loadInstalledApps,
           ),
         ],
@@ -361,17 +367,30 @@ class _AppsListPageState extends State<AppsListPage> {
         children: [
           // Search bar
           Container(
-            color: const Color(0xFF1A1F3A),
+            color: Theme.of(context).cardColor,
             padding: const EdgeInsets.all(16),
             child: TextField(
               onChanged: _filterApps,
-              style: GoogleFonts.cairo(color: Colors.white),
+              style: GoogleFonts.cairo(
+                color: Theme.of(context).textTheme.bodyLarge?.color,
+              ),
               decoration: InputDecoration(
                 hintText: l10n.searchApp,
-                hintStyle: GoogleFonts.cairo(color: Colors.white60),
-                prefixIcon: const Icon(Icons.search, color: Colors.white60),
+                hintStyle: GoogleFonts.cairo(
+                  color: Theme.of(
+                    context,
+                  ).textTheme.bodyMedium?.color?.withValues(alpha: 0.6),
+                ),
+                prefixIcon: Icon(
+                  Icons.search,
+                  color: Theme.of(
+                    context,
+                  ).iconTheme.color?.withValues(alpha: 0.6),
+                ),
                 filled: true,
-                fillColor: Colors.white.withOpacity(0.05),
+                fillColor: Theme.of(
+                  context,
+                ).dividerColor.withValues(alpha: 0.05),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
                   borderSide: BorderSide.none,
@@ -414,7 +433,7 @@ class _AppsListPageState extends State<AppsListPage> {
                             height: _topBannerAd!.size.height.toDouble(),
                             decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(12),
-                              color: const Color(0xFF1A1F3A),
+                              color: Theme.of(context).cardColor,
                             ),
                             child: ClipRRect(
                               borderRadius: BorderRadius.circular(12),
@@ -445,7 +464,7 @@ class _AppsListPageState extends State<AppsListPage> {
               alignment: Alignment.center,
               width: _bannerAd!.size.width.toDouble(),
               height: _bannerAd!.size.height.toDouble(),
-              color: const Color(0xFF1A1F3A),
+              color: Theme.of(context).cardColor,
               child: AdWidget(ad: _bannerAd!),
             ),
         ],

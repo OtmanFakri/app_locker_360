@@ -104,12 +104,15 @@ class _PinResetPageState extends State<PinResetPage> {
     final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
-      backgroundColor: const Color(0xFF0A0E21),
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new, color: Colors.white),
+          icon: Icon(
+            Icons.arrow_back_ios_new,
+            color: Theme.of(context).appBarTheme.foregroundColor,
+          ),
           onPressed: () => Navigator.pop(context),
         ),
       ),
@@ -128,7 +131,7 @@ class _PinResetPageState extends State<PinResetPage> {
                         style: GoogleFonts.cairo(
                           fontSize: 28,
                           fontWeight: FontWeight.bold,
-                          color: Colors.white,
+                          color: Theme.of(context).textTheme.bodyLarge?.color,
                         ),
                       ),
                       const SizedBox(height: 12),
@@ -139,7 +142,9 @@ class _PinResetPageState extends State<PinResetPage> {
                         textAlign: TextAlign.center,
                         style: GoogleFonts.cairo(
                           fontSize: 16,
-                          color: Colors.white60,
+                          color: Theme.of(
+                            context,
+                          ).textTheme.bodyMedium?.color?.withValues(alpha: 0.6),
                         ),
                       ),
 
@@ -169,6 +174,13 @@ class _PinResetPageState extends State<PinResetPage> {
                       NumberPad(
                         onNumberPressed: _onNumberPressed,
                         onDeletePressed: _onDeletePressed,
+                        textColor:
+                            Theme.of(context).textTheme.bodyLarge?.color ??
+                            Colors.black,
+                        buttonColor: Theme.of(
+                          context,
+                        ).dividerColor.withValues(alpha: 0.1),
+                        buttonBorderColor: Colors.transparent,
                       ),
 
                       const SizedBox(height: 32),

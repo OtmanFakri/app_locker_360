@@ -14,7 +14,6 @@ import 'package:app_locker360/data/services/ad_helper.dart';
 import 'package:app_locker360/l10n/app_localizations.dart';
 import 'package:device_apps/device_apps.dart';
 import 'package:app_locker360/presentation/pages/auth/widgets/forgot_password_dialog.dart';
-import 'package:app_locker360/core/services/intruder_detection_service.dart';
 
 class ScreenLockPage extends StatefulWidget {
   final String? lockedPackageName;
@@ -34,7 +33,7 @@ class _ScreenLockPageState extends State<ScreenLockPage>
   String _enteredPin = '';
   bool _showError = false;
   bool _showPinPad = true;
-  int _failedAttempts = 0;
+
   late AnimationController _shakeController;
   late Animation<double> _shakeAnimation;
   late AnimationController _pulseController;
@@ -48,6 +47,7 @@ class _ScreenLockPageState extends State<ScreenLockPage>
 
   AppsConfig? _appConfig; // Store config
 
+  @override
   void initState() {
     super.initState();
     _initializeAnimations();
@@ -95,14 +95,6 @@ class _ScreenLockPageState extends State<ScreenLockPage>
     }
   }
 
-
-
-
-
-
-
-
-
   Future<void> _verifyPin() async {
     final settings = MMKVService.getGlobalSettings();
     String targetPin = settings.masterPin;
@@ -116,14 +108,13 @@ class _ScreenLockPageState extends State<ScreenLockPage>
     }
 
     if (_enteredPin == targetPin) {
-      // Correct PIN - Reset failed attempts
-      _failedAttempts = 0;
+      // Correct PIN
+
       await _unlockApp();
     } else {
-      // Wrong PIN - Increment failed attempts
+      // Wrong PIN
       setState(() {
         _showError = true;
-        _failedAttempts++;
         _enteredPin = '';
       });
       // ... (Intruder selfie logic)
@@ -192,7 +183,7 @@ class _ScreenLockPageState extends State<ScreenLockPage>
     return PopScope(
       canPop: false,
       child: Scaffold(
-        backgroundColor: const Color(0xFF0F1729),
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         body: SafeArea(
           child: LayoutBuilder(
             builder: (context, constraints) {
@@ -352,7 +343,7 @@ class _ScreenLockPageState extends State<ScreenLockPage>
         width: double.infinity,
         padding: const EdgeInsets.all(24),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: Theme.of(context).cardColor,
           borderRadius: BorderRadius.circular(30),
         ),
         child: Column(
@@ -365,7 +356,7 @@ class _ScreenLockPageState extends State<ScreenLockPage>
               style: GoogleFonts.cairo(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
-                color: Colors.black,
+                color: Theme.of(context).textTheme.bodyLarge?.color,
               ),
             ),
             const SizedBox(height: 24),
@@ -396,7 +387,7 @@ class _ScreenLockPageState extends State<ScreenLockPage>
       width: double.infinity,
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).cardColor,
         borderRadius: BorderRadius.circular(30),
       ),
       child: Column(
@@ -445,7 +436,7 @@ class _ScreenLockPageState extends State<ScreenLockPage>
               style: GoogleFonts.cairo(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
-                color: Colors.black87,
+                color: Theme.of(context).textTheme.bodyLarge?.color,
               ),
               textAlign: TextAlign.center,
             ),
@@ -466,7 +457,7 @@ class _ScreenLockPageState extends State<ScreenLockPage>
                 style: GoogleFonts.cairo(
                   fontSize: 16,
                   fontWeight: FontWeight.w700,
-                  color: Colors.black,
+                  color: Theme.of(context).textTheme.bodyMedium?.color,
                 ),
                 textAlign: TextAlign.center,
               );
@@ -498,8 +489,11 @@ class _ScreenLockPageState extends State<ScreenLockPage>
             NumberPad(
               onNumberPressed: _onNumberPressed,
               onDeletePressed: _onDeletePressed,
-              textColor: Colors.black,
-              buttonColor: Colors.grey[100],
+              textColor:
+                  Theme.of(context).textTheme.bodyLarge?.color ?? Colors.black,
+              buttonColor: Theme.of(
+                context,
+              ).dividerColor.withValues(alpha: 0.1),
               buttonBorderColor: Colors.transparent,
             ),
 
@@ -558,7 +552,7 @@ class _ScreenLockPageState extends State<ScreenLockPage>
                   l10n.usePin,
                   style: GoogleFonts.cairo(
                     fontSize: 18,
-                    color: Colors.black,
+                    color: Theme.of(context).textTheme.bodyLarge?.color,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -669,6 +663,4 @@ class _ScreenLockPageState extends State<ScreenLockPage>
       builder: (context) => const ForgotPasswordDialog(),
     );
   }
-
-
 }

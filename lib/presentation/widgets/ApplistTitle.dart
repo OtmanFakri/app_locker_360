@@ -13,6 +13,7 @@ class AppListTile extends StatelessWidget {
   final VoidCallback onLongPress;
 
   const AppListTile({
+    super.key,
     required this.app,
     required this.onLockToggle,
     required this.onInternetToggle,
@@ -30,9 +31,12 @@ class AppListTile extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
-        color: const Color(0xFF1A1F3A),
+        color: Theme.of(context).cardColor,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.white.withOpacity(0.1), width: 1),
+        border: Border.all(
+          color: Theme.of(context).dividerColor.withValues(alpha: 0.1),
+          width: 1,
+        ),
       ),
       child: Material(
         color: Colors.transparent,
@@ -75,7 +79,7 @@ class AppListTile extends StatelessWidget {
                       Text(
                         app.appName,
                         style: GoogleFonts.cairo(
-                          color: Colors.white,
+                          color: Theme.of(context).textTheme.bodyLarge?.color,
                           fontSize: 16,
                           fontWeight: FontWeight.w600,
                         ),
@@ -86,7 +90,9 @@ class AppListTile extends StatelessWidget {
                       Text(
                         app.packageName,
                         style: GoogleFonts.cairo(
-                          color: Colors.white60,
+                          color: Theme.of(
+                            context,
+                          ).textTheme.bodyMedium?.color?.withValues(alpha: 0.6),
                           fontSize: 12,
                         ),
                         maxLines: 1,
@@ -109,7 +115,7 @@ class AppListTile extends StatelessWidget {
                           : Icons.no_encryption_rounded,
                       color: hasUninstallProtection
                           ? const Color(0xFF9C27B0)
-                          : Colors.white60,
+                          : Theme.of(context).disabledColor,
                       onTap: onUninstallProtectionToggle,
                     ),
 
@@ -118,7 +124,7 @@ class AppListTile extends StatelessWidget {
                     // Internet block toggle
                     ActionButton(
                       icon: _getInternetIcon(blockInternet),
-                      color: _getInternetColor(blockInternet),
+                      color: _getInternetColor(context, blockInternet),
                       onTap: onInternetToggle,
                     ),
 
@@ -131,7 +137,7 @@ class AppListTile extends StatelessWidget {
                           : Icons.lock_open_rounded,
                       color: isLocked
                           ? const Color(0xFF667EEA)
-                          : Colors.white60,
+                          : Theme.of(context).disabledColor,
                       onTap: onLockToggle,
                     ),
                   ],
@@ -157,10 +163,10 @@ class AppListTile extends StatelessWidget {
     }
   }
 
-  Color _getInternetColor(NetBlock block) {
+  Color _getInternetColor(BuildContext context, NetBlock block) {
     switch (block) {
       case NetBlock.none:
-        return Colors.white60;
+        return Theme.of(context).disabledColor;
       case NetBlock.wifi:
       case NetBlock.mobile:
         return Colors.orange;

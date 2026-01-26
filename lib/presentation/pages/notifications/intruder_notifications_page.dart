@@ -37,22 +37,32 @@ class _IntruderNotificationsPageState extends State<IntruderNotificationsPage> {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        backgroundColor: const Color(0xFF1A1F3A),
+        backgroundColor: Theme.of(context).cardColor,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         title: Text(
           'Delete Photo?',
-          style: GoogleFonts.cairo(color: Colors.white),
+          style: GoogleFonts.cairo(
+            color: Theme.of(context).textTheme.bodyLarge?.color,
+          ),
         ),
         content: Text(
           'Are you sure you want to delete this intruder photo?',
-          style: GoogleFonts.cairo(color: Colors.white70),
+          style: GoogleFonts.cairo(
+            color: Theme.of(
+              context,
+            ).textTheme.bodyMedium?.color?.withValues(alpha: 0.7),
+          ),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
             child: Text(
               'Cancel',
-              style: GoogleFonts.cairo(color: Colors.white70),
+              style: GoogleFonts.cairo(
+                color: Theme.of(
+                  context,
+                ).textTheme.bodyMedium?.color?.withValues(alpha: 0.7),
+              ),
             ),
           ),
           TextButton(
@@ -86,22 +96,32 @@ class _IntruderNotificationsPageState extends State<IntruderNotificationsPage> {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        backgroundColor: const Color(0xFF1A1F3A),
+        backgroundColor: Theme.of(context).cardColor,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         title: Text(
           'Clear All Photos?',
-          style: GoogleFonts.cairo(color: Colors.white),
+          style: GoogleFonts.cairo(
+            color: Theme.of(context).textTheme.bodyLarge?.color,
+          ),
         ),
         content: Text(
           'Are you sure you want to delete all intruder photos? This cannot be undone.',
-          style: GoogleFonts.cairo(color: Colors.white70),
+          style: GoogleFonts.cairo(
+            color: Theme.of(
+              context,
+            ).textTheme.bodyMedium?.color?.withValues(alpha: 0.7),
+          ),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
             child: Text(
               'Cancel',
-              style: GoogleFonts.cairo(color: Colors.white70),
+              style: GoogleFonts.cairo(
+                color: Theme.of(
+                  context,
+                ).textTheme.bodyMedium?.color?.withValues(alpha: 0.7),
+              ),
             ),
           ),
           TextButton(
@@ -156,16 +176,16 @@ class _IntruderNotificationsPageState extends State<IntruderNotificationsPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF0A0E21),
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
-        backgroundColor: const Color(0xFF1A1F3A),
+        backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
         elevation: 0,
         title: Text(
           'Intruder Photos',
           style: GoogleFonts.cairo(
             fontSize: 24,
             fontWeight: FontWeight.bold,
-            color: Colors.white,
+            color: Theme.of(context).appBarTheme.foregroundColor,
           ),
         ),
         actions: [
@@ -195,7 +215,7 @@ class _IntruderNotificationsPageState extends State<IntruderNotificationsPage> {
           Icon(
             Icons.photo_camera_rounded,
             size: 80,
-            color: Colors.white.withOpacity(0.3),
+            color: Theme.of(context).iconTheme.color?.withValues(alpha: 0.3),
           ),
           const SizedBox(height: 24),
           Text(
@@ -203,14 +223,19 @@ class _IntruderNotificationsPageState extends State<IntruderNotificationsPage> {
             style: GoogleFonts.cairo(
               fontSize: 20,
               fontWeight: FontWeight.bold,
-              color: Colors.white,
+              color: Theme.of(context).textTheme.bodyLarge?.color,
             ),
           ),
           const SizedBox(height: 8),
           Text(
             'Photos will appear here when someone\nenters wrong PIN 3 times',
             textAlign: TextAlign.center,
-            style: GoogleFonts.cairo(fontSize: 14, color: Colors.white60),
+            style: GoogleFonts.cairo(
+              fontSize: 14,
+              color: Theme.of(
+                context,
+              ).textTheme.bodyMedium?.color?.withValues(alpha: 0.6),
+            ),
           ),
         ],
       ),
@@ -229,9 +254,11 @@ class _IntruderNotificationsPageState extends State<IntruderNotificationsPage> {
         return Container(
           margin: const EdgeInsets.only(bottom: 16),
           decoration: BoxDecoration(
-            color: const Color(0xFF1A1F3A),
+            color: Theme.of(context).cardColor,
             borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: Colors.white.withOpacity(0.1)),
+            border: Border.all(
+              color: Theme.of(context).dividerColor.withValues(alpha: 0.1),
+            ),
           ),
           child: ListTile(
             contentPadding: const EdgeInsets.all(12),
@@ -253,7 +280,7 @@ class _IntruderNotificationsPageState extends State<IntruderNotificationsPage> {
             title: Text(
               'Intruder Detected',
               style: GoogleFonts.cairo(
-                color: Colors.white,
+                color: Theme.of(context).textTheme.bodyLarge?.color,
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
               ),
@@ -274,7 +301,9 @@ class _IntruderNotificationsPageState extends State<IntruderNotificationsPage> {
                       child: Text(
                         timestamp,
                         style: GoogleFonts.cairo(
-                          color: Colors.white60,
+                          color: Theme.of(
+                            context,
+                          ).textTheme.bodyMedium?.color?.withValues(alpha: 0.6),
                           fontSize: 12,
                         ),
                         overflow: TextOverflow.ellipsis,

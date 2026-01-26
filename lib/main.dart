@@ -7,11 +7,9 @@ import 'package:app_locker360/data/datasources/mmkv_service.dart';
 import 'package:app_locker360/presentation/pages/onboarding/page.dart';
 import 'package:app_locker360/presentation/pages/auth/auth_page.dart';
 import 'package:mmkv/mmkv.dart';
-import 'package:permission_handler/permission_handler.dart';
 import 'package:usage_stats/usage_stats.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
 import 'dart:async';
-import 'package:socket_io_client/socket_io_client.dart' as io;
 import 'package:android_intent_plus/android_intent.dart';
 import 'package:android_intent_plus/flag.dart';
 import 'package:app_locker360/data/services/ad_helper.dart';
@@ -215,16 +213,18 @@ class _MainAppState extends State<MainApp> with WidgetsBindingObserver {
     'com.example.app_locker360/intent',
   );
 
-  // Locale state for language switching
+  // Locale and Theme state
   late String _currentLocale;
+  String _currentTheme = 'Light';
 
   // Static callback for settings page to trigger rebuild
   static _MainAppState? _instance;
 
   static void _rebuildApp() {
     _instance?.setState(() {
-      _instance?._currentLocale =
-          MMKVService.getGlobalSettings().preferredLanguage;
+      final settings = MMKVService.getGlobalSettings();
+      _instance?._currentLocale = settings.preferredLanguage;
+      _instance?._currentTheme = settings.appTheme;
     });
   }
 
@@ -232,7 +232,10 @@ class _MainAppState extends State<MainApp> with WidgetsBindingObserver {
   void initState() {
     super.initState();
     _instance = this;
-    _currentLocale = MMKVService.getGlobalSettings().preferredLanguage;
+    final settings = MMKVService.getGlobalSettings();
+    _currentLocale = settings.preferredLanguage;
+    _currentTheme = settings.appTheme;
+
     WidgetsBinding.instance.addObserver(this);
     _initLifecycleListeners();
   }
@@ -298,10 +301,49 @@ class _MainAppState extends State<MainApp> with WidgetsBindingObserver {
   Widget build(BuildContext context) {
     final locale = Locale(_currentLocale);
 
+    ThemeMode themeMode;
+    if (_currentTheme == 'System') {
+      themeMode = ThemeMode.system;
+    } else if (_currentTheme == 'Dark') {
+      themeMode = ThemeMode.dark;
+    } else {
+      themeMode = ThemeMode.light;
+    }
+
     return MaterialApp(
       title: 'App Locker 360',
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(useMaterial3: true, brightness: Brightness.dark),
+      theme: ThemeData(
+        useMaterial3: true,
+        brightness: Brightness.light,
+        scaffoldBackgroundColor: const Color(
+          0xFFF5F6FA,
+        ), // Light grey background
+        cardColor: Colors.white,
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: const Color(0xFF667EEA),
+          brightness: Brightness.light,
+        ),
+        appBarTheme: const AppBarTheme(
+          backgroundColor: Colors.white,
+          foregroundColor: Colors.black,
+        ),
+      ),
+      darkTheme: ThemeData(
+        useMaterial3: true,
+        brightness: Brightness.dark,
+        scaffoldBackgroundColor: const Color(0xFF0A0E21),
+        cardColor: const Color(0xFF1A1F3A),
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: const Color(0xFF667EEA),
+          brightness: Brightness.dark,
+        ),
+        appBarTheme: const AppBarTheme(
+          backgroundColor: Color(0xFF1A1F3A),
+          foregroundColor: Colors.white,
+        ),
+      ),
+      themeMode: themeMode,
       // Localization
       localizationsDelegates: [
         AppLocalizations.delegate,

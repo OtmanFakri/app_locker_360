@@ -112,7 +112,7 @@ class _BackupPinDisplayPageState extends State<BackupPinDisplayPage>
     final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
-      backgroundColor: const Color(0xFF0A0E21),
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: SafeArea(
         child: FadeTransition(
           opacity: _fadeAnimation,
@@ -160,7 +160,7 @@ class _BackupPinDisplayPageState extends State<BackupPinDisplayPage>
                     style: GoogleFonts.cairo(
                       fontSize: 32,
                       fontWeight: FontWeight.bold,
-                      color: Colors.white,
+                      color: Theme.of(context).textTheme.bodyLarge?.color,
                     ),
                     textAlign: TextAlign.center,
                   ),
@@ -173,7 +173,9 @@ class _BackupPinDisplayPageState extends State<BackupPinDisplayPage>
                     textAlign: TextAlign.center,
                     style: GoogleFonts.cairo(
                       fontSize: 16,
-                      color: Colors.white60,
+                      color: Theme.of(
+                        context,
+                      ).textTheme.bodyMedium?.color?.withValues(alpha: 0.6),
                       height: 1.6,
                     ),
                   ),
@@ -184,10 +186,12 @@ class _BackupPinDisplayPageState extends State<BackupPinDisplayPage>
                   Container(
                     padding: const EdgeInsets.all(24),
                     decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.05),
+                      color: Theme.of(
+                        context,
+                      ).dividerColor.withValues(alpha: 0.05),
                       borderRadius: BorderRadius.circular(20),
                       border: Border.all(
-                        color: const Color(0xFF667EEA).withOpacity(0.3),
+                        color: const Color(0xFF667EEA).withValues(alpha: 0.3),
                         width: 2,
                       ),
                     ),
@@ -197,7 +201,8 @@ class _BackupPinDisplayPageState extends State<BackupPinDisplayPage>
                           l10n.backupPin,
                           style: GoogleFonts.cairo(
                             fontSize: 18,
-                            color: Colors.white70,
+                            color: Theme.of(context).textTheme.bodyMedium?.color
+                                ?.withValues(alpha: 0.7),
                             fontWeight: FontWeight.w500,
                           ),
                         ),
@@ -207,7 +212,7 @@ class _BackupPinDisplayPageState extends State<BackupPinDisplayPage>
                           style: GoogleFonts.robotoMono(
                             fontSize: 36,
                             fontWeight: FontWeight.bold,
-                            color: Colors.white,
+                            color: Theme.of(context).textTheme.bodyLarge?.color,
                             letterSpacing: 4,
                           ),
                         ),
@@ -301,7 +306,7 @@ class _BackupPinDisplayPageState extends State<BackupPinDisplayPage>
                           style: GoogleFonts.cairo(
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
-                            color: Colors.white,
+                            color: Theme.of(context).textTheme.bodyLarge?.color,
                           ),
                         ),
                       ),
@@ -338,7 +343,9 @@ class _BackupPinDisplayPageState extends State<BackupPinDisplayPage>
                   begin: Alignment.centerLeft,
                   end: Alignment.centerRight,
                 ),
-          color: onPressed == null ? Colors.white.withOpacity(0.1) : null,
+          color: onPressed == null
+              ? Theme.of(context).dividerColor.withValues(alpha: 0.1)
+              : null,
           borderRadius: BorderRadius.circular(16),
           boxShadow: onPressed == null
               ? null

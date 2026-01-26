@@ -165,7 +165,7 @@ class _AuthPageState extends State<AuthPage> with TickerProviderStateMixin {
     final settings = MMKVService.getGlobalSettings();
     final l10n = AppLocalizations.of(context)!;
     return Scaffold(
-      backgroundColor: const Color(0xFF0A0E21),
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: SafeArea(
         child: LayoutBuilder(
           builder: (context, constraints) {
@@ -190,7 +190,7 @@ class _AuthPageState extends State<AuthPage> with TickerProviderStateMixin {
                           style: GoogleFonts.cairo(
                             fontSize: 28,
                             fontWeight: FontWeight.bold,
-                            color: Colors.white,
+                            color: Theme.of(context).textTheme.bodyLarge?.color,
                           ),
                         ),
                         const SizedBox(height: 8),
@@ -198,7 +198,8 @@ class _AuthPageState extends State<AuthPage> with TickerProviderStateMixin {
                           l10n.accessDashboard,
                           style: GoogleFonts.cairo(
                             fontSize: 16,
-                            color: Colors.white60,
+                            color: Theme.of(context).textTheme.bodyMedium?.color
+                                ?.withValues(alpha: 0.6),
                           ),
                         ),
 
@@ -243,6 +244,13 @@ class _AuthPageState extends State<AuthPage> with TickerProviderStateMixin {
                           NumberPad(
                             onNumberPressed: _onNumberPressed,
                             onDeletePressed: _onDeletePressed,
+                            textColor:
+                                Theme.of(context).textTheme.bodyLarge?.color ??
+                                Colors.black,
+                            buttonColor: Theme.of(
+                              context,
+                            ).dividerColor.withValues(alpha: 0.1),
+                            buttonBorderColor: Colors.transparent,
                           )
                         else
                           Padding(
@@ -258,7 +266,9 @@ class _AuthPageState extends State<AuthPage> with TickerProviderStateMixin {
                                   horizontal: 32,
                                   vertical: 12,
                                 ),
-                                backgroundColor: Colors.white.withOpacity(0.1),
+                                backgroundColor: Theme.of(
+                                  context,
+                                ).dividerColor.withValues(alpha: 0.1),
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(30),
                                 ),
@@ -267,7 +277,9 @@ class _AuthPageState extends State<AuthPage> with TickerProviderStateMixin {
                                 l10n.usePin,
                                 style: GoogleFonts.cairo(
                                   fontSize: 16,
-                                  color: Colors.white,
+                                  color: Theme.of(
+                                    context,
+                                  ).textTheme.bodyLarge?.color,
                                   fontWeight: FontWeight.bold,
                                 ),
                               ),

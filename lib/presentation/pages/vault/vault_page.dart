@@ -63,21 +63,24 @@ class _VaultPageState extends State<VaultPage> {
     final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
-      backgroundColor: const Color(0xFF0A0E21),
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
-        backgroundColor: const Color(0xFF1A1F3A),
+        backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
         elevation: 0,
         title: Text(
           l10n.vault,
           style: GoogleFonts.cairo(
             fontSize: 24,
             fontWeight: FontWeight.bold,
-            color: Colors.white,
+            color: Theme.of(context).appBarTheme.foregroundColor,
           ),
         ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.add_rounded, color: Colors.white),
+            icon: Icon(
+              Icons.add_rounded,
+              color: Theme.of(context).appBarTheme.foregroundColor,
+            ),
             onPressed: _addFilesToVault,
           ),
         ],
@@ -86,7 +89,7 @@ class _VaultPageState extends State<VaultPage> {
         children: [
           // File type selector
           Container(
-            color: const Color(0xFF1A1F3A),
+            color: Theme.of(context).cardColor,
             padding: const EdgeInsets.all(16),
             child: SingleChildScrollView(
               scrollDirection: Axis.horizontal,
@@ -138,13 +141,16 @@ class _VaultPageState extends State<VaultPage> {
                         Icon(
                           Icons.folder_open_rounded,
                           size: 80,
-                          color: Colors.white.withOpacity(0.3),
+                          color: Theme.of(
+                            context,
+                          ).iconTheme.color?.withValues(alpha: 0.3),
                         ),
                         const SizedBox(height: 16),
                         Text(
                           l10n.noFilesInVault,
                           style: GoogleFonts.cairo(
-                            color: Colors.white60,
+                            color: Theme.of(context).textTheme.bodyMedium?.color
+                                ?.withValues(alpha: 0.6),
                             fontSize: 16,
                           ),
                         ),
@@ -152,7 +158,8 @@ class _VaultPageState extends State<VaultPage> {
                         Text(
                           l10n.tapToAddFiles,
                           style: GoogleFonts.cairo(
-                            color: Colors.white.withOpacity(0.4),
+                            color: Theme.of(context).textTheme.bodyMedium?.color
+                                ?.withValues(alpha: 0.4),
                             fontSize: 14,
                           ),
                         ),
@@ -185,7 +192,7 @@ class _VaultPageState extends State<VaultPage> {
               alignment: Alignment.center,
               width: _bannerAd!.size.width.toDouble(),
               height: _bannerAd!.size.height.toDouble(),
-              color: const Color(0xFF1A1F3A),
+              color: Theme.of(context).cardColor,
               child: AdWidget(ad: _bannerAd!),
             ),
         ],
@@ -209,7 +216,9 @@ class _VaultPageState extends State<VaultPage> {
                   colors: [Color(0xFF667EEA), Color(0xFF764BA2)],
                 )
               : null,
-          color: isSelected ? null : Colors.white.withOpacity(0.05),
+          color: isSelected
+              ? null
+              : Theme.of(context).dividerColor.withValues(alpha: 0.05),
           borderRadius: BorderRadius.circular(20),
         ),
         child: Row(
@@ -220,7 +229,9 @@ class _VaultPageState extends State<VaultPage> {
             Text(
               label,
               style: GoogleFonts.cairo(
-                color: Colors.white,
+                color: isSelected
+                    ? Colors.white
+                    : Theme.of(context).textTheme.bodyMedium?.color,
                 fontSize: 14,
                 fontWeight: FontWeight.w600,
               ),
@@ -517,12 +528,12 @@ class _VaultPageState extends State<VaultPage> {
     return await showDialog<String>(
       context: context,
       builder: (context) => AlertDialog(
-        backgroundColor: const Color(0xFF1A1F3A),
+        backgroundColor: Theme.of(context).cardColor,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         title: Text(
           l10n.chooseFileType,
           style: GoogleFonts.cairo(
-            color: Colors.white,
+            color: Theme.of(context).textTheme.bodyLarge?.color,
             fontWeight: FontWeight.bold,
           ),
         ),
@@ -536,7 +547,9 @@ class _VaultPageState extends State<VaultPage> {
               ),
               title: Text(
                 l10n.images,
-                style: GoogleFonts.cairo(color: Colors.white),
+                style: GoogleFonts.cairo(
+                  color: Theme.of(context).textTheme.bodyLarge?.color,
+                ),
               ),
               onTap: () => Navigator.pop(context, 'image'),
             ),
@@ -547,7 +560,9 @@ class _VaultPageState extends State<VaultPage> {
               ),
               title: Text(
                 l10n.videos,
-                style: GoogleFonts.cairo(color: Colors.white),
+                style: GoogleFonts.cairo(
+                  color: Theme.of(context).textTheme.bodyLarge?.color,
+                ),
               ),
               onTap: () => Navigator.pop(context, 'video'),
             ),
@@ -558,7 +573,9 @@ class _VaultPageState extends State<VaultPage> {
               ),
               title: Text(
                 l10n.otherFiles,
-                style: GoogleFonts.cairo(color: Colors.white),
+                style: GoogleFonts.cairo(
+                  color: Theme.of(context).textTheme.bodyLarge?.color,
+                ),
               ),
               onTap: () => Navigator.pop(context, 'other'),
             ),
@@ -608,9 +625,12 @@ class _VaultItemCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: const Color(0xFF1A1F3A),
+        color: Theme.of(context).cardColor,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.white.withOpacity(0.1), width: 1),
+        border: Border.all(
+          color: Theme.of(context).dividerColor.withValues(alpha: 0.1),
+          width: 1,
+        ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -686,7 +706,7 @@ class _VaultItemCard extends StatelessWidget {
                 Text(
                   item.fileName ?? 'ملف',
                   style: GoogleFonts.cairo(
-                    color: Colors.white,
+                    color: Theme.of(context).textTheme.bodyLarge?.color,
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
                   ),
@@ -696,7 +716,12 @@ class _VaultItemCard extends StatelessWidget {
                 const SizedBox(height: 4),
                 Text(
                   item.fileSizeFormatted,
-                  style: GoogleFonts.cairo(color: Colors.white60, fontSize: 12),
+                  style: GoogleFonts.cairo(
+                    color: Theme.of(
+                      context,
+                    ).textTheme.bodyMedium?.color?.withValues(alpha: 0.6),
+                    fontSize: 12,
+                  ),
                 ),
               ],
             ),

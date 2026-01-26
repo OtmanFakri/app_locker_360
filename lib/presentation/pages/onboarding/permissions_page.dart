@@ -139,7 +139,7 @@ class _PermissionsPageState extends State<PermissionsPage>
     final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
-      backgroundColor: const Color(0xFF0A0E21),
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(24.0),
@@ -153,14 +153,19 @@ class _PermissionsPageState extends State<PermissionsPage>
                 style: GoogleFonts.cairo(
                   fontSize: 32,
                   fontWeight: FontWeight.bold,
-                  color: Colors.white,
+                  color: Theme.of(context).textTheme.bodyLarge?.color,
                 ),
               ),
               const SizedBox(height: 12),
               Text(
                 l10n.permissionsSubtitle,
                 textAlign: TextAlign.center,
-                style: GoogleFonts.cairo(fontSize: 16, color: Colors.white60),
+                style: GoogleFonts.cairo(
+                  fontSize: 16,
+                  color: Theme.of(
+                    context,
+                  ).textTheme.bodyMedium?.color?.withValues(alpha: 0.6),
+                ),
               ),
 
               const SizedBox(height: 48),
@@ -233,7 +238,11 @@ class _PermissionsPageState extends State<PermissionsPage>
                             end: Alignment.centerRight,
                           )
                         : null,
-                    color: _allPermissionsGranted ? null : Colors.white24,
+                    color: _allPermissionsGranted
+                        ? null
+                        : Theme.of(
+                            context,
+                          ).dividerColor.withValues(alpha: 0.24),
                     borderRadius: BorderRadius.circular(16),
                     boxShadow: _allPermissionsGranted
                         ? [
@@ -253,7 +262,7 @@ class _PermissionsPageState extends State<PermissionsPage>
                         fontWeight: FontWeight.bold,
                         color: _allPermissionsGranted
                             ? Colors.white
-                            : Colors.white38,
+                            : Theme.of(context).disabledColor,
                       ),
                     ),
                   ),

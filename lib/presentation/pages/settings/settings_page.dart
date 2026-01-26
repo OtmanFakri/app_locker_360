@@ -105,13 +105,13 @@ class _SettingsPageState extends State<SettingsPage> {
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
           color: isSelected
-              ? const Color(0xFF667EEA).withOpacity(0.2)
-              : const Color(0xFF0A0E21),
+              ? const Color(0xFF667EEA).withValues(alpha: 0.2)
+              : Theme.of(context).cardColor,
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
             color: isSelected
                 ? const Color(0xFF667EEA)
-                : Colors.white.withOpacity(0.1),
+                : Theme.of(context).dividerColor.withValues(alpha: 0.1),
             width: 2,
           ),
         ),
@@ -125,7 +125,7 @@ class _SettingsPageState extends State<SettingsPage> {
             Text(
               label,
               style: GoogleFonts.cairo(
-                color: Colors.white,
+                color: Theme.of(context).textTheme.bodyLarge?.color,
                 fontSize: 16,
                 fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
               ),
@@ -142,16 +142,16 @@ class _SettingsPageState extends State<SettingsPage> {
     final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
-      backgroundColor: const Color(0xFF0A0E21),
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
-        backgroundColor: const Color(0xFF1A1F3A),
+        backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
         elevation: 0,
         title: Text(
           l10n.settings,
           style: GoogleFonts.cairo(
             fontSize: 24,
             fontWeight: FontWeight.bold,
-            color: Colors.white,
+            color: Theme.of(context).appBarTheme.foregroundColor,
           ),
         ),
       ),
@@ -230,6 +230,7 @@ class _SettingsPageState extends State<SettingsPage> {
                     );
                     MMKVService.updateGlobalSettings(updated);
                     setState(() {});
+                    rebuildMainApp();
                   },
                 ),
                 _buildLanguageTile(
@@ -327,9 +328,12 @@ class _SettingsPageState extends State<SettingsPage> {
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
-        color: const Color(0xFF1A1F3A),
+        color: Theme.of(context).cardColor,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.white.withOpacity(0.1), width: 1),
+        border: Border.all(
+          color: Theme.of(context).dividerColor.withValues(alpha: 0.1),
+          width: 1,
+        ),
       ),
       child: SwitchListTile(
         value: value,
@@ -337,7 +341,7 @@ class _SettingsPageState extends State<SettingsPage> {
         secondary: Container(
           padding: const EdgeInsets.all(8),
           decoration: BoxDecoration(
-            color: const Color(0xFF667EEA).withOpacity(0.2),
+            color: const Color(0xFF667EEA).withValues(alpha: 0.2),
             borderRadius: BorderRadius.circular(12),
           ),
           child: Icon(icon, color: const Color(0xFF667EEA)),
@@ -345,14 +349,19 @@ class _SettingsPageState extends State<SettingsPage> {
         title: Text(
           title,
           style: GoogleFonts.cairo(
-            color: Colors.white,
+            color: Theme.of(context).textTheme.bodyLarge?.color,
             fontSize: 16,
             fontWeight: FontWeight.w600,
           ),
         ),
         subtitle: Text(
           subtitle,
-          style: GoogleFonts.cairo(color: Colors.white60, fontSize: 13),
+          style: GoogleFonts.cairo(
+            color: Theme.of(
+              context,
+            ).textTheme.bodyMedium?.color?.withValues(alpha: 0.6),
+            fontSize: 13,
+          ),
         ),
         activeColor: const Color(0xFF667EEA),
       ),
@@ -369,16 +378,19 @@ class _SettingsPageState extends State<SettingsPage> {
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
-        color: const Color(0xFF1A1F3A),
+        color: Theme.of(context).cardColor,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.white.withOpacity(0.1), width: 1),
+        border: Border.all(
+          color: Theme.of(context).dividerColor.withValues(alpha: 0.1),
+          width: 1,
+        ),
       ),
       child: ListTile(
         onTap: onTap,
         leading: Container(
           padding: const EdgeInsets.all(8),
           decoration: BoxDecoration(
-            color: const Color(0xFF667EEA).withOpacity(0.2),
+            color: const Color(0xFF667EEA).withValues(alpha: 0.2),
             borderRadius: BorderRadius.circular(12),
           ),
           child: Icon(icon, color: const Color(0xFF667EEA)),
@@ -386,14 +398,19 @@ class _SettingsPageState extends State<SettingsPage> {
         title: Text(
           title,
           style: GoogleFonts.cairo(
-            color: Colors.white,
+            color: Theme.of(context).textTheme.bodyLarge?.color,
             fontSize: 16,
             fontWeight: FontWeight.w600,
           ),
         ),
         subtitle: Text(
           subtitle,
-          style: GoogleFonts.cairo(color: Colors.white60, fontSize: 13),
+          style: GoogleFonts.cairo(
+            color: Theme.of(
+              context,
+            ).textTheme.bodyMedium?.color?.withValues(alpha: 0.6),
+            fontSize: 13,
+          ),
         ),
         trailing: Row(
           mainAxisSize: MainAxisSize.min,
@@ -407,9 +424,9 @@ class _SettingsPageState extends State<SettingsPage> {
               ),
             ),
             const SizedBox(width: 8),
-            const Icon(
+            Icon(
               Icons.arrow_forward_ios,
-              color: Colors.white60,
+              color: Theme.of(context).iconTheme.color?.withValues(alpha: 0.6),
               size: 16,
             ),
           ],
@@ -427,9 +444,12 @@ class _SettingsPageState extends State<SettingsPage> {
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: const Color(0xFF1A1F3A),
+        color: Theme.of(context).cardColor,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.white.withOpacity(0.1), width: 1),
+        border: Border.all(
+          color: Theme.of(context).dividerColor.withOpacity(0.1),
+          width: 1,
+        ),
       ),
       child: Row(
         children: [
@@ -449,7 +469,7 @@ class _SettingsPageState extends State<SettingsPage> {
                 Text(
                   title,
                   style: GoogleFonts.cairo(
-                    color: Colors.white,
+                    color: Theme.of(context).textTheme.bodyLarge?.color,
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
                   ),
@@ -457,7 +477,12 @@ class _SettingsPageState extends State<SettingsPage> {
                 const SizedBox(height: 4),
                 Text(
                   subtitle,
-                  style: GoogleFonts.cairo(color: Colors.white60, fontSize: 13),
+                  style: GoogleFonts.cairo(
+                    color: Theme.of(
+                      context,
+                    ).textTheme.bodyMedium?.color?.withOpacity(0.6),
+                    fontSize: 13,
+                  ),
                 ),
               ],
             ),

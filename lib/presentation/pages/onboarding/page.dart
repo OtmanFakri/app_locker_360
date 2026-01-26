@@ -79,7 +79,7 @@ class _OnboardingPageState extends State<OnboardingPage>
     final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
-      backgroundColor: const Color(0xFF0A0E21),
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: SafeArea(
         child: Column(
           children: [
@@ -162,7 +162,9 @@ class _OnboardingPageState extends State<OnboardingPage>
               l10n.welcomeTo,
               style: GoogleFonts.cairo(
                 fontSize: 24,
-                color: Colors.white70,
+                color: Theme.of(
+                  context,
+                ).textTheme.bodyMedium?.color?.withValues(alpha: 0.7),
                 fontWeight: FontWeight.w400,
               ),
             ),
@@ -176,7 +178,7 @@ class _OnboardingPageState extends State<OnboardingPage>
                 style: GoogleFonts.cairo(
                   fontSize: 40,
                   fontWeight: FontWeight.bold,
-                  color: Colors.white,
+                  color: Theme.of(context).textTheme.bodyLarge?.color,
                 ),
               ),
             ),
@@ -188,7 +190,9 @@ class _OnboardingPageState extends State<OnboardingPage>
               textAlign: TextAlign.center,
               style: GoogleFonts.cairo(
                 fontSize: 16,
-                color: Colors.white60,
+                color: Theme.of(
+                  context,
+                ).textTheme.bodyMedium?.color?.withValues(alpha: 0.6),
                 height: 1.6,
               ),
             ),
@@ -212,13 +216,18 @@ class _OnboardingPageState extends State<OnboardingPage>
               style: GoogleFonts.cairo(
                 fontSize: 36,
                 fontWeight: FontWeight.bold,
-                color: Colors.white,
+                color: Theme.of(context).textTheme.bodyLarge?.color,
               ),
             ),
             const SizedBox(height: 16),
             Text(
               l10n.featuresSubtitle,
-              style: GoogleFonts.cairo(fontSize: 16, color: Colors.white60),
+              style: GoogleFonts.cairo(
+                fontSize: 16,
+                color: Theme.of(
+                  context,
+                ).textTheme.bodyMedium?.color?.withValues(alpha: 0.6),
+              ),
             ),
             const SizedBox(height: 48),
 
@@ -290,7 +299,7 @@ class _OnboardingPageState extends State<OnboardingPage>
               style: GoogleFonts.cairo(
                 fontSize: 32,
                 fontWeight: FontWeight.bold,
-                color: Colors.white,
+                color: Theme.of(context).textTheme.bodyLarge?.color,
               ),
               textAlign: TextAlign.center,
             ),
@@ -327,9 +336,12 @@ class _OnboardingPageState extends State<OnboardingPage>
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.05),
+        color: Theme.of(context).dividerColor.withValues(alpha: 0.05),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: Colors.white.withOpacity(0.1), width: 1),
+        border: Border.all(
+          color: Theme.of(context).dividerColor.withValues(alpha: 0.1),
+          width: 1,
+        ),
       ),
       child: Row(
         children: [
@@ -352,13 +364,18 @@ class _OnboardingPageState extends State<OnboardingPage>
                   style: GoogleFonts.cairo(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
-                    color: Colors.white,
+                    color: Theme.of(context).textTheme.bodyLarge?.color,
                   ),
                 ),
                 const SizedBox(height: 4),
                 Text(
                   description,
-                  style: GoogleFonts.cairo(fontSize: 14, color: Colors.white60),
+                  style: GoogleFonts.cairo(
+                    fontSize: 14,
+                    color: Theme.of(
+                      context,
+                    ).textTheme.bodyMedium?.color?.withValues(alpha: 0.6),
+                  ),
                 ),
               ],
             ),
@@ -392,7 +409,7 @@ class _OnboardingPageState extends State<OnboardingPage>
             text,
             style: GoogleFonts.cairo(
               fontSize: 15,
-              color: Colors.white,
+              color: Theme.of(context).textTheme.bodyLarge?.color,
               fontWeight: FontWeight.w500,
             ),
           ),
@@ -417,7 +434,9 @@ class _OnboardingPageState extends State<OnboardingPage>
                     colors: [Color(0xFF667EEA), Color(0xFF764BA2)],
                   )
                 : null,
-            color: _currentPage == index ? null : Colors.white24,
+            color: _currentPage == index
+                ? null
+                : Theme.of(context).dividerColor.withValues(alpha: 0.24),
             borderRadius: BorderRadius.circular(4),
           ),
         ),
@@ -580,13 +599,18 @@ class _PinSetupPageState extends State<PinSetupPage> {
                 style: GoogleFonts.cairo(
                   fontSize: 28,
                   fontWeight: FontWeight.bold,
-                  color: Colors.white,
+                  color: Theme.of(context).textTheme.bodyLarge?.color,
                 ),
               ),
               const SizedBox(height: 12),
               Text(
                 _isConfirming ? l10n.reEnterPin : l10n.enterFourDigitPin,
-                style: GoogleFonts.cairo(fontSize: 16, color: Colors.white60),
+                style: GoogleFonts.cairo(
+                  fontSize: 16,
+                  color: Theme.of(
+                    context,
+                  ).textTheme.bodyMedium?.color?.withValues(alpha: 0.6),
+                ),
               ),
 
               const SizedBox(height: 60),
@@ -635,13 +659,17 @@ class _PinSetupPageState extends State<PinSetupPage> {
                     colors: [Color(0xFF667EEA), Color(0xFF764BA2)],
                   )
                 : null,
-            color: index < currentPin.length ? null : Colors.white24,
+            color: index < currentPin.length
+                ? null
+                : Theme.of(context).dividerColor.withValues(alpha: 0.24),
             border: Border.all(
               color: _showError
                   ? Colors.redAccent
                   : (index < currentPin.length
                         ? Colors.transparent
-                        : Colors.white24),
+                        : Theme.of(
+                            context,
+                          ).dividerColor.withValues(alpha: 0.24)),
               width: 2,
             ),
           ),
@@ -673,7 +701,10 @@ class _PinSetupPageState extends State<PinSetupPage> {
         }
         if (number == 'delete') {
           return _buildNumberButton(
-            child: const Icon(Icons.backspace_outlined, color: Colors.white),
+            child: Icon(
+              Icons.backspace_outlined,
+              color: Theme.of(context).iconTheme.color,
+            ),
             onPressed: _onDeletePressed,
           );
         }
@@ -683,7 +714,7 @@ class _PinSetupPageState extends State<PinSetupPage> {
             style: GoogleFonts.cairo(
               fontSize: 28,
               fontWeight: FontWeight.w600,
-              color: Colors.white,
+              color: Theme.of(context).textTheme.bodyLarge?.color,
             ),
           ),
           onPressed: () => _onNumberPressed(number),
@@ -702,9 +733,12 @@ class _PinSetupPageState extends State<PinSetupPage> {
         width: 80,
         height: 80,
         decoration: BoxDecoration(
-          color: Colors.white.withOpacity(0.05),
+          color: Theme.of(context).dividerColor.withValues(alpha: 0.05),
           shape: BoxShape.circle,
-          border: Border.all(color: Colors.white.withOpacity(0.1), width: 1),
+          border: Border.all(
+            color: Theme.of(context).dividerColor.withValues(alpha: 0.1),
+            width: 1,
+          ),
         ),
         child: Center(child: child),
       ),
