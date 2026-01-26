@@ -10,6 +10,7 @@ import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:app_locker360/data/services/ad_helper.dart';
 import 'package:app_locker360/l10n/app_localizations.dart';
 import 'package:app_locker360/presentation/pages/notifications/intruder_notifications_page.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 
 /// Apps list page - main tab showing all installed apps
 class AppsListPage extends StatefulWidget {
@@ -84,9 +85,17 @@ class _AppsListPageState extends State<AppsListPage> {
         onlyAppsWithLaunchIntent: true,
       );
 
+      // Filter out the current app
+      final packageInfo = await PackageInfo.fromPlatform();
+      final currentPackageName = packageInfo.packageName;
+
+      final filteredApps = apps
+          .where((app) => app.packageName != currentPackageName)
+          .toList();
+
       setState(() {
-        _installedApps = apps;
-        _filteredApps = apps;
+        _installedApps = filteredApps;
+        _filteredApps = filteredApps;
         _isLoading = false;
       });
     } catch (e) {
