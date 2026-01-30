@@ -145,12 +145,12 @@ void onStart(ServiceInstance service) async {
             !isUnlockedMMKV) {
           // Check if this is a system installer package
           final isSystemInstaller = [
-            'com.android.packageinstaller',
-            'com.google.android.packageinstaller',
-            'com.android.settings',
-            'com.android.vending',
-            'com.miui.packageinstaller',
-            'com.miui.securitycenter',
+            // 'com.android.packageinstaller',
+            // 'com.google.android.packageinstaller',
+            // 'com.android.settings',
+            // 'com.android.vending',
+            // 'com.miui.packageinstaller',
+            // 'com.miui.securitycenter',
           ].contains(currentPackage);
 
           if (isSystemInstaller) {

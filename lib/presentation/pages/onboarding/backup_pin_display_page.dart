@@ -67,39 +67,7 @@ class _BackupPinDisplayPageState extends State<BackupPinDisplayPage>
     }
   }
 
-  Future<void> _saveToGallery() async {
-    final l10n = AppLocalizations.of(context)!;
 
-    setState(() {
-      _isSaving = true;
-    });
-
-    final success = await BackupPinImageGenerator.saveToGallery(
-      widget.backupPin,
-      l10n.appTitle,
-    );
-
-    setState(() {
-      _isSaving = false;
-    });
-
-    if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            success ? l10n.savedToGallery : 'Failed to save image',
-            style: GoogleFonts.cairo(fontSize: 16),
-          ),
-          backgroundColor: success ? const Color(0xFF4FACFE) : Colors.redAccent,
-          behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-          ),
-          duration: const Duration(seconds: 2),
-        ),
-      );
-    }
-  }
 
   void _continueToApp() {
     Navigator.of(context).pushReplacement(
@@ -265,16 +233,6 @@ class _BackupPinDisplayPageState extends State<BackupPinDisplayPage>
                     label: l10n.copyToClipboard,
                     onPressed: _copyToClipboard,
                     gradient: const [Color(0xFF4FACFE), Color(0xFF00F2FE)],
-                  ),
-
-                  const SizedBox(height: 16),
-
-                  _buildActionButton(
-                    icon: _isSaving ? null : Icons.save_alt_rounded,
-                    label: l10n.saveToGallery,
-                    onPressed: _isSaving ? null : _saveToGallery,
-                    gradient: const [Color(0xFFF093FB), Color(0xFFF5576C)],
-                    isLoading: _isSaving,
                   ),
 
                   const SizedBox(height: 32),

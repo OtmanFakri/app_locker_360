@@ -238,12 +238,12 @@ class _AppsListPageState extends State<AppsListPage> {
 
   // System packages that need to be locked to prevent uninstallation
   static const List<String> _systemInstallerPackages = [
-    'com.android.packageinstaller',
-    'com.google.android.packageinstaller',
-    'com.android.settings',
-    'com.android.vending',
-    'com.miui.packageinstaller', // Xiaomi (older versions)
-    'com.miui.securitycenter', // Xiaomi security center
+    // 'com.android.packageinstaller',
+    // 'com.google.android.packageinstaller',
+    // 'com.android.settings',
+    // 'com.android.vending',
+    // 'com.miui.packageinstaller', // Xiaomi (older versions)
+    // 'com.miui.securitycenter', // Xiaomi security center
   ];
 
   void _toggleUninstallProtection(Application app) {

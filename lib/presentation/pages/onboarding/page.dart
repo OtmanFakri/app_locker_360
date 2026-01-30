@@ -125,78 +125,83 @@ class _OnboardingPageState extends State<OnboardingPage>
   Widget _buildWelcomePage(AppLocalizations l10n) {
     return FadeTransition(
       opacity: _fadeAnimation,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 32.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            // App icon with gradient background
-            Container(
-              width: 140,
-              height: 140,
-              decoration: BoxDecoration(
-                gradient: const LinearGradient(
-                  colors: [Color(0xFF667EEA), Color(0xFF764BA2)],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                ),
-                borderRadius: BorderRadius.circular(32),
-                boxShadow: [
-                  BoxShadow(
-                    color: const Color(0xFF667EEA).withOpacity(0.4),
-                    blurRadius: 30,
-                    offset: const Offset(0, 15),
+      child: Center(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.symmetric(vertical: 24),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 32.0),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                // App icon with gradient background
+                Container(
+                  width: 140,
+                  height: 140,
+                  decoration: BoxDecoration(
+                    gradient: const LinearGradient(
+                      colors: [Color(0xFF667EEA), Color(0xFF764BA2)],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
+                    borderRadius: BorderRadius.circular(32),
+                    boxShadow: [
+                      BoxShadow(
+                        color: const Color(0xFF667EEA).withOpacity(0.4),
+                        blurRadius: 30,
+                        offset: const Offset(0, 15),
+                      ),
+                    ],
                   ),
-                ],
-              ),
-              child: const Icon(
-                Icons.lock_rounded,
-                size: 70,
-                color: Colors.white,
-              ),
-            ),
-            const SizedBox(height: 48),
-
-            // Welcome title
-            Text(
-              l10n.welcomeTo,
-              style: GoogleFonts.cairo(
-                fontSize: 24,
-                color: Theme.of(
-                  context,
-                ).textTheme.bodyMedium?.color?.withValues(alpha: 0.7),
-                fontWeight: FontWeight.w400,
-              ),
-            ),
-            const SizedBox(height: 8),
-            ShaderMask(
-              shaderCallback: (bounds) => const LinearGradient(
-                colors: [Color(0xFF667EEA), Color(0xFF764BA2)],
-              ).createShader(bounds),
-              child: Text(
-                l10n.appTitle,
-                style: GoogleFonts.cairo(
-                  fontSize: 40,
-                  fontWeight: FontWeight.bold,
-                  color: Theme.of(context).textTheme.bodyLarge?.color,
+                  child: const Icon(
+                    Icons.lock_rounded,
+                    size: 70,
+                    color: Colors.white,
+                  ),
                 ),
-              ),
-            ),
-            const SizedBox(height: 24),
+                const SizedBox(height: 48),
 
-            // Description
-            Text(
-              l10n.onboardingWelcomeDesc,
-              textAlign: TextAlign.center,
-              style: GoogleFonts.cairo(
-                fontSize: 16,
-                color: Theme.of(
-                  context,
-                ).textTheme.bodyMedium?.color?.withValues(alpha: 0.6),
-                height: 1.6,
-              ),
+                // Welcome title
+                Text(
+                  l10n.welcomeTo,
+                  style: GoogleFonts.cairo(
+                    fontSize: 24,
+                    color: Theme.of(
+                      context,
+                    ).textTheme.bodyMedium?.color?.withValues(alpha: 0.7),
+                    fontWeight: FontWeight.w400,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                ShaderMask(
+                  shaderCallback: (bounds) => const LinearGradient(
+                    colors: [Color(0xFF667EEA), Color(0xFF764BA2)],
+                  ).createShader(bounds),
+                  child: Text(
+                    l10n.appTitle,
+                    style: GoogleFonts.cairo(
+                      fontSize: 40,
+                      fontWeight: FontWeight.bold,
+                      color: Theme.of(context).textTheme.bodyLarge?.color,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 24),
+
+                // Description
+                Text(
+                  l10n.onboardingWelcomeDesc,
+                  textAlign: TextAlign.center,
+                  style: GoogleFonts.cairo(
+                    fontSize: 16,
+                    color: Theme.of(
+                      context,
+                    ).textTheme.bodyMedium?.color?.withValues(alpha: 0.6),
+                    height: 1.6,
+                  ),
+                ),
+              ],
             ),
-          ],
+          ),
         ),
       ),
     );
@@ -205,54 +210,59 @@ class _OnboardingPageState extends State<OnboardingPage>
   Widget _buildFeaturesPage(AppLocalizations l10n) {
     return FadeTransition(
       opacity: _fadeAnimation,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 32.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            // Title
-            Text(
-              l10n.powerfulFeatures,
-              style: GoogleFonts.cairo(
-                fontSize: 36,
-                fontWeight: FontWeight.bold,
-                color: Theme.of(context).textTheme.bodyLarge?.color,
-              ),
-            ),
-            const SizedBox(height: 16),
-            Text(
-              l10n.featuresSubtitle,
-              style: GoogleFonts.cairo(
-                fontSize: 16,
-                color: Theme.of(
-                  context,
-                ).textTheme.bodyMedium?.color?.withValues(alpha: 0.6),
-              ),
-            ),
-            const SizedBox(height: 48),
+      child: Center(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.symmetric(vertical: 24),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 32.0),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                // Title
+                Text(
+                  l10n.powerfulFeatures,
+                  style: GoogleFonts.cairo(
+                    fontSize: 36,
+                    fontWeight: FontWeight.bold,
+                    color: Theme.of(context).textTheme.bodyLarge?.color,
+                  ),
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  l10n.featuresSubtitle,
+                  style: GoogleFonts.cairo(
+                    fontSize: 16,
+                    color: Theme.of(
+                      context,
+                    ).textTheme.bodyMedium?.color?.withValues(alpha: 0.6),
+                  ),
+                ),
+                const SizedBox(height: 48),
 
-            // Features list
-            _buildFeatureItem(
-              icon: Icons.apps_rounded,
-              title: l10n.lockApps,
-              description: l10n.lockAppsDesc,
-              gradient: const [Color(0xFF667EEA), Color(0xFF764BA2)],
+                // Features list
+                _buildFeatureItem(
+                  icon: Icons.apps_rounded,
+                  title: l10n.lockApps,
+                  description: l10n.lockAppsDesc,
+                  gradient: const [Color(0xFF667EEA), Color(0xFF764BA2)],
+                ),
+                const SizedBox(height: 24),
+                _buildFeatureItem(
+                  icon: Icons.folder_rounded,
+                  title: l10n.fileVault,
+                  description: l10n.fileVaultDesc,
+                  gradient: const [Color(0xFFF093FB), Color(0xFFF5576C)],
+                ),
+                const SizedBox(height: 24),
+                _buildFeatureItem(
+                  icon: Icons.camera_alt_rounded,
+                  title: l10n.intruderDetection,
+                  description: l10n.intruderDetectionDesc,
+                  gradient: const [Color(0xFF4FACFE), Color(0xFF00F2FE)],
+                ),
+              ],
             ),
-            const SizedBox(height: 24),
-            _buildFeatureItem(
-              icon: Icons.folder_rounded,
-              title: l10n.fileVault,
-              description: l10n.fileVaultDesc,
-              gradient: const [Color(0xFFF093FB), Color(0xFFF5576C)],
-            ),
-            const SizedBox(height: 24),
-            _buildFeatureItem(
-              icon: Icons.camera_alt_rounded,
-              title: l10n.intruderDetection,
-              description: l10n.intruderDetectionDesc,
-              gradient: const [Color(0xFF4FACFE), Color(0xFF00F2FE)],
-            ),
-          ],
+          ),
         ),
       ),
     );
@@ -261,67 +271,72 @@ class _OnboardingPageState extends State<OnboardingPage>
   Widget _buildSecurityPage(AppLocalizations l10n) {
     return FadeTransition(
       opacity: _fadeAnimation,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 32.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            // Security icon
-            Container(
-              width: 120,
-              height: 120,
-              decoration: BoxDecoration(
-                gradient: const LinearGradient(
-                  colors: [Color(0xFF4FACFE), Color(0xFF00F2FE)],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                ),
-                shape: BoxShape.circle,
-                boxShadow: [
-                  BoxShadow(
-                    color: const Color(0xFF4FACFE).withOpacity(0.4),
-                    blurRadius: 30,
-                    offset: const Offset(0, 15),
+      child: Center(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.symmetric(vertical: 24),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 32.0),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                // Security icon
+                Container(
+                  width: 120,
+                  height: 120,
+                  decoration: BoxDecoration(
+                    gradient: const LinearGradient(
+                      colors: [Color(0xFF4FACFE), Color(0xFF00F2FE)],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
+                    shape: BoxShape.circle,
+                    boxShadow: [
+                      BoxShadow(
+                        color: const Color(0xFF4FACFE).withOpacity(0.4),
+                        blurRadius: 30,
+                        offset: const Offset(0, 15),
+                      ),
+                    ],
                   ),
-                ],
-              ),
-              child: const Icon(
-                Icons.shield_rounded,
-                size: 60,
-                color: Colors.white,
-              ),
-            ),
-            const SizedBox(height: 48),
+                  child: const Icon(
+                    Icons.shield_rounded,
+                    size: 60,
+                    color: Colors.white,
+                  ),
+                ),
+                const SizedBox(height: 48),
 
-            // Title
-            Text(
-              l10n.topLevelSecurity,
-              style: GoogleFonts.cairo(
-                fontSize: 32,
-                fontWeight: FontWeight.bold,
-                color: Theme.of(context).textTheme.bodyLarge?.color,
-              ),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 16),
+                // Title
+                Text(
+                  l10n.topLevelSecurity,
+                  style: GoogleFonts.cairo(
+                    fontSize: 32,
+                    fontWeight: FontWeight.bold,
+                    color: Theme.of(context).textTheme.bodyLarge?.color,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 16),
 
-            // Description
-            Text(
-              l10n.securityDesc,
-              textAlign: TextAlign.center,
-              style: GoogleFonts.cairo(
-                fontSize: 16,
-                color: Colors.white60,
-                height: 1.6,
-              ),
-            ),
-            const SizedBox(height: 48),
+                // Description
+                Text(
+                  l10n.securityDesc,
+                  textAlign: TextAlign.center,
+                  style: GoogleFonts.cairo(
+                    fontSize: 16,
+                    color: Colors.white60,
+                    height: 1.6,
+                  ),
+                ),
+                const SizedBox(height: 48),
 
-            // Security features
-            _buildSecurityBadge(l10n.aes256Encryption),
-            const SizedBox(height: 12),
-            _buildSecurityBadge(l10n.fingerprintProtection),
-          ],
+                // Security features
+                _buildSecurityBadge(l10n.aes256Encryption),
+                const SizedBox(height: 12),
+                _buildSecurityBadge(l10n.fingerprintProtection),
+              ],
+            ),
+          ),
         ),
       ),
     );
@@ -585,7 +600,7 @@ class _PinSetupPageState extends State<PinSetupPage> {
     final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
-      backgroundColor: const Color(0xFF0A0E21),
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(24.0),

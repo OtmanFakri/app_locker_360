@@ -21,13 +21,11 @@ class NumberPad extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Column(
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
         _buildNumberRow(['1', '2', '3']),
-        const SizedBox(height: 16),
         _buildNumberRow(['4', '5', '6']),
-        const SizedBox(height: 16),
         _buildNumberRow(['7', '8', '9']),
-        const SizedBox(height: 16),
         _buildNumberRow(['', '0', 'delete']),
       ],
     );

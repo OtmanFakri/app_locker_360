@@ -152,10 +152,10 @@ class AppLocalizationsAr extends AppLocalizations {
   String get storagePermissionRequired => 'يجب منح صلاحية الوصول للملفات';
 
   @override
-  String get permissionsRequired => 'الأذونات المطلوبة';
+  String get permissionsRequired => 'صلاحية المطلوبة';
 
   @override
-  String get permissionsSubtitle => 'نحتاج هذه الأذونات لحماية تطبيقاتك وملفاتك';
+  String get permissionsSubtitle => 'نحتاج هذه صلاحية لحماية تطبيقاتك وملفاتك';
 
   @override
   String get continueButton => 'متابعة';

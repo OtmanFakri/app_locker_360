@@ -24,6 +24,7 @@ class PermissionItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     // Get localized strings based on keys
     String title;
@@ -54,14 +55,23 @@ class PermissionItem extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.05),
+        color: isDark ? Colors.white.withOpacity(0.05) : Colors.white,
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
           color: isGranted
               ? const Color(0xFF4FACFE).withOpacity(0.5)
-              : Colors.white.withOpacity(0.1),
+              : Theme.of(context).dividerColor.withOpacity(0.1),
           width: 1.5,
         ),
+        boxShadow: isDark
+            ? null
+            : [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.05),
+                  blurRadius: 10,
+                  offset: const Offset(0, 4),
+                ),
+              ],
       ),
       child: Column(
         children: [
@@ -86,7 +96,7 @@ class PermissionItem extends StatelessWidget {
                       style: GoogleFonts.cairo(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
-                        color: Colors.white,
+                        color: Theme.of(context).textTheme.bodyLarge?.color,
                       ),
                     ),
                     const SizedBox(height: 4),
@@ -94,7 +104,9 @@ class PermissionItem extends StatelessWidget {
                       description,
                       style: GoogleFonts.cairo(
                         fontSize: 14,
-                        color: Colors.white60,
+                        color: Theme.of(
+                          context,
+                        ).textTheme.bodyMedium?.color?.withOpacity(0.6),
                       ),
                     ),
                   ],
