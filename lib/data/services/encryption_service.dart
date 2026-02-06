@@ -166,6 +166,110 @@ class EncryptionService {
       throw Exception('Streaming encryption failed: $e');
     }
   }
+
+  /// Decrypt file in chunks (streaming)
+  /// Matches encryptFileStreaming logic: treats file as independent encrypted chunks
+  static Future<File> decryptFileStreaming({
+    required File encryptedFile,
+    required File destinationFile,
+    required String pin,
+    required Uint8List salt,
+    int chunkSize = 1024 * 1024, // 1MB chunks (must match encryption)
+  }) async {
+    try {
+      // Derive encryption key
+      final keyBytes = _deriveKey(pin, salt);
+      final key = encrypt_pkg.Key(keyBytes);
+
+      // Create encrypter
+      final encrypter = encrypt_pkg.Encrypter(
+        encrypt_pkg.AES(key, mode: encrypt_pkg.AESMode.cbc),
+      );
+
+      final sink = destinationFile.openWrite();
+
+      // Calculate encrypted chunk size:
+      // chunkSize (1MB) is exact multiple of 16 bytes.
+      // PKCS7 padding always adds padding if multiple of block size.
+      // So encryption adds 1 full block (16 bytes).
+      // Total encrypted chunk size = chunkSize + 16 bytes.
+      // The FIRST 16 bytes of the file is the global IV.
+      // BUT, encryptFileStreaming reused the same IV for every chunk.
+      // Wait, encryptFileStreaming writes IV *once* at start of file:
+      // sink.add(iv.bytes);
+      // Then writes encrypted chunks.
+
+      // Let's verify encryptFileStreaming behavior:
+      // 1. Writes IV (16 bytes).
+      // 2. Loop:
+      //    Encrypt(chunk, iv).
+      //    Write bytes.
+
+      // So to decrypt:
+      // 1. Read first 16 bytes as IV.
+      // 2. Read EncryptedChunkSize bytes (1MB + 16 bytes).
+      // 3. Decrypt using IV. (Note: reused IV is bad security, but that's how it was written)
+      // 4. Repeat.
+
+      // We need to read manual byte ranges. Streams might return variable chunk sizes.
+      // Better to use synchronous random access for simplicity and reliability with fixed offsets?
+      // Or manually buffer the stream.
+
+      final raf = await encryptedFile.open();
+      final fileSize = await encryptedFile.length();
+
+      // 1. Read IV
+      if (fileSize < _ivLength) throw Exception('File too short');
+
+      final ivBytes = await raf.read(_ivLength);
+      final iv = encrypt_pkg.IV(ivBytes);
+
+      // 2. Decrypt chunks
+      // Expected encrypted chunk size for full 1MB chunk
+      // AES block size = 16
+      // 1MB = 1048576 bytes
+      // Padded size = 1048576 + 16 = 1048592
+      const acceptedChunkSize = 1024 * 1024;
+      const encryptedBlockOverhead = 16; // PKCS7 padding for full block
+      const fullEncryptedChunkSize = acceptedChunkSize + encryptedBlockOverhead;
+
+      int offset = _ivLength;
+
+      while (offset < fileSize) {
+        // Determine how much to read
+        // If remaining < fullEncryptedChunkSize, it's the last chunk
+        // BUT wait. If the last chunk was small, say 100 bytes.
+        // Encrypted size = 100 + (16 - 100%16) = 112 bytes.
+        // We handle "last chunk" by just reading rest of file?
+        // YES, because we know we wrote sequentially.
+        // The problem is if we have multiple full chunks.
+
+        int bytesToRead;
+        if (fileSize - offset >= fullEncryptedChunkSize) {
+          bytesToRead = fullEncryptedChunkSize;
+        } else {
+          bytesToRead = fileSize - offset;
+        }
+
+        final encryptedChunk = await raf.read(bytesToRead);
+
+        final decryptedChunk = encrypter.decryptBytes(
+          encrypt_pkg.Encrypted(encryptedChunk),
+          iv: iv,
+        );
+
+        sink.add(decryptedChunk);
+        offset += bytesToRead;
+      }
+
+      await raf.close();
+      await sink.close();
+
+      return destinationFile;
+    } catch (e) {
+      throw Exception('Streaming decryption failed: $e');
+    }
+  }
 }
 
 /// PBKDF2 implementation for key derivation

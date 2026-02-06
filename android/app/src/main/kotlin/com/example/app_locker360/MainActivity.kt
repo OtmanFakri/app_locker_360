@@ -10,6 +10,7 @@ class MainActivity: FlutterFragmentActivity() {
     private val CHANNEL = "com.example.app_locker360/media_scanner"
     private val INTENT_CHANNEL = "com.example.app_locker360/intent"
     private val FIREWALL_CHANNEL = "com.example.app_locker360/firewall"
+    private val ACCESSIBILITY_CHANNEL = "com.example.app_locker360/accessibility"
     private var intentMethodChannel: MethodChannel? = null
     
     companion object {
@@ -177,6 +178,57 @@ class MainActivity: FlutterFragmentActivity() {
                 }
             }
         }
+
+        // Accessibility Channel
+        MethodChannel(flutterEngine.dartExecutor.binaryMessenger, ACCESSIBILITY_CHANNEL).setMethodCallHandler { call, result ->
+            when (call.method) {
+                "notifyPinVerified" -> {
+                    try {
+                        AppMonitorAccessibilityService.notifyPinVerified()
+                        result.success(true)
+                    } catch (e: Exception) {
+                        result.error("ERROR", "Failed to notify accessibility service: ${e.message}", null)
+                    }
+                }
+                "isAccessibilityServiceEnabled" -> {
+                    try {
+                        val isEnabled = isAccessibilityServiceEnabled()
+                        result.success(isEnabled)
+                    } catch (e: Exception) {
+                        result.error("ERROR", "Failed to check accessibility service: ${e.message}", null)
+                    }
+                }
+                "isBatteryOptimizationDisabled" -> {
+                    try {
+                        val isDisabled = isBatteryOptimizationDisabled()
+                        result.success(isDisabled)
+                    } catch (e: Exception) {
+                        result.error("ERROR", "Failed to check battery optimization: ${e.message}", null)
+                    }
+                }
+                "requestIgnoreBatteryOptimization" -> {
+                    try {
+                        // Enable temporary bypass so settings app doesn't trigger PIN
+                        AppMonitorAccessibilityService.setTemporaryBypass()
+                        requestIgnoreBatteryOptimization()
+                        result.success(true)
+                    } catch (e: Exception) {
+                        result.error("ERROR", "Failed to request battery optimization: ${e.message}", null)
+                    }
+                }
+                "setTemporaryBypass" -> {
+                    try {
+                        AppMonitorAccessibilityService.setTemporaryBypass()
+                        result.success(true)
+                    } catch (e: Exception) {
+                        result.error("ERROR", "Failed to set temporary bypass: ${e.message}", null)
+                    }
+                }
+                else -> {
+                    result.notImplemented()
+                }
+            }
+        }
     }
 
     override fun onNewIntent(intent: android.content.Intent) {
@@ -242,6 +294,34 @@ class MainActivity: FlutterFragmentActivity() {
         } catch (e: Exception) {
             println("XIAOMI DEBUG: Error -> $e")
             return false 
+        }
+    }
+
+    private fun isAccessibilityServiceEnabled(): Boolean {
+        val accessibilityManager = getSystemService(Context.ACCESSIBILITY_SERVICE) as android.view.accessibility.AccessibilityManager
+        val enabledServices = android.provider.Settings.Secure.getString(
+            contentResolver,
+            android.provider.Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES
+        )
+        val serviceName = "$packageName/${AppMonitorAccessibilityService::class.java.name}"
+        return enabledServices?.contains(serviceName) == true
+    }
+
+    private fun isBatteryOptimizationDisabled(): Boolean {
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
+            val powerManager = getSystemService(Context.POWER_SERVICE) as android.os.PowerManager
+            return powerManager.isIgnoringBatteryOptimizations(packageName)
+        }
+        return true // Older versions don't have battery optimization
+    }
+
+    private fun requestIgnoreBatteryOptimization() {
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
+            val intent = android.content.Intent().apply {
+                action = android.provider.Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS
+                data = android.net.Uri.parse("package:$packageName")
+            }
+            startActivity(intent)
         }
     }
 }

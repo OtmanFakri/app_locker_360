@@ -236,6 +236,61 @@ class VaultService {
     }
   }
 
+  /// Restore a vault item (decrypt and save to public storage)
+  static Future<String> restoreVaultItem({
+    required VaultItem item,
+    required String masterPin,
+    required Uint8List encryptionSalt,
+  }) async {
+    try {
+      // 1. Decrypt file to temp
+      final decryptedFile = await decryptVaultItem(
+        item: item,
+        masterPin: masterPin,
+        encryptionSalt: encryptionSalt,
+      );
+
+      // 2. Get public directory
+      final fileTypeString = item.fileType.toString().split('.').last;
+      final publicDir = await FileManagerService.getPublicDirectory(
+        fileTypeString,
+      );
+
+      if (publicDir == null) {
+        throw Exception('Could not access public storage');
+      }
+
+      // 3. Create destination file
+      // Verify unique name
+      String fileName =
+          item.fileName ??
+          'restored_file_${DateTime.now().millisecondsSinceEpoch}';
+      File destinationFile = File('${publicDir.path}/$fileName');
+
+      int counter = 1;
+      while (await destinationFile.exists()) {
+        final nameWithoutExt = FileManagerService.getFileNameWithoutExtension(
+          fileName,
+        );
+        final ext = FileManagerService.getFileExtension(fileName);
+        destinationFile = File(
+          '${publicDir.path}/${nameWithoutExt}_$counter.$ext',
+        );
+        counter++;
+      }
+
+      // 4. Copy to public directory
+      await decryptedFile.copy(destinationFile.path);
+
+      // 5. Delete from vault
+      await deleteVaultItem(item);
+
+      return destinationFile.path;
+    } catch (e) {
+      throw Exception('Failed to restore file: $e');
+    }
+  }
+
   /// Decrypt a vault item to a temporary location for viewing
   static Future<File> decryptVaultItem({
     required VaultItem item,
@@ -253,8 +308,8 @@ class VaultService {
       final tempDir = await FileManagerService.getTempDirectory();
       final decryptedFile = File('${tempDir.path}/${item.fileName}');
 
-      // Decrypt file
-      await EncryptionService.decryptFile(
+      // Decrypt file (streaming)
+      await EncryptionService.decryptFileStreaming(
         encryptedFile: encryptedFile,
         destinationFile: decryptedFile,
         pin: masterPin,

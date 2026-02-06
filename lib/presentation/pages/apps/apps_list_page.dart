@@ -11,6 +11,7 @@ import 'package:app_locker360/data/services/ad_helper.dart';
 import 'package:app_locker360/l10n/app_localizations.dart';
 import 'package:app_locker360/presentation/pages/notifications/intruder_notifications_page.dart';
 import 'package:package_info_plus/package_info_plus.dart';
+import 'package:android_intent_plus/android_intent.dart';
 
 /// Apps list page - main tab showing all installed apps
 class AppsListPage extends StatefulWidget {
@@ -81,7 +82,7 @@ class _AppsListPageState extends State<AppsListPage> {
     try {
       final apps = await DeviceApps.getInstalledApplications(
         includeAppIcons: true,
-        includeSystemApps: false,
+        includeSystemApps: true,
         onlyAppsWithLaunchIntent: true,
       );
 
@@ -246,12 +247,140 @@ class _AppsListPageState extends State<AppsListPage> {
     // 'com.miui.securitycenter', // Xiaomi security center
   ];
 
-  void _toggleUninstallProtection(Application app) {
+  static const _accessibilityChannel = MethodChannel(
+    'com.example.app_locker360/accessibility',
+  );
+
+  Future<void> _toggleUninstallProtection(Application app) async {
     final config =
         MMKVService.getAppConfig(app.packageName) ??
         AppsConfig(packageName: app.packageName, appName: app.appName);
 
     final newProtectionState = !config.uninstallProtection;
+
+    // If enabling protection, check permissions first
+    if (newProtectionState) {
+      final l10n = AppLocalizations.of(context)!;
+
+      try {
+        // Check accessibility service
+        final isAccessibilityEnabled =
+            await _accessibilityChannel.invokeMethod<bool>(
+              'isAccessibilityServiceEnabled',
+            ) ??
+            false;
+
+        if (!isAccessibilityEnabled) {
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(
+                  'Accessibility Service must be enabled for uninstall protection',
+                  style: GoogleFonts.cairo(),
+                ),
+                backgroundColor: Colors.orange,
+                duration: const Duration(seconds: 3),
+                action: SnackBarAction(
+                  label: 'Open Settings',
+                  textColor: Colors.white,
+                  onPressed: () async {
+                    // Enable temporary bypass so settings doesn't trigger PIN
+                    try {
+                      await _accessibilityChannel.invokeMethod(
+                        'setTemporaryBypass',
+                      );
+                    } catch (e) {
+                      print('Error setting bypass: $e');
+                    }
+
+                    // Open accessibility settings
+                    final intent = AndroidIntent(
+                      action: 'android.settings.ACCESSIBILITY_SETTINGS',
+                    );
+                    intent.launch();
+                  },
+                ),
+              ),
+            );
+          }
+          return; // Don't enable protection
+        }
+
+        // Check battery optimization
+        final isBatteryOptimizationDisabled =
+            await _accessibilityChannel.invokeMethod<bool>(
+              'isBatteryOptimizationDisabled',
+            ) ??
+            false;
+
+        if (!isBatteryOptimizationDisabled) {
+          // Enable bypass BEFORE showing the dialog
+          try {
+            await _accessibilityChannel.invokeMethod('setTemporaryBypass');
+            print('⏳ Bypass enabled before battery optimization dialog');
+          } catch (e) {
+            print('Warning: Failed to set bypass: $e');
+          }
+
+          if (mounted) {
+            final shouldRequest = await showDialog<bool>(
+              context: context,
+              builder: (context) => AlertDialog(
+                title: Text(
+                  'Battery Optimization',
+                  style: GoogleFonts.cairo(fontWeight: FontWeight.bold),
+                ),
+                content: Text(
+                  'For reliable uninstall protection, battery optimization must be disabled for this app. Would you like to disable it now?',
+                  style: GoogleFonts.cairo(),
+                ),
+                actions: [
+                  TextButton(
+                    onPressed: () => Navigator.pop(context, false),
+                    child: Text('Cancel', style: GoogleFonts.cairo()),
+                  ),
+                  TextButton(
+                    onPressed: () => Navigator.pop(context, true),
+                    child: Text('Open Settings', style: GoogleFonts.cairo()),
+                  ),
+                ],
+              ),
+            );
+
+            if (shouldRequest == true) {
+              // Refresh bypass before opening settings
+              try {
+                await _accessibilityChannel.invokeMethod('setTemporaryBypass');
+                print('⏳ Bypass refreshed before opening battery settings');
+              } catch (e) {
+                print('Warning: Failed to refresh bypass: $e');
+              }
+
+              await _accessibilityChannel.invokeMethod(
+                'requestIgnoreBatteryOptimization',
+              );
+            }
+          }
+          return; // Don't enable protection yet
+        }
+      } catch (e) {
+        print('Error checking permissions: $e');
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                'Error checking permissions: $e',
+                style: GoogleFonts.cairo(),
+              ),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+        return;
+      }
+    }
+
+    // All checks passed or we're disabling protection - proceed
     final updatedConfig = config.copyWith(
       uninstallProtection: newProtectionState,
     );
@@ -261,6 +390,19 @@ class _AppsListPageState extends State<AppsListPage> {
     if (newProtectionState) {
       // Enabling protection - lock system packages
       _lockSystemInstallerPackages();
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              'Uninstall protection enabled for ${app.appName}',
+              style: GoogleFonts.cairo(),
+            ),
+            backgroundColor: Colors.green,
+            duration: const Duration(seconds: 2),
+          ),
+        );
+      }
     } else {
       // Disabling protection - check if we should unlock system packages
       _unlockSystemInstallerPackagesIfNeeded();

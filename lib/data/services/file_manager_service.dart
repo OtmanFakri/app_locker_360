@@ -65,6 +65,20 @@ class FileManagerService {
     return decryptedDir;
   }
 
+  /// Get public directory for restoration (Downloads or Pictures)
+  static Future<Directory?> getPublicDirectory(String fileType) async {
+    if (Platform.isAndroid) {
+      // Use Downloads for everything for simplicity in Android 10+ scoped storage
+      // Or Pictures for images/video if we can
+      final dir = Directory('/storage/emulated/0/Download');
+      if (await dir.exists()) {
+        return dir;
+      }
+      return await getExternalStorageDirectory();
+    }
+    return await getApplicationDocumentsDirectory(); // iOS / fallback
+  }
+
   /// Pick images from gallery
   static Future<List<File>?> pickImages({bool allowMultiple = true}) async {
     try {

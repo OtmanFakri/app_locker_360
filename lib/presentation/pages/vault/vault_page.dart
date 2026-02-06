@@ -14,6 +14,13 @@ import 'package:app_locker360/l10n/app_localizations.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:app_locker360/data/services/ad_helper.dart';
 
+// Viewers
+import 'package:app_locker360/presentation/pages/vault/viewers/image_viewer_page.dart';
+import 'package:app_locker360/presentation/pages/vault/viewers/video_player_page.dart';
+import 'package:app_locker360/presentation/pages/vault/viewers/audio_player_dialog.dart';
+import 'package:android_intent_plus/android_intent.dart';
+import 'package:android_intent_plus/flag.dart';
+
 /// Vault page - shows encrypted files
 class VaultPage extends StatefulWidget {
   const VaultPage({super.key});
@@ -55,6 +62,120 @@ class _VaultPageState extends State<VaultPage> {
         ad.dispose();
       },
     )..load();
+  }
+
+  Future<void> _openVaultItem(VaultItem item) async {
+    setState(() => _isLoading = true);
+
+    try {
+      // Get master PIN and salt
+      final settings = MMKVService.getGlobalSettings();
+      final masterPin = settings.masterPin;
+
+      // Handle case where salt might be null (though unlikely in prod)
+      if (settings.encryptionSalt == null) {
+        throw Exception('Encryption key not found (salt is null)');
+      }
+      final salt = Uint8List.fromList(settings.encryptionSalt!);
+
+      // Decrypt file to temp
+      final file = await VaultService.decryptVaultItem(
+        item: item,
+        masterPin: masterPin,
+        encryptionSalt: salt,
+      );
+
+      setState(() => _isLoading = false);
+
+      if (!mounted) return;
+
+      // Open based on type
+      switch (item.fileType) {
+        case FileType.image:
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (_) => ImageViewerPage(imageFile: file, vaultItem: item),
+            ),
+          );
+          break;
+        case FileType.video:
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (_) => VideoPlayerPage(videoFile: file, vaultItem: item),
+            ),
+          );
+          break;
+        case FileType.audio:
+          showDialog(
+            context: context,
+            builder: (_) => AudioPlayerDialog(audioFile: file, vaultItem: item),
+          );
+          break;
+        case FileType.document:
+        case FileType.other:
+          // Open with external app using Intent
+          try {
+            final mimeType = _getMimeType(item.fileName);
+            final intent = AndroidIntent(
+              action: 'action_view',
+              data: Uri.encodeFull('file://${file.path}'),
+              type: mimeType,
+              flags: [Flag.FLAG_GRANT_READ_URI_PERMISSION],
+            );
+            await intent.launch();
+          } catch (e) {
+            print('Error launching intent: $e');
+            if (mounted) {
+              _showError('No app found to open this file');
+            }
+          }
+          break;
+      }
+    } catch (e) {
+      setState(() => _isLoading = false);
+      if (mounted) {
+        // Provide user-friendly error for known decryption failures
+        if (e.toString().contains('Invalid or corrupted pad block') ||
+            e.toString().contains('Mac mismatch')) {
+          _showError(
+            'Decryption failed: Key mismatch. Please delete and re-add this file.',
+          );
+        } else {
+          _showError('Failed to open file: $e');
+        }
+      }
+    }
+  }
+
+  String _getMimeType(String? fileName) {
+    if (fileName == null) return '*/*';
+    final ext = fileName.split('.').last.toLowerCase();
+    switch (ext) {
+      case 'pdf':
+        return 'application/pdf';
+      case 'doc':
+        return 'application/msword';
+      case 'docx':
+        return 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
+      case 'xls':
+        return 'application/vnd.ms-excel';
+      case 'xlsx':
+        return 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
+      case 'ppt':
+        return 'application/vnd.ms-powerpoint';
+      case 'pptx':
+        return 'application/vnd.openxmlformats-officedocument.presentationml.presentation';
+      case 'txt':
+        return 'text/plain';
+      case 'apk':
+        return 'application/vnd.android.package-archive';
+      case 'zip':
+        return 'application/zip';
+      default:
+        return '*/*';
+    }
   }
 
   @override
@@ -181,6 +302,8 @@ class _VaultPageState extends State<VaultPage> {
                       return _VaultItemCard(
                         item: item,
                         onDelete: () => _deleteVaultItem(item),
+                        onRestore: () => _restoreVaultItem(item),
+                        onTap: () => _openVaultItem(item),
                       );
                     },
                   ),
@@ -276,9 +399,6 @@ class _VaultPageState extends State<VaultPage> {
 
         if (selectedAssets != null && selectedAssets.isNotEmpty) {
           // SILENT DELETION STRATEGY:
-          // We pass the AssetEntity to vault_service, which will delete the
-          // original file directly from the filesystem (no dialog needed!)
-
           setState(() => _isLoading = true);
           int successCount = 0;
           int failCount = 0;
@@ -330,17 +450,14 @@ class _VaultPageState extends State<VaultPage> {
         );
 
         if (selectedAssets != null && selectedAssets.isNotEmpty) {
-          // Same silent deletion strategy as images
           setState(() => _isLoading = true);
           int successCount = 0;
           int failCount = 0;
 
           for (final asset in selectedAssets) {
             try {
-              // Get the file from the asset
               final file = await asset.file;
               if (file != null) {
-                // vault_service will handle silent deletion
                 await _addSingleFileToVault(file, originalAsset: asset);
                 successCount++;
               }
@@ -371,9 +488,6 @@ class _VaultPageState extends State<VaultPage> {
         }
         return; // Early return for videos
       } else if (fileType == 'other') {
-        // Use file_picker for any other file type (MP3, PDF, APK, DOCX, etc.)
-        // Note: file_picker creates a cache copy, but we want to delete the ORIGINAL file too
-
         picker.FilePickerResult? result;
         try {
           result = await picker.FilePicker.platform.pickFiles(
@@ -395,34 +509,23 @@ class _VaultPageState extends State<VaultPage> {
 
           for (final platformFile in result.files) {
             try {
-              // Skip files without a path (e.g., from cloud storage)
               if (platformFile.path == null) {
-                print('⚠️ Skipping file without path: ${platformFile.name}');
                 failCount++;
                 continue;
               }
 
               final file = File(platformFile.path!);
 
-              // Verify file exists before processing
               if (!await file.exists()) {
-                print('⚠️ File does not exist: ${platformFile.path}');
                 failCount++;
                 continue;
               }
 
-              // Try to find and delete the original file
-              // file_picker gives us a cache copy, but we need to delete the original
+              // Try to find and delete the original file if possible
               String? originalPath;
-
-              // If the file is in cache, try to find the original
               if (platformFile.path!.contains('cache/file_picker')) {
-                // The original file is likely in Downloads or Documents
-                // We'll search common locations for a file with the same name and size
                 final fileName = platformFile.name;
                 final fileSize = await file.length();
-
-                // Common document locations
                 final searchPaths = [
                   '/storage/emulated/0/Download',
                   '/storage/emulated/0/Documents',
@@ -441,14 +544,11 @@ class _VaultPageState extends State<VaultPage> {
                 }
               }
 
-              // Encrypt and vault the file
               await _addSingleFileToVault(file, originalAsset: null);
 
-              // Delete the original file if we found it
               if (originalPath != null) {
                 try {
                   await File(originalPath).delete();
-                  print('✅ Deleted original file: $originalPath');
                 } catch (e) {
                   print('⚠️ Failed to delete original file: $e');
                 }
@@ -480,7 +580,7 @@ class _VaultPageState extends State<VaultPage> {
             }
           }
         }
-        return; // Early return for other files
+        return;
       }
     } catch (e) {
       setState(() => _isLoading = false);
@@ -492,13 +592,11 @@ class _VaultPageState extends State<VaultPage> {
 
   Future<void> _addSingleFileToVault(
     File file, {
-    AssetEntity? originalAsset, // NEW: Optional asset for direct deletion
+    AssetEntity? originalAsset,
   }) async {
-    // Get master PIN and salt
     final settings = MMKVService.getGlobalSettings();
     final masterPin = settings.masterPin;
 
-    // Get or generate salt
     Uint8List salt;
     if (settings.encryptionSalt != null &&
         settings.encryptionSalt!.isNotEmpty) {
@@ -509,14 +607,12 @@ class _VaultPageState extends State<VaultPage> {
       await MMKVService.updateGlobalSettings(updatedSettings);
     }
 
-    // Use VaultService to add file to vault
     await VaultService.addFileToVault(
       sourceFile: file,
-      originalAsset: originalAsset, // Pass the AssetEntity for direct deletion
+      originalAsset: originalAsset,
       masterPin: masterPin,
       encryptionSalt: salt,
       onProgress: (progress) {
-        // Optional: Update UI with progress
         print('Progress: ${(progress * 100).toStringAsFixed(0)}%');
       },
     );
@@ -585,6 +681,74 @@ class _VaultPageState extends State<VaultPage> {
     );
   }
 
+  Future<void> _restoreVaultItem(VaultItem item) async {
+    try {
+      final confirmed = await showDialog<bool>(
+        context: context,
+        builder: (context) => AlertDialog(
+          backgroundColor: Theme.of(context).cardColor,
+          title: Text(
+            'Restore File?',
+            style: GoogleFonts.cairo(fontWeight: FontWeight.bold),
+          ),
+          content: Text(
+            'This will decrypt and move the file back to public storage.',
+            style: GoogleFonts.cairo(),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context, false),
+              child: Text('Cancel', style: GoogleFonts.cairo()),
+            ),
+            TextButton(
+              onPressed: () => Navigator.pop(context, true),
+              child: Text(
+                'Restore',
+                style: GoogleFonts.cairo(fontWeight: FontWeight.bold),
+              ),
+            ),
+          ],
+        ),
+      );
+
+      if (confirmed != true) return;
+
+      setState(() => _isLoading = true);
+
+      // Get master PIN and salt
+      final settings = MMKVService.getGlobalSettings();
+      if (settings.encryptionSalt == null) {
+        throw Exception('Encryption key not found');
+      }
+
+      final savedPath = await VaultService.restoreVaultItem(
+        item: item,
+        masterPin: settings.masterPin,
+        encryptionSalt: Uint8List.fromList(settings.encryptionSalt!),
+      );
+
+      setState(() => _isLoading = false);
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              'File restored to: $savedPath',
+              style: GoogleFonts.cairo(),
+            ),
+            backgroundColor: Colors.green,
+            duration: const Duration(seconds: 4),
+          ),
+        );
+      }
+    } catch (e) {
+      setState(() => _isLoading = false);
+      if (mounted) {
+        _showError('Failed to restore file: $e');
+      }
+    }
+  }
+
   Future<void> _deleteVaultItem(VaultItem item) async {
     try {
       await VaultService.deleteVaultItem(item);
@@ -618,8 +782,15 @@ class _VaultPageState extends State<VaultPage> {
 class _VaultItemCard extends StatelessWidget {
   final VaultItem item;
   final VoidCallback onDelete;
+  final VoidCallback onRestore; // Added onRestore
+  final VoidCallback onTap; // Added onTap
 
-  const _VaultItemCard({required this.item, required this.onDelete});
+  const _VaultItemCard({
+    required this.item,
+    required this.onDelete,
+    required this.onRestore, // Added required onRestore
+    required this.onTap, // Added required onTap
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -638,44 +809,47 @@ class _VaultItemCard extends StatelessWidget {
           Expanded(
             child: Stack(
               children: [
-                // Display thumbnail if available, otherwise show icon
-                Container(
-                  decoration: BoxDecoration(
-                    color: const Color(0xFF667EEA).withOpacity(0.2),
-                    borderRadius: const BorderRadius.vertical(
-                      top: Radius.circular(16),
+                // Wrap content with GestureDetector to handle tap
+                GestureDetector(
+                  onTap: onTap,
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF667EEA).withOpacity(0.2),
+                      borderRadius: const BorderRadius.vertical(
+                        top: Radius.circular(16),
+                      ),
                     ),
+                    child: item.thumbnail != null
+                        ? ClipRRect(
+                            borderRadius: const BorderRadius.vertical(
+                              top: Radius.circular(16),
+                            ),
+                            child: Image.memory(
+                              item.thumbnail!,
+                              fit: BoxFit.cover,
+                              width: double.infinity,
+                              height: double.infinity,
+                              errorBuilder: (context, error, stackTrace) {
+                                return Center(
+                                  child: Icon(
+                                    _getIconForType(item.fileType),
+                                    size: 48,
+                                    color: const Color(0xFF667EEA),
+                                  ),
+                                );
+                              },
+                            ),
+                          )
+                        : Center(
+                            child: Icon(
+                              _getIconForType(item.fileType),
+                              size: 48,
+                              color: const Color(0xFF667EEA),
+                            ),
+                          ),
                   ),
-                  child: item.thumbnail != null
-                      ? ClipRRect(
-                          borderRadius: const BorderRadius.vertical(
-                            top: Radius.circular(16),
-                          ),
-                          child: Image.memory(
-                            item.thumbnail!,
-                            fit: BoxFit.cover,
-                            width: double.infinity,
-                            height: double.infinity,
-                            errorBuilder: (context, error, stackTrace) {
-                              // Fallback to icon if thumbnail fails to load
-                              return Center(
-                                child: Icon(
-                                  _getIconForType(item.fileType),
-                                  size: 48,
-                                  color: const Color(0xFF667EEA),
-                                ),
-                              );
-                            },
-                          ),
-                        )
-                      : Center(
-                          child: Icon(
-                            _getIconForType(item.fileType),
-                            size: 48,
-                            color: const Color(0xFF667EEA),
-                          ),
-                        ),
                 ),
+                // Delete Button
                 Positioned(
                   top: 8,
                   right: 8,
@@ -695,32 +869,49 @@ class _VaultItemCard extends StatelessWidget {
                     ),
                   ),
                 ),
+                // Restore Button
+                Positioned(
+                  top: 8,
+                  left: 8,
+                  child: GestureDetector(
+                    onTap: onRestore,
+                    child: Container(
+                      padding: const EdgeInsets.all(4),
+                      decoration: BoxDecoration(
+                        color: Colors.green,
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(
+                        Icons.download_rounded,
+                        color: Colors.white,
+                        size: 16,
+                      ),
+                    ),
+                  ),
+                ),
               ],
             ),
           ),
           Padding(
-            padding: const EdgeInsets.all(12),
+            padding: const EdgeInsets.all(8),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  item.fileName ?? 'ملف',
-                  style: GoogleFonts.cairo(
-                    color: Theme.of(context).textTheme.bodyLarge?.color,
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600,
-                  ),
+                  item.fileName ?? 'Unknown',
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
+                  style: GoogleFonts.cairo(
+                    fontSize: 14,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
                 const SizedBox(height: 4),
                 Text(
                   item.fileSizeFormatted,
                   style: GoogleFonts.cairo(
-                    color: Theme.of(
-                      context,
-                    ).textTheme.bodyMedium?.color?.withValues(alpha: 0.6),
                     fontSize: 12,
+                    color: Theme.of(context).textTheme.bodySmall?.color,
                   ),
                 ),
               ],
@@ -741,7 +932,7 @@ class _VaultItemCard extends StatelessWidget {
         return Icons.audiotrack_rounded;
       case FileType.document:
         return Icons.description_rounded;
-      case FileType.other:
+      default:
         return Icons.insert_drive_file_rounded;
     }
   }

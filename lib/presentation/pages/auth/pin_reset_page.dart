@@ -8,7 +8,10 @@ import 'package:app_locker360/l10n/app_localizations.dart';
 
 /// Page to reset the master PIN after backup verification
 class PinResetPage extends StatefulWidget {
-  const PinResetPage({super.key});
+  final VoidCallback? onSuccess;
+  final VoidCallback? onCancel;
+
+  const PinResetPage({super.key, this.onSuccess, this.onCancel});
 
   @override
   State<PinResetPage> createState() => _PinResetPageState();
@@ -71,22 +74,26 @@ class _PinResetPageState extends State<PinResetPage> {
       await MMKVService.updateGlobalSettings(updatedSettings);
 
       if (mounted) {
-        // Show success message
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              'PIN Reset Successfully', // TODO: Localize
-              style: GoogleFonts.cairo(),
+        if (widget.onSuccess != null) {
+          widget.onSuccess!();
+        } else {
+          // Standalone mode: Show success message and navigate
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                'PIN Reset Successfully', // TODO: Localize
+                style: GoogleFonts.cairo(),
+              ),
+              backgroundColor: Colors.green,
             ),
-            backgroundColor: Colors.green,
-          ),
-        );
+          );
 
-        // Navigate to Home
-        Navigator.of(context).pushAndRemoveUntil(
-          MaterialPageRoute(builder: (context) => const HomePage()),
-          (route) => false,
-        );
+          // Navigate to Home
+          Navigator.of(context).pushAndRemoveUntil(
+            MaterialPageRoute(builder: (context) => const HomePage()),
+            (route) => false,
+          );
+        }
       }
     } else {
       // Mismatch
@@ -113,7 +120,13 @@ class _PinResetPageState extends State<PinResetPage> {
             Icons.arrow_back_ios_new,
             color: Theme.of(context).appBarTheme.foregroundColor,
           ),
-          onPressed: () => Navigator.pop(context),
+          onPressed: () {
+            if (widget.onCancel != null) {
+              widget.onCancel!();
+            } else {
+              Navigator.pop(context);
+            }
+          },
         ),
       ),
       body: SafeArea(

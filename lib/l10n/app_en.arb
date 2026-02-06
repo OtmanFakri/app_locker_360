@@ -551,5 +551,8 @@
 "minute": "Minute",
 "@minute": { "description": "Minute unit" },
 "minutes": "Minutes",
-"@minutes": { "description": "Minutes unit" }
+"@minutes": { "description": "Minutes unit" },
+"pinSaved": "PIN Reset Successfully",
+"@pinSaved": { "description": "Success message after resetting PIN" }
 }
+```

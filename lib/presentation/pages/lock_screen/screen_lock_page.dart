@@ -13,15 +13,18 @@ import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:app_locker360/data/services/ad_helper.dart';
 import 'package:app_locker360/l10n/app_localizations.dart';
 import 'package:device_apps/device_apps.dart';
-import 'package:app_locker360/presentation/pages/auth/widgets/forgot_password_dialog.dart';
+import 'package:app_locker360/presentation/pages/auth/pin_reset_page.dart';
 
 class ScreenLockPage extends StatefulWidget {
   final String? lockedPackageName;
   final VoidCallback? onUnlockSuccess;
+  final bool isUninstallProtection;
+
   const ScreenLockPage({
     super.key,
     this.lockedPackageName,
     this.onUnlockSuccess,
+    this.isUninstallProtection = false,
   });
 
   @override
@@ -33,6 +36,10 @@ class _ScreenLockPageState extends State<ScreenLockPage>
   String _enteredPin = '';
   bool _showError = false;
   bool _showPinPad = true;
+
+  // State for overlay handling
+  bool _showForgotPassword = false;
+  bool _showPinReset = false;
 
   late AnimationController _shakeController;
   late Animation<double> _shakeAnimation;
@@ -46,6 +53,10 @@ class _ScreenLockPageState extends State<ScreenLockPage>
   bool _isMiddleBannerAdLoaded = false;
 
   AppsConfig? _appConfig; // Store config
+
+  static const _accessibilityChannel = MethodChannel(
+    'com.example.app_locker360/accessibility',
+  );
 
   @override
   void initState() {
@@ -132,6 +143,18 @@ class _ScreenLockPageState extends State<ScreenLockPage>
       return;
     }
 
+    // If this is uninstall protection, notify the accessibility service
+    if (widget.isUninstallProtection) {
+      try {
+        await _accessibilityChannel.invokeMethod('notifyPinVerified');
+        print(
+          "✅ Notified accessibility service of successful PIN verification",
+        );
+      } catch (e) {
+        print("⚠️ Failed to notify accessibility service: $e");
+      }
+    }
+
     // Default unlock behavior
     // 1. Inform Background Service IMMEDIATELY (Fast)
     if (widget.lockedPackageName != null) {
@@ -164,15 +187,87 @@ class _ScreenLockPageState extends State<ScreenLockPage>
 
   @override
   Widget build(BuildContext context) {
+    return PopScope(
+      canPop: false,
+      child: Scaffold(
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+        body: Stack(
+          children: [
+            // 1. Main Lock Screen Content
+            _buildLockScreenContent(context),
+
+            // 2. Overlay: Forgot Password / Pin Reset Barrier
+            if (_showForgotPassword || _showPinReset)
+              Container(
+                color: Colors.black.withOpacity(0.8), // Darken background
+                width: double.infinity,
+                height: double.infinity,
+              ),
+
+            // 3. Overlay Content: Forgot Password
+            if (_showForgotPassword)
+              Center(
+                child: SingleChildScrollView(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                    // We reuse the existing dialog widget but we need to intercept navigation
+                    // Or better: construct the visual content directly.
+                    // For speed, let's wrap the logic or create a dedicated method here.
+                    child: _buildForgotPasswordOverlay(),
+                  ),
+                ),
+              ),
+
+            // 4. Overlay Content: Pin Reset (If we want to do it inline too)
+            // Actually, standard ForgotPasswordDialog navigates to PinResetPage.
+            // Since we are in overlay land, we should probably handle reset here too or just allow navigation if it works?
+            // Standard Navigation fails because overlay is TOP.
+            // So we must show Reset Page content here too.
+            if (_showPinReset)
+              Positioned.fill(
+                child: Container(
+                  color: Theme.of(context).scaffoldBackgroundColor,
+                  child: PinResetPage(
+                    onSuccess: () {
+                      // Show success message
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(
+                            'PIN Reset Successfully',
+                            style: GoogleFonts.cairo(),
+                          ),
+                          backgroundColor: Colors.green,
+                        ),
+                      );
+
+                      _unlockApp();
+                      setState(() {
+                        _showPinReset = false;
+                        _showForgotPassword = false;
+                      });
+                    },
+                    onCancel: () {
+                      setState(() {
+                        _showPinReset = false;
+                        // _showForgotPassword = false; // Do we want to go back to Forgot Password or just Cancel?
+                        // If user cancels reset, maybe they want to go back to Lock Screen
+                        _showForgotPassword = false;
+                      });
+                    },
+                  ),
+                ),
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildLockScreenContent(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
 
     // Determine effective settings
-    bool useFingerprint =
-        _appConfig?.enableFingerprint ??
-        true; // Default to true if not set? Or check global?
-    // Wait, AppsConfig default is true. Global settings might override?
-    // User logic: AppsConfig overrides global.
-    // If _appConfig is null (e.g. testing?), use global.
+    bool useFingerprint = _appConfig?.enableFingerprint ?? true;
     if (_appConfig == null) {
       final settings = MMKVService.getGlobalSettings();
       useFingerprint = settings.fingerprintEnabled;
@@ -180,82 +275,106 @@ class _ScreenLockPageState extends State<ScreenLockPage>
 
     LockType lockType = _appConfig?.lockType ?? LockType.global;
 
-    return PopScope(
-      canPop: false,
-      child: Scaffold(
-        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-        body: SafeArea(
-          child: LayoutBuilder(
-            builder: (context, constraints) {
-              return SingleChildScrollView(
-                child: ConstrainedBox(
-                  constraints: BoxConstraints(minHeight: constraints.maxHeight),
-                  child: IntrinsicHeight(
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 24.0,
-                        vertical: 16.0,
-                      ),
-                      child: Column(
-                        children: [
-                          const SizedBox(height: 40),
+    return SafeArea(
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          return SingleChildScrollView(
+            child: ConstrainedBox(
+              constraints: BoxConstraints(minHeight: constraints.maxHeight),
+              child: IntrinsicHeight(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 24.0,
+                    vertical: 16.0,
+                  ),
+                  child: Column(
+                    children: [
+                      const SizedBox(height: 40),
 
-                          // App Icon (Circular)
-                          _buildAppIcon(),
+                      // App Icon (Circular)
+                      _buildAppIcon(),
 
-                          const SizedBox(height: 32),
+                      const SizedBox(height: 32),
 
-                          // Middle Ad Banner
-                          if (_isMiddleBannerAdLoaded &&
-                              _middleBannerAd != null) ...[
-                            // ... (Ad Widget) - Keeping existing logic but simplifying snippet
-                            Container(
-                              alignment: Alignment.center,
-                              width: _middleBannerAd!.size.width.toDouble(),
-                              height: _middleBannerAd!.size.height.toDouble(),
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(12),
-                                border: Border.all(
-                                  color: Colors.white.withOpacity(0.1),
-                                  width: 1,
-                                ),
-                              ),
-                              child: ClipRRect(
-                                borderRadius: BorderRadius.circular(12),
-                                child: AdWidget(ad: _middleBannerAd!),
-                              ),
+                      // Middle Ad Banner
+                      if (_isMiddleBannerAdLoaded &&
+                          _middleBannerAd != null) ...[
+                        // ... (Ad Widget) - Keeping existing logic but simplifying snippet
+                        Container(
+                          alignment: Alignment.center,
+                          width: _middleBannerAd!.size.width.toDouble(),
+                          height: _middleBannerAd!.size.height.toDouble(),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(
+                              color: Colors.white.withOpacity(0.1),
+                              width: 1,
                             ),
-                            const SizedBox(height: 40),
-                          ],
-
-                          // Unlock Options Card
-                          _buildUnlockOptionsCard(
-                            l10n,
-                            lockType,
-                            useFingerprint,
                           ),
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(12),
+                            child: AdWidget(ad: _middleBannerAd!),
+                          ),
+                        ),
+                        const SizedBox(height: 40),
+                      ],
 
-                          const Spacer(),
+                      // Unlock Options Card
+                      _buildUnlockOptionsCard(l10n, lockType, useFingerprint),
 
-                          // Banner Ad
-                          if (_isBannerAdLoaded && _bannerAd != null)
-                            Container(
-                              alignment: Alignment.center,
-                              width: _bannerAd!.size.width.toDouble(),
-                              height: _bannerAd!.size.height.toDouble(),
-                              child: AdWidget(ad: _bannerAd!),
-                            ),
-                          if (_isBannerAdLoaded) const SizedBox(height: 16),
-                        ],
-                      ),
-                    ),
+                      const Spacer(),
+
+                      // Banner Ad
+                      if (_isBannerAdLoaded && _bannerAd != null)
+                        Container(
+                          alignment: Alignment.center,
+                          width: _bannerAd!.size.width.toDouble(),
+                          height: _bannerAd!.size.height.toDouble(),
+                          child: AdWidget(ad: _bannerAd!),
+                        ),
+                      if (_isBannerAdLoaded) const SizedBox(height: 16),
+                    ],
                   ),
                 ),
-              );
-            },
-          ),
-        ),
+              ),
+            ),
+          );
+        },
       ),
+    );
+  }
+
+  // --- OVERLAY WIDGETS ---
+
+  // Re-implemented ForgotPasswordDialog logic inline
+  Widget _buildForgotPasswordOverlay() {
+    final l10n = AppLocalizations.of(context)!;
+    // We need a controller, but we are inside build (stateless widget logic inside stateful).
+    // Better to have controller in State.
+    // Let's create a separate widget file for this overlay content if possible, or just use a small stateful widget here.
+    return _InternalForgotPassword(
+      l10n: l10n,
+      onCancel: () {
+        setState(() {
+          _showForgotPassword = false;
+        });
+      },
+      onVerified: () {
+        setState(() {
+          _showForgotPassword = false;
+          // Since PinResetPage uses Navigator.pop, and we are showing it inline...
+          // Wait, PinResetPage is a full page. If we show it inline, its back button pops Navigator.
+          // But there is nothing to pop on the lock screen stack context?
+          // Actually, showing PinResetPage inline is fine, but we need to handle its exit.
+          // BUT PinResetPage pushes Home on success. That's fine for normal app, but for Lock Screen?
+          // If we reset PIN, we probably want to UNLOCK the current app or just go back to PIN pad?
+          // Going to Home replaces the route. If Lock Screen is overlay, Home is underneath.
+          // If Lock Screen is covering Home, we need to dismiss Lock Screen too.
+          // Let's assume on success, we just go back to PIN pad (with new PIN active) or unlock.
+          // For now, let's just show it.
+          _showPinReset = true;
+        });
+      },
     );
   }
 
@@ -392,11 +511,9 @@ class _ScreenLockPageState extends State<ScreenLockPage>
       ),
       child: Column(
         children: [
-          // ... (Facebook Icon / App Icon logic)
           FutureBuilder<ApplicationWithIcon?>(
             future: _getAppWithIcon(),
             builder: (context, snapshot) {
-              // ... (Copy existing icon logic)
               if (snapshot.hasData && snapshot.data != null) {
                 return Container(
                   width: 60,
@@ -658,9 +775,176 @@ class _ScreenLockPageState extends State<ScreenLockPage>
   }
 
   void _onForgotPassword() {
-    showDialog(
-      context: context,
-      builder: (context) => const ForgotPasswordDialog(),
+    setState(() {
+      _showForgotPassword = true;
+    });
+  }
+}
+
+// --- HELPER WIDGET FOR INTERNAL STATE ---
+
+class _InternalForgotPassword extends StatefulWidget {
+  final AppLocalizations l10n;
+  final VoidCallback onCancel;
+  final VoidCallback onVerified;
+
+  const _InternalForgotPassword({
+    required this.l10n,
+    required this.onCancel,
+    required this.onVerified,
+  });
+
+  @override
+  State<_InternalForgotPassword> createState() =>
+      _InternalForgotPasswordState();
+}
+
+class _InternalForgotPasswordState extends State<_InternalForgotPassword> {
+  final TextEditingController _backupPinController = TextEditingController();
+  bool _showError = false;
+
+  @override
+  void dispose() {
+    _backupPinController.dispose();
+    super.dispose();
+  }
+
+  void _verifyBackupPin() {
+    final settings = MMKVService.getGlobalSettings();
+    final enteredPin = _backupPinController.text.trim();
+
+    if (enteredPin == settings.backupPin) {
+      widget.onVerified();
+    } else {
+      setState(() {
+        _showError = true;
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(24.0),
+      decoration: BoxDecoration(
+        color: const Color(0xFF1A1F3A),
+        borderRadius: BorderRadius.circular(24),
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          // Icon
+          Container(
+            width: 80,
+            height: 80,
+            decoration: const BoxDecoration(
+              gradient: LinearGradient(
+                colors: [Color(0xFFF093FB), Color(0xFFF5576C)],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+              shape: BoxShape.circle,
+            ),
+            child: const Icon(
+              Icons.lock_reset_rounded,
+              color: Colors.white,
+              size: 40,
+            ),
+          ),
+          const SizedBox(height: 24),
+
+          // Title
+          Text(
+            widget.l10n.recoverAccount,
+            style: GoogleFonts.cairo(
+              fontSize: 24,
+              fontWeight: FontWeight.bold,
+              color: Colors.white,
+            ),
+          ),
+          const SizedBox(height: 12),
+
+          // Description
+          Text(
+            widget.l10n.backupPinDescription,
+            textAlign: TextAlign.center,
+            style: GoogleFonts.cairo(
+              fontSize: 15,
+              color: Colors.white70,
+              height: 1.5,
+            ),
+          ),
+          const SizedBox(height: 24),
+
+          // Backup PIN Input
+          TextField(
+            controller: _backupPinController,
+            style: GoogleFonts.robotoMono(color: Colors.white, fontSize: 18),
+            textAlign: TextAlign.center,
+            keyboardType: TextInputType.text,
+            maxLength: 20, // Increased length and changed type
+            decoration: InputDecoration(
+              hintText: 'XXX-XXX-XXX',
+              hintStyle: GoogleFonts.robotoMono(color: Colors.white24),
+              filled: true,
+              fillColor: Colors.white.withOpacity(0.05),
+              counterText: "",
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide.none,
+              ),
+              contentPadding: const EdgeInsets.symmetric(vertical: 16),
+              errorText: _showError ? widget.l10n.invalidBackupPin : null,
+              errorStyle: GoogleFonts.cairo(color: Colors.redAccent),
+            ),
+            onChanged: (_) {
+              if (_showError) {
+                setState(() {
+                  _showError = false;
+                });
+              }
+            },
+          ),
+
+          const SizedBox(height: 24),
+
+          // Verify Button
+          GestureDetector(
+            onTap: _verifyBackupPin,
+            child: Container(
+              width: double.infinity,
+              padding: const EdgeInsets.symmetric(vertical: 16),
+              decoration: BoxDecoration(
+                gradient: const LinearGradient(
+                  colors: [Color(0xFF667EEA), Color(0xFF764BA2)],
+                ),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Center(
+                child: Text(
+                  widget.l10n.verifyAndReset,
+                  style: GoogleFonts.cairo(
+                    fontSize: 16,
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ),
+          ),
+
+          const SizedBox(height: 16),
+
+          // Cancel Button
+          TextButton(
+            onPressed: widget.onCancel,
+            child: Text(
+              widget.l10n.cancel,
+              style: GoogleFonts.cairo(color: Colors.white60, fontSize: 14),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

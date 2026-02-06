@@ -122,7 +122,9 @@ class GlobalSettings {
       hideAppIcon: map['hideAppIcon'] as bool? ?? false,
       stealthMode: map['stealthMode'] as bool? ?? false,
       hasCompletedOnboarding: map['hasCompletedOnboarding'] as bool? ?? false,
-      encryptionSalt: map['encryptionSalt'] as List<int>?,
+      encryptionSalt: (map['encryptionSalt'] as List?)
+          ?.map((e) => e as int)
+          .toList(),
     );
   }
 
